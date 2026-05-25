@@ -2,32 +2,28 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Marathon 🏃">
+  <meta name="apple-mobile-web-app-title" content="Marathon">
   <meta name="theme-color" content="#0a0f1e">
-  <title>🏃 Suivi Marathon Venise</title>
-  <link rel="manifest" href="manifest.json">
+  <title>Suivi Marathon Venise 🏃</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0a0f1e; font-family: Georgia, serif; }
-    input, button, textarea { font-family: Georgia, serif; }
-    input:focus { outline: none; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#0a0f1e;font-family:Georgia,serif}
+    input,button,textarea{font-family:Georgia,serif}
+    #root{min-height:100vh}
   </style>
 </head>
 <body>
-  <div id="root"></div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.8.0/Recharts.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-  <script type="text/babel" data-presets="react">
+<div id="root"><div style="display:flex;align-items:center;justify-content:center;min-height:100vh;color:#94a3b8;font-size:18px">Chargement 🏃...</div></div>
+<script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.23.10/babel.min.js" crossorigin></script>
+<script type="text/babel" data-type="module">
 const { useState, useEffect } = React;
-const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } = Recharts;
-
-
-
+const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } = Recharts;
 
 // ── PLAN (déficit & poids cible par semaine) ──────────────────────────────────
 // cibleKcalJours : objectif calorique par jour [Lun, Mar, Mer, Jeu, Ven, Sam, Dim]
@@ -364,19 +360,17 @@ function App() {
   const [showImport, setShowImport] = useState(false);
   const [copyMsg, setCopyMsg] = useState("");
 
-  // Load from localStorage
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("suivi-marathon-v1");
+      const saved = localStorage.getItem("suivi-v1");
       if (saved) setData(JSON.parse(saved));
-    } catch {}
+    } catch(e) {}
     setLoaded(true);
   }, []);
 
-  // Save to localStorage
   const save = (newData) => {
     setData(newData);
-    try { localStorage.setItem("suivi-marathon-v1", JSON.stringify(newData)); } catch {}
+    try { localStorage.setItem("suivi-v1", JSON.stringify(newData)); } catch(e) {}
   };
 
   // Export — copier dans le presse-papier
@@ -1043,8 +1037,7 @@ function App() {
   );
 }
 
-
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
-  </script>
+</script>
 </body>
 </html>
