@@ -13,17 +13,51 @@
     body{background:#0a0f1e;font-family:Georgia,serif}
     input,button,textarea{font-family:Georgia,serif}
     #root{min-height:100vh}
+    #loading{display:flex;align-items:center;justify-content:center;min-height:100vh;color:#94a3b8;font-size:18px;flex-direction:column;gap:16px}
   </style>
 </head>
 <body>
-<div id="root"><div style="display:flex;align-items:center;justify-content:center;min-height:100vh;color:#94a3b8;font-size:18px">Chargement 🏃...</div></div>
-<script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js" crossorigin></script>
-<script src="https://unpkg.com/@babel/standalone@7.23.10/babel.min.js" crossorigin></script>
-<script type="text/babel" data-type="module">
+<div id="loading">
+  <div>🏃 Chargement...</div>
+  <div style="font-size:13px;color:#475569">Première ouverture : peut prendre 10-15 secondes</div>
+</div>
+<div id="root" style="display:none"></div>
+<script>
+var scripts = [
+  "https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js",
+  "https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js",
+  "https://cdnjs.cloudflare.com/ajax/libs/recharts/2.8.0/Recharts.js",
+  "https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"
+];
+var idx = 0;
+function loadNext() {
+  if (idx >= scripts.length) { startApp(); return; }
+  var s = document.createElement('script');
+  s.src = scripts[idx++];
+  s.onload = loadNext;
+  s.onerror = function() {
+    document.getElementById('loading').innerHTML = '<div>❌ Erreur réseau</div><div style="font-size:13px;color:#64748b">Vérifie ta connexion et recharge</div>';
+  };
+  document.head.appendChild(s);
+}
+function startApp() {
+  try {
+    var appCode = document.getElementById('app-code').textContent;
+    var transformed = Babel.transform(appCode, { presets: ['react'] }).code;
+    eval(transformed);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('root').style.display = 'block';
+  } catch(e) {
+    document.getElementById('loading').innerHTML = '<div>❌ Erreur: ' + e.message.substring(0,120) + '</div>';
+    console.error(e);
+  }
+}
+loadNext();
+</script>
+<script id="app-code" type="text/plain">
 const { useState, useEffect } = React;
 const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } = Recharts;
+
 
 // ── PLAN (déficit & poids cible par semaine) ──────────────────────────────────
 // cibleKcalJours : objectif calorique par jour [Lun, Mar, Mer, Jeu, Ven, Sam, Dim]
@@ -81,6 +115,7 @@ const PHASE_COLORS = {
 
 const EMPTY_JOUR = () => ({
   sportFait: "",
+  garminKcal: "",
   kCalTotales: "",
   petitDejText: "", dejeunerText: "", collationText: "", dinerText: "",
   petitDejMacros: null, dejeunerMacros: null, collationMacros: null, dinerMacros: null,
@@ -124,7 +159,7 @@ function getCibleKcalDynamique(plan, planningSport) {
 }
 
 // ── NUTRITION PANEL with AI macro calculation ─────────────────────────────────
-function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, updateJour }) {
+function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJour, updateJour }) {
   const [inputText, setInputText] = useState({
     petitDej: jour.petitDejText || "",
     dejeuner: jour.dejeunerText || "",
@@ -188,13 +223,78 @@ Arrondis à l'entier. Si une quantité n'est pas précisée, utilise une portion
   const totalManuel = parseFloat(jour.kCalTotales) || 0;
   const totalEffectif = totalManuel > 0 ? totalManuel : totaux.kcal;
   const hasTotaux = totalEffectif > 0;
-  const kcalOk = hasTotaux && totalEffectif <= cibleKcal + 80;
+  const garminVal = parseFloat(jour.garminKcal) || 0;
+  const budgetEffectif = garminVal > 0 ? Math.round(garminVal - (deficitCibleJour || 0)) : cibleKcal;
+  const kcalOk = hasTotaux && totalEffectif <= budgetEffectif + 80;
 
   return (
     <div style={{ background: "#1e293b", borderRadius: 14, padding: "16px 20px", border: "1px solid #334155" }}>
+      {/* Budget calorique dynamique */}
+      {(() => {
+        const garmin = parseFloat(jour.garminKcal) || 0;
+        const budgetMax = garmin > 0
+          ? Math.round(garmin - deficitCibleJour)
+          : cibleKcal;
+        const totalMange = totalEffectif;
+        const restant = budgetMax - totalMange;
+        return (
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap" }}>
+              <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>
+                🍽️ Nutrition
+              </div>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {garmin > 0 ? (
+                  <>
+                    <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 11, background: "#10b98122", color: "#10b981" }}>
+                      ⌚ Brûlé : {garmin} kcal
+                    </span>
+                    <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 11, background: "#f59e0b22", color: "#f59e0b" }}>
+                      🎯 Déficit visé : {deficitCibleJour} kcal
+                    </span>
+                    <span style={{
+                      padding: "2px 8px", borderRadius: 6, fontSize: 11, fontWeight: 700,
+                      background: "#6366f122", color: "#6366f1",
+                    }}>
+                      💡 Budget : {budgetMax} kcal
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 11, background: "#6366f122", color: "#6366f1" }}>
+                      🎯 Objectif : {cibleKcal} kcal
+                    </span>
+                    <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 11, background: "#334155", color: "#64748b" }}>
+                      ⌚ Saisis Garmin pour budget réel
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+            {totalMange > 0 && (
+              <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ flex: 1, background: "#0f172a", borderRadius: 99, height: 6, overflow: "hidden" }}>
+                  <div style={{
+                    height: "100%", borderRadius: 99,
+                    width: `${Math.min((totalMange / budgetMax) * 100, 100)}%`,
+                    background: totalMange > budgetMax ? "#ef4444" : totalMange > budgetMax * 0.9 ? "#f59e0b" : "#10b981",
+                    transition: "width 0.3s",
+                  }} />
+                </div>
+                <span style={{
+                  fontSize: 12, fontWeight: 700, whiteSpace: "nowrap",
+                  color: totalMange > budgetMax ? "#ef4444" : totalMange > budgetMax * 0.9 ? "#f59e0b" : "#10b981",
+                }}>
+                  {totalMange} / {budgetMax} kcal
+                  {restant >= 0 ? ` · reste ${restant}` : ` · dépassé ${Math.abs(restant)}`}
+                </span>
+              </div>
+            )}
+          </div>
+        );
+      })()}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
         <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>
-          🍽️ Nutrition · objectif <span style={{ color: "#6366f1" }}>{cibleKcal} kcal</span>
         </div>
         {hasTotaux && (
           <span style={{
@@ -362,7 +462,7 @@ function App() {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("suivi-v1");
+      const saved = localStorage.getItem("suivi-marathon-v1");
       if (saved) setData(JSON.parse(saved));
     } catch(e) {}
     setLoaded(true);
@@ -370,7 +470,7 @@ function App() {
 
   const save = (newData) => {
     setData(newData);
-    try { localStorage.setItem("suivi-v1", JSON.stringify(newData)); } catch(e) {}
+    try { localStorage.setItem("suivi-marathon-v1", JSON.stringify(newData)); } catch(e) {}
   };
 
   // Export — copier dans le presse-papier
@@ -478,20 +578,36 @@ function App() {
 
     // Déficit réel = somme kcal brûlées estimées - kcal mangées (sur jours avec données)
     const deficitCible = DEFICIT_CIBLE[s] || 0;
-    // Déficit réel approx: (TDEE_base/jour * nb_jours_saisis + sport estimé) - kcal mangées
-    // Simplifié : on compare apport cible semaine vs apport réel saisi
-    const apportCibleSem = cibleKcalDyn.reduce((a, b) => a + b, 0);
+
+    // Calories brûlées Garmin par jour
+    const garminKcals = joursData.map(j => parseFloat(j.garminKcal) || null);
+    const garminValides = garminKcals.filter(k => k !== null);
+    const totalGarminSem = garminValides.length > 0
+      ? Math.round(garminValides.reduce((a, b) => a + b, 0) / garminValides.length * 7)
+      : null;
+
+    // Calories mangées
     const apportReelSem = kcalsValides.length === 7
       ? kcalsValides.reduce((a, b) => a + b, 0)
       : kcalsValides.length > 0
         ? Math.round(kcalsValides.reduce((a, b) => a + b, 0) / kcalsValides.length * 7)
         : null;
-    const deficitReel = apportReelSem !== null
-      ? Math.round(apportCibleSem + deficitCible - apportReelSem)
-      : null;
+
+    // Déficit réel = calories brûlées Garmin - calories mangées (si Garmin dispo)
+    // Sinon fallback sur calcul théorique
+    const apportCibleSem = cibleKcalDyn.reduce((a, b) => a + b, 0);
+    let deficitReel = null;
+    let deficitSource = "théorique";
+    if (totalGarminSem !== null && apportReelSem !== null) {
+      deficitReel = Math.round(totalGarminSem - apportReelSem);
+      deficitSource = "garmin";
+    } else if (apportReelSem !== null) {
+      deficitReel = Math.round(apportCibleSem + deficitCible - apportReelSem);
+      deficitSource = "estimé";
+    }
     const deficitOk = deficitReel !== null && deficitReel >= deficitCible * 0.85;
 
-    return { poids, poidsOk, moyKcal, cibleMoyenne, kcalOk: deficitOk, faitSessions, planSessions, sportOk, joursOk, deficitCible, deficitReel, deficitOk };
+    return { poids, poidsOk, moyKcal, cibleMoyenne, kcalOk: deficitOk, faitSessions, planSessions, sportOk, joursOk, deficitCible, deficitReel, deficitOk, deficitSource, totalGarminSem };
   };
 
   const plan = PLAN[activeSem - 1];
@@ -718,6 +834,38 @@ function App() {
                         fontFamily: "inherit", boxSizing: "border-box",
                       }}
                     />
+                    <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ fontSize: 20 }}>⌚</span>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 11, color: "#64748b", marginBottom: 4 }}>
+                          Calories brûlées Garmin (total journée)
+                        </div>
+                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                          <input
+                            type="number"
+                            value={j.garminKcal}
+                            onChange={e => updateJour(activeSem, activeJour, "garminKcal", e.target.value)}
+                            placeholder="ex: 2 150"
+                            style={{
+                              width: 130, padding: "8px 12px", borderRadius: 8,
+                              border: `1.5px solid ${j.garminKcal ? "#10b981" : "#334155"}`,
+                              background: "#0f172a", color: "#f8fafc", fontSize: 13,
+                              fontFamily: "inherit",
+                            }}
+                          />
+                          <span style={{ fontSize: 12, color: "#64748b" }}>kcal</span>
+                          {j.garminKcal && j.kCalTotales && (
+                            <span style={{
+                              fontSize: 12, padding: "3px 8px", borderRadius: 6,
+                              background: parseFloat(j.garminKcal) - parseFloat(j.kCalTotales || 0) > 0 ? "#064e3b" : "#450a0a",
+                              color: parseFloat(j.garminKcal) - parseFloat(j.kCalTotales || 0) > 0 ? "#6ee7b7" : "#fca5a5",
+                            }}>
+                              Déficit : {Math.round(parseFloat(j.garminKcal) - parseFloat(j.kCalTotales || 0))} kcal
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Nutrition avec saisie texte + calcul IA */}
@@ -726,6 +874,7 @@ function App() {
                     activeJour={activeJour}
                     activeSem={activeSem}
                     cibleKcal={getCibleKcalDynamique(plan, week.planningSport)[activeJour]}
+                    deficitCibleJour={Math.round((DEFICIT_CIBLE[activeSem] || 0) / 7)}
                     updateJour={updateJour}
                   />
                 </div>
@@ -817,11 +966,16 @@ function App() {
                       {/* Déficit réel */}
                       <td style={{ padding: "10px 8px", textAlign: "center" }}>
                         {hasData && k.deficitReel !== null ? (
-                          <span style={{
-                            padding: "2px 8px", borderRadius: 6, fontSize: 12,
-                            background: k.deficitOk ? "#064e3b" : "#450a0a",
-                            color: k.deficitOk ? "#6ee7b7" : "#fca5a5",
-                          }}>{k.deficitReel} kcal</span>
+                          <div>
+                            <span style={{
+                              padding: "2px 8px", borderRadius: 6, fontSize: 12,
+                              background: k.deficitOk ? "#064e3b" : "#450a0a",
+                              color: k.deficitOk ? "#6ee7b7" : "#fca5a5",
+                            }}>{k.deficitReel} kcal</span>
+                            <div style={{ fontSize: 10, color: k.deficitSource === "garmin" ? "#10b981" : "#64748b", marginTop: 2 }}>
+                              {k.deficitSource === "garmin" ? "⌚ Garmin" : k.deficitSource === "estimé" ? "~ estimé" : ""}
+                            </div>
+                          </div>
                         ) : <span style={{ color: "#334155" }}>—</span>}
                       </td>
                       {/* Sport */}
@@ -1036,6 +1190,7 @@ function App() {
     </div>
   );
 }
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
 </script>
