@@ -562,17 +562,33 @@ function App() {
     const faitSessions = joursData.filter(j => j.sportFait.trim() !== "").length;
     const sportOk = planSessions === 0 ? null : faitSessions >= planSessions;
 
-    // Par jour : vert si kcal ok selon cible du JOUR et sport planifié fait
+    // Par jour : vert si déficit du jour atteint
+    // déficit jour = garmin brûlé - kcal mangées >= déficit cible journalier
+    const deficitCibleJour = Math.round((DEFICIT_CIBLE[s] || 0) / 7);
     const joursOk = joursData.map((j, i) => {
       const kcal = kcals[i];
+      const garmin = parseFloat(j.garminKcal) || null;
       const cibleJour = cibleKcalDyn[i];
       const planSport = w.planningSport[i]?.trim() !== "";
       const faitSport = j.sportFait.trim() !== "";
-      const kcalJourOk = kcal !== null && kcal <= cibleJour + 80;
-      if (!kcal && !planSport) return null;
+
+      if (!kcal && !planSport) return null; // pas de données
+
+      // Sport planifié mais pas fait → rouge
       if (planSport && !faitSport) return false;
-      if (kcal && !kcalJourOk) return false;
-      if (kcal || faitSport) return true;
+
+      if (kcal) {
+        if (garmin !== null) {
+          // On a Garmin : on vérifie le déficit réel du jour
+          const deficitJour = garmin - kcal;
+          return deficitJour >= deficitCibleJour - 50;
+        } else {
+          // Pas de Garmin : on compare aux calories cibles du jour
+          return kcal <= cibleJour + 80;
+        }
+      }
+
+      if (faitSport) return true;
       return null;
     });
 
