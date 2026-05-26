@@ -26,7 +26,6 @@
 var scripts = [
   "https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js",
   "https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js",
-  "https://cdnjs.cloudflare.com/ajax/libs/recharts/2.8.0/Recharts.js",
   "https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"
 ];
 var idx = 0;
@@ -56,7 +55,6 @@ loadNext();
 </script>
 <script id="app-code" type="text/plain">
 const { useState, useEffect } = React;
-const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } = Recharts;
 
 
 // ── PLAN (déficit & poids cible par semaine) ──────────────────────────────────
@@ -1025,20 +1023,19 @@ function App() {
                   Saisis au moins 2 semaines de données pour voir le graphique
                 </div>
               ) : (
-                <ResponsiveContainer width="100%" height={220}>
-                  <LineChart data={PLAN.map(p => {
+                <SimpleLineChart
+                  height={220}
+                  yMin={62} yMax={71}
+                  data={PLAN.map(p => {
                     const w = getWeek(p.sem);
                     const poids = parseFloat(w.poidsLundi) || null;
-                    return { sem: `S${p.sem}`, cible: p.ciblePoids, reel: poids };
-                  })}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="sem" stroke="#64748b" fontSize={11} />
-                    <YAxis domain={[62, 71]} stroke="#64748b" fontSize={11} />
-                    <Tooltip contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 8, fontSize: 12 }} />
-                    <Line type="monotone" dataKey="cible" stroke="#334155" strokeDasharray="4 4" dot={false} name="Objectif" />
-                    <Line type="monotone" dataKey="reel" stroke="#6366f1" strokeWidth={2} dot={{ fill: "#6366f1", r: 4 }} connectNulls={false} name="Réel" />
-                  </LineChart>
-                </ResponsiveContainer>
+                    return { sem: 'S'+p.sem, cible: p.ciblePoids, reel: poids };
+                  })}
+                  lines={[
+                    { key: 'cible', color: '#334155' },
+                    { key: 'reel', color: '#6366f1' },
+                  ]}
+                />
               )}
             </div>
 
@@ -1052,20 +1049,19 @@ function App() {
                   Saisis au moins 2 semaines de données pour voir le graphique
                 </div>
               ) : (
-                <ResponsiveContainer width="100%" height={220}>
-                  <LineChart data={PLAN.map(p => {
+                <SimpleLineChart
+                  height={220}
+                  yMin={1400} yMax={2100}
+                  data={PLAN.map(p => {
                     const k = kpiSem(p.sem);
                     const cibleMoy = Math.round(p.cibleKcalJours.reduce((a, b) => a + b, 0) / 7);
-                    return { sem: `S${p.sem}`, cible: cibleMoy, reel: k.moyKcal };
-                  })}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="sem" stroke="#64748b" fontSize={11} />
-                    <YAxis domain={[1400, 2100]} stroke="#64748b" fontSize={11} />
-                    <Tooltip contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 8, fontSize: 12 }} />
-                    <Line type="monotone" dataKey="cible" stroke="#334155" strokeDasharray="4 4" dot={false} name="Objectif" />
-                    <Line type="monotone" dataKey="reel" stroke="#10b981" strokeWidth={2} dot={{ fill: "#10b981", r: 4 }} connectNulls={false} name="Réel" />
-                  </LineChart>
-                </ResponsiveContainer>
+                    return { sem: 'S'+p.sem, cible: cibleMoy, reel: k.moyKcal };
+                  })}
+                  lines={[
+                    { key: 'cible', color: '#334155' },
+                    { key: 'reel', color: '#10b981' },
+                  ]}
+                />
               )}
             </div>
 
