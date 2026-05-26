@@ -726,9 +726,9 @@ function App() {
                     width: 38, height: 38, borderRadius: 8, border: "none",
                     fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                     background: activeSem === p.sem ? "#6366f1"
-                      : hasData ? (k.poidsOk && k.kcalOk && k.sportOk !== false ? "#064e3b" : "#450a0a")
-                      : "#1e293b",
-                    color: activeSem === p.sem ? "white" : hasData ? "#d1fae5" : "#64748b",
+                      : !hasData ? "#1e293b"
+                      : (k.poidsOk === false || k.kcalOk === false || k.sportOk === false)
+                        ? "#450a0a" : "#064e3b",
                     outline: activeSem === p.sem ? "2px solid #818cf8" : "none",
                   }}>S{p.sem}</button>
                 );
