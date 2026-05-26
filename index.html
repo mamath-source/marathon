@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Marathon">
+  <meta name="apple-mobile-web-app-title" content="Marathon Venise">
   <meta name="theme-color" content="#0a0f1e">
+  <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iIzBmMTcyYSIvPjxjaXJjbGUgY3g9IjMyMCIgY3k9IjEwMCIgcj0iNDUiIGZpbGw9IiM2MzY2ZjEiLz48cGF0aCBkPSJNMjgwIDE1NSBMMjIwIDI4MCBMMjYwIDI4MCBMMjAwIDQyMCBMMzIwIDI4MCBMMjc1IDI4MCBMMzQwIDE1NSBaIiBmaWxsPSIjNjM2NmYxIi8+PHBhdGggZD0iTTE4MCAyMDAgUTE2MCAyNjAgMTgwIDMyMCIgc3Ryb2tlPSIjMTBiOTgxIiBzdHJva2Utd2lkdGg9IjE4IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMzQwIDIwMCBRMzcwIDI2MCAzNDAgMzIwIiBzdHJva2U9IiMxMGI5ODEiIHN0cm9rZS13aWR0aD0iMTgiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjx0ZXh0IHg9IjI1NiIgeT0iNDgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjQ4IiBmb250LWZhbWlseT0iR2VvcmdpYSI+VmVuaXNlIDI1LjEwPC90ZXh0Pjwvc3ZnPg==">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iIzBmMTcyYSIvPjxjaXJjbGUgY3g9IjMyMCIgY3k9IjEwMCIgcj0iNDUiIGZpbGw9IiM2MzY2ZjEiLz48cGF0aCBkPSJNMjgwIDE1NSBMMjIwIDI4MCBMMjYwIDI4MCBMMjAwIDQyMCBMMzIwIDI4MCBMMjc1IDI4MCBMMzQwIDE1NSBaIiBmaWxsPSIjNjM2NmYxIi8+PHBhdGggZD0iTTE4MCAyMDAgUTE2MCAyNjAgMTgwIDMyMCIgc3Ryb2tlPSIjMTBiOTgxIiBzdHJva2Utd2lkdGg9IjE4IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMzQwIDIwMCBRMzcwIDI2MCAzNDAgMzIwIiBzdHJva2U9IiMxMGI5ODEiIHN0cm9rZS13aWR0aD0iMTgiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjx0ZXh0IHg9IjI1NiIgeT0iNDgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjQ4IiBmb250LWZhbWlseT0iR2VvcmdpYSI+VmVuaXNlIDI1LjEwPC90ZXh0Pjwvc3ZnPg==">
   <title>Suivi Marathon Venise 🏃</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
@@ -19,7 +21,7 @@
 <body>
 <div id="loading">
   <div>🏃 Chargement...</div>
-  <div style="font-size:13px;color:#475569">Première ouverture : peut prendre 10-15 secondes</div>
+  <div style="font-size:13px;color:#475569">Première ouverture : 10-15 secondes</div>
 </div>
 <div id="root" style="display:none"></div>
 <script>
@@ -912,7 +914,8 @@ function App() {
                 <tr>
                   <th style={{ padding: "8px 12px", textAlign: "left", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>Semaine</th>
                   <th style={{ padding: "8px 12px", textAlign: "left", color: "#64748b", borderBottom: "1px solid #1e293b" }}>Phase</th>
-                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b" }}>⚖️ Poids</th>
+                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b" }}>⚖️ Poids réel</th>
+                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>📉 Poids estimé</th>
                   <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🔥 Déficit cible</th>
                   <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🍽️ Déficit réel</th>
                   <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b" }}>🏃 Sport</th>
@@ -945,7 +948,7 @@ function App() {
                           color: PHASE_COLORS[p.phase],
                         }}>{p.phase}</span>
                       </td>
-                      {/* Poids */}
+                      {/* Poids réel */}
                       <td style={{ padding: "10px 8px", textAlign: "center" }}>
                         {hasData ? (
                           <span style={{
@@ -954,6 +957,10 @@ function App() {
                             color: k.poidsOk ? "#6ee7b7" : k.poids ? "#fca5a5" : "#64748b",
                           }}>{k.poids ? `${k.poids} kg` : "—"}</span>
                         ) : <span style={{ color: "#334155" }}>—</span>}
+                      </td>
+                      {/* Poids estimé selon plan */}
+                      <td style={{ padding: "10px 8px", textAlign: "center" }}>
+                        <span style={{ fontSize: 12, color: "#475569" }}>{p.ciblePoids} kg</span>
                       </td>
                       {/* Déficit cible */}
                       <td style={{ padding: "10px 8px", textAlign: "center" }}>
@@ -1023,18 +1030,9 @@ function App() {
                   Saisis au moins 2 semaines de données pour voir le graphique
                 </div>
               ) : (
-                <SimpleLineChart
-                  height={220}
-                  yMin={62} yMax={71}
-                  data={PLAN.map(p => {
-                    const w = getWeek(p.sem);
-                    const poids = parseFloat(w.poidsLundi) || null;
-                    return { sem: 'S'+p.sem, cible: p.ciblePoids, reel: poids };
-                  })}
-                  lines={[
-                    { key: 'cible', color: '#334155' },
-                    { key: 'reel', color: '#6366f1' },
-                  ]}
+                <SimpleLineChart height={220} yMin={62} yMax={71}
+                  data={PLAN.map(p => { const w = getWeek(p.sem); return { sem: 'S'+p.sem, cible: p.ciblePoids, reel: parseFloat(w.poidsLundi)||null }; })}
+                  lines={[{key:'cible',color:'#334155'},{key:'reel',color:'#6366f1'}]}
                 />
               )}
             </div>
@@ -1049,18 +1047,9 @@ function App() {
                   Saisis au moins 2 semaines de données pour voir le graphique
                 </div>
               ) : (
-                <SimpleLineChart
-                  height={220}
-                  yMin={1400} yMax={2100}
-                  data={PLAN.map(p => {
-                    const k = kpiSem(p.sem);
-                    const cibleMoy = Math.round(p.cibleKcalJours.reduce((a, b) => a + b, 0) / 7);
-                    return { sem: 'S'+p.sem, cible: cibleMoy, reel: k.moyKcal };
-                  })}
-                  lines={[
-                    { key: 'cible', color: '#334155' },
-                    { key: 'reel', color: '#10b981' },
-                  ]}
+                <SimpleLineChart height={220} yMin={1400} yMax={2100}
+                  data={PLAN.map(p => { const k = kpiSem(p.sem); return { sem: 'S'+p.sem, cible: Math.round(p.cibleKcalJours.reduce((a,b)=>a+b,0)/7), reel: k.moyKcal }; })}
+                  lines={[{key:'cible',color:'#334155'},{key:'reel',color:'#10b981'}]}
                 />
               )}
             </div>
