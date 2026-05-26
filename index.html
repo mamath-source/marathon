@@ -712,7 +712,15 @@ function App() {
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
               {PLAN.map(p => {
                 const k = kpiSem(p.sem);
-                const hasData = data[p.sem] !== undefined;
+                const hasData = (() => {
+                  const w = data[p.sem];
+                  if (!w) return false;
+                  if (w.poidsLundi) return true;
+                  if (w.planningSport?.some(s => s?.trim())) return true;
+                  if (w.jours?.some(j => j.sportFait?.trim() || j.garminKcal?.trim() || j.kCalTotales?.trim() ||
+                    j.petitDejMacros || j.dejeunerMacros || j.collationMacros || j.dinerMacros)) return true;
+                  return false;
+                })();
                 return (
                   <button key={p.sem} onClick={() => setActiveSem(p.sem)} style={{
                     width: 38, height: 38, borderRadius: 8, border: "none",
@@ -943,7 +951,15 @@ function App() {
               <tbody>
                 {PLAN.map(p => {
                   const k = kpiSem(p.sem);
-                  const hasData = data[p.sem] !== undefined;
+                  const hasData = (() => {
+                  const w = data[p.sem];
+                  if (!w) return false;
+                  if (w.poidsLundi) return true;
+                  if (w.planningSport?.some(s => s?.trim())) return true;
+                  if (w.jours?.some(j => j.sportFait?.trim() || j.garminKcal?.trim() || j.kCalTotales?.trim() ||
+                    j.petitDejMacros || j.dejeunerMacros || j.collationMacros || j.dinerMacros)) return true;
+                  return false;
+                })();
                   const isActive = p.sem === activeSem;
                   return (
                     <tr key={p.sem}
