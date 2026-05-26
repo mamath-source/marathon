@@ -473,20 +473,6 @@ function App() {
     try { localStorage.setItem("suivi-marathon-v1", JSON.stringify(newData)); } catch(e) {}
   };
 
-  const resetAll = () => {
-    if (!window.confirm("Effacer toutes les données ?")) return;
-    try { localStorage.removeItem("suivi-marathon-v1"); } catch {}
-    save({});
-    setCopyMsg("✅ Toutes les données effacées !");
-  };
-
-  const resetWeek = (sem) => {
-    const newData = { ...data };
-    delete newData[sem];
-    save(newData);
-    setCopyMsg("✅ Semaine S" + sem + " réinitialisée !");
-  };
-
   // Export — copier dans le presse-papier
   const exportData = async () => {
     const txt = JSON.stringify(data);
@@ -712,11 +698,6 @@ function App() {
                 fontFamily: "inherit", border: "1px solid #334155",
                 background: "transparent", color: "#f59e0b",
               }}>📂 Charger</button>
-              <button onClick={resetAll} style={{
-                padding: "7px 14px", borderRadius: 8, fontSize: 13, cursor: "pointer",
-                fontFamily: "inherit", border: "1px solid #450a0a",
-                background: "transparent", color: "#ef4444",
-              }}>🗑 Reset</button>
             </div>
           </div>
         </div>
@@ -731,23 +712,15 @@ function App() {
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
               {PLAN.map(p => {
                 const k = kpiSem(p.sem);
-                const hasData = (() => {
-                  const w = data[p.sem];
-                  if (!w) return false;
-                  if (w.poidsLundi) return true;
-                  if (w.planningSport?.some(s => s?.trim())) return true;
-                  if (w.jours?.some(j => j.sportFait?.trim() || j.garminKcal?.trim() || j.kCalTotales?.trim() ||
-                    j.petitDejMacros || j.dejeunerMacros || j.collationMacros || j.dinerMacros)) return true;
-                  return false;
-                })();
+                const hasData = data[p.sem] !== undefined;
                 return (
                   <button key={p.sem} onClick={() => setActiveSem(p.sem)} style={{
                     width: 38, height: 38, borderRadius: 8, border: "none",
                     fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                     background: activeSem === p.sem ? "#6366f1"
-                      : !hasData ? "#1e293b"
-                      : (k.poidsOk === false || k.kcalOk === false || k.sportOk === false)
-                        ? "#450a0a" : "#064e3b",
+                      : hasData ? (k.poidsOk && k.kcalOk && k.sportOk !== false ? "#064e3b" : "#450a0a")
+                      : "#1e293b",
+                    color: activeSem === p.sem ? "white" : hasData ? "#d1fae5" : "#64748b",
                     outline: activeSem === p.sem ? "2px solid #818cf8" : "none",
                   }}>S{p.sem}</button>
                 );
@@ -805,10 +778,6 @@ function App() {
                 />
                 <span style={{ fontSize: 13, color: "#64748b" }}>kg</span>
                 {kpi.poids && badge(kpi.poidsOk, kpi.poidsOk ? `✓ ${kpi.poids} kg` : `✗ ${kpi.poids} kg`)}
-              <button onClick={() => resetWeek(activeSem)} style={{
-                marginLeft: "auto", padding: "4px 10px", borderRadius: 6, border: "1px solid #450a0a",
-                background: "transparent", color: "#ef4444", fontSize: 11, cursor: "pointer", fontFamily: "inherit",
-              }}>🗑 Réinit. semaine</button>
               </div>
             </div>
 
@@ -974,15 +943,7 @@ function App() {
               <tbody>
                 {PLAN.map(p => {
                   const k = kpiSem(p.sem);
-                  const hasData = (() => {
-                  const w = data[p.sem];
-                  if (!w) return false;
-                  if (w.poidsLundi) return true;
-                  if (w.planningSport?.some(s => s?.trim())) return true;
-                  if (w.jours?.some(j => j.sportFait?.trim() || j.garminKcal?.trim() || j.kCalTotales?.trim() ||
-                    j.petitDejMacros || j.dejeunerMacros || j.collationMacros || j.dinerMacros)) return true;
-                  return false;
-                })();
+                  const hasData = data[p.sem] !== undefined;
                   const isActive = p.sem === activeSem;
                   return (
                     <tr key={p.sem}
