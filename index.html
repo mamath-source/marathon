@@ -230,50 +230,20 @@ function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJo
         </div>
       )}
 
-      {/* Saisie par repas */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12 }}>
-        {repas.map(r => {
-          const val = jour[r.key]?.kcal || "";
-          return (
-            <div key={r.key}>
-              <div style={{ fontSize: 11, color: "#64748b", marginBottom: 4 }}>{r.label}</div>
-              <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
-                <input type="number"
-                  value={val}
-                  onChange={e => {
-                    const v = parseInt(e.target.value) || 0;
-                    updateJour(activeSem, activeJour, r.key, v > 0 ? { kcal: v, prot: 0, gluc: 0, lip: 0 } : null);
-                  }}
-                  placeholder="kcal"
-                  style={{
-                    flex: 1, padding: "8px 8px", borderRadius: 8,
-                    border: `1px solid ${val ? "#6366f1" : "#334155"}`,
-                    background: "#0f172a", color: "#f8fafc", fontSize: 13, fontFamily: "inherit",
-                  }}
-                />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Total journée direct */}
-      <div style={{ borderTop: "1px solid #1e293b", paddingTop: 12, display: "flex", alignItems: "center", gap: 8 }}>
-        <span style={{ fontSize: 12, color: "#64748b", whiteSpace: "nowrap" }}>📅 Total journée</span>
+      {/* Total journée uniquement */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
+        <span style={{ fontSize: 13, color: "#94a3b8", whiteSpace: "nowrap" }}>📅 Calories du jour</span>
         <input type="number"
           value={jour.kCalTotales}
           onChange={e => updateJour(activeSem, activeJour, "kCalTotales", e.target.value)}
-          placeholder="ou total direct"
+          placeholder="ex: 1650"
           style={{
-            width: 120, padding: "8px 10px", borderRadius: 8,
+            width: 130, padding: "10px 14px", borderRadius: 8,
             border: `1.5px solid ${jour.kCalTotales ? "#10b981" : "#334155"}`,
-            background: "#0f172a", color: "#f8fafc", fontSize: 13, fontFamily: "inherit",
+            background: "#0f172a", color: "#f8fafc", fontSize: 15, fontFamily: "inherit",
           }}
         />
-        <span style={{ fontSize: 12, color: "#64748b" }}>kcal</span>
-        {sommeRepas > 0 && !totalManuel && (
-          <span style={{ fontSize: 11, color: "#6366f1" }}>Somme : {sommeRepas} kcal</span>
-        )}
+        <span style={{ fontSize: 13, color: "#64748b" }}>kcal</span>
       </div>
     </div>
   );
@@ -313,6 +283,7 @@ function App() {
   };
 
   const resetWeek = (sem) => {
+    if (!window.confirm("Effacer toutes les données de S" + sem + " ? Cette action est irréversible.")) return;
     const newData = { ...data };
     delete newData[sem];
     save(newData);
@@ -539,11 +510,7 @@ function App() {
                 fontFamily: "inherit", border: "1px solid #334155",
                 background: "transparent", color: "#f59e0b",
               }}>📂 Charger</button>
-              <button onClick={resetAll} style={{
-                padding: "7px 14px", borderRadius: 8, fontSize: 13, cursor: "pointer",
-                fontFamily: "inherit", border: "1px solid #450a0a",
-                background: "transparent", color: "#ef4444",
-              }}>🗑 Reset</button>
+
             </div>
           </div>
         </div>
@@ -555,6 +522,48 @@ function App() {
         {activeTab === "saisie" && (
           <div>
             {/* Sélecteur semaine */}
+            {/* Compteur jours */}
+            {(() => {
+              const totalJours = 154;
+              const joursOk = PLAN.reduce((acc, p) => {
+                const w = getWeek(p.sem);
+                return acc + w.jours.filter(j => j.kCalTotales || j.garminKcal).length;
+              }, 0);
+              const pct = joursOk / totalJours;
+              const r = 44, cx = 52, cy = 52, stroke = 6;
+              const circ = 2 * Math.PI * r;
+              const dash = pct * circ;
+              const col = pct < 0.33 ? "#6366f1" : pct < 0.66 ? "#f59e0b" : "#10b981";
+              return (
+                <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20, padding: "12px 16px", background: "#1e293b", borderRadius: 14, border: "1px solid #334155" }}>
+                  <svg width={104} height={104}>
+                    <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1e293b" strokeWidth={stroke}/>
+                    <circle cx={cx} cy={cy} r={r} fill="none" stroke="#0f172a" strokeWidth={stroke+2}/>
+                    <circle cx={cx} cy={cy} r={r} fill="none" stroke={col} strokeWidth={stroke}
+                      strokeDasharray={`${dash} ${circ}`}
+                      strokeLinecap="round"
+                      transform={`rotate(-90 ${cx} ${cy})`}
+                      style={{ transition: "stroke-dasharray 0.5s ease" }}
+                    />
+                    <text x={cx} y={cy-6} textAnchor="middle" fill="#f8fafc" fontSize="16" fontWeight="bold">{joursOk}</text>
+                    <text x={cx} y={cy+10} textAnchor="middle" fill="#64748b" fontSize="11">/{totalJours}</text>
+                    <text x={cx} y={cy+24} textAnchor="middle" fill={col} fontSize="10">{Math.round(pct*100)}%</text>
+                  </svg>
+                  <div>
+                    <div style={{ fontSize: 15, color: "#f8fafc", fontWeight: 600 }}>Progression</div>
+                    <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 4 }}>
+                      {joursOk} jour{joursOk > 1 ? "s" : ""} saisi{joursOk > 1 ? "s" : ""}
+                    </div>
+                    <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
+                      sur {totalJours} jours au total
+                    </div>
+                    <div style={{ fontSize: 12, color: col, marginTop: 4, fontWeight: 600 }}>
+                      {totalJours - joursOk} jours restants
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
               {PLAN.map(p => {
                 const k = kpiSem(p.sem);
