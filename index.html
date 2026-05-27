@@ -412,25 +412,25 @@ function App() {
     // Déficit réel = somme kcal brûlées estimées - kcal mangées (sur jours avec données)
     const deficitCible = DEFICIT_CIBLE[s] || 0;
 
-    // Déficit réel : uniquement sur jours avec Garmin ET calories mangées
-    const joursAvecDeuxDonnees = joursData.filter((j, i) => {
-      const garmin = parseFloat(j.garminKcal);
-      const cal = kcals[i];
-      return !isNaN(garmin) && garmin > 0 && cal !== null;
-    });
-
+    // Déficit réel = somme cumulée des déficits journaliers (Garmin - calories)
+    // Uniquement sur les jours où les deux valeurs sont saisies
+    const apportCibleSem = cibleKcalDyn.reduce((a, b) => a + b, 0);
     let deficitReel = null;
     let deficitSource = "—";
-    const apportCibleSem = cibleKcalDyn.reduce((a, b) => a + b, 0);
+    let deficitCumul = 0;
+    let joursComplets = 0;
 
-    if (joursAvecDeuxDonnees.length > 0) {
-      // Calcul sur les jours avec données complètes, extrapolé à 7 jours
-      const deficitJours = joursAvecDeuxDonnees.map((j, idx) => {
-        const realIdx = joursData.indexOf(j);
-        return parseFloat(j.garminKcal) - (kcals[realIdx] || 0);
-      });
-      const moyDeficitJour = deficitJours.reduce((a, b) => a + b, 0) / deficitJours.length;
-      deficitReel = Math.round(moyDeficitJour * 7);
+    joursData.forEach((j, i) => {
+      const garmin = parseFloat(j.garminKcal);
+      const cal = parseFloat(j.kCalTotales) || kcals[i];
+      if (!isNaN(garmin) && garmin > 0 && cal !== null && cal > 0) {
+        deficitCumul += garmin - cal;
+        joursComplets++;
+      }
+    });
+
+    if (joursComplets > 0) {
+      deficitReel = Math.round(deficitCumul);
       deficitSource = "garmin";
     }
     const deficitOk = deficitReel !== null && deficitReel >= deficitCible * 0.85;
@@ -868,8 +868,8 @@ function App() {
                               background: k.deficitOk ? "#064e3b" : "#450a0a",
                               color: k.deficitOk ? "#6ee7b7" : "#fca5a5",
                             }}>{k.deficitReel} kcal</span>
-                            <div style={{ fontSize: 10, color: k.deficitSource === "garmin" ? "#10b981" : "#64748b", marginTop: 2 }}>
-                              {k.deficitSource === "garmin" ? "⌚ Garmin" : k.deficitSource === "estimé" ? "~ estimé" : ""}
+                            <div style={{ fontSize: 10, color: "#10b981", marginTop: 2 }}>
+                              ⌚ cumulé
                             </div>
                           </div>
                         ) : <span style={{ color: "#334155" }}>—</span>}
