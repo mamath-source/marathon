@@ -798,7 +798,8 @@ function App() {
                   <th style={{ padding: "8px 12px", textAlign: "left", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>Semaine</th>
                   <th style={{ padding: "8px 12px", textAlign: "left", color: "#64748b", borderBottom: "1px solid #1e293b" }}>Phase</th>
                   <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b" }}>⚖️ Poids réel</th>
-                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>📉 Poids estimé</th>
+                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>📉 Poids plan</th>
+                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🔮 Nouvelle estim.</th>
                   <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🔥 Déficit cible</th>
                   <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🍽️ Déficit réel</th>
                   <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b" }}>🏃 Sport</th>
@@ -852,6 +853,72 @@ function App() {
                       {/* Poids estimé selon plan */}
                       <td style={{ padding: "10px 8px", textAlign: "center" }}>
                         <span style={{ fontSize: 12, color: "#475569" }}>{p.ciblePoids} kg</span>
+                      </td>
+                      {/* Poids recalculé depuis dernier poids réel + déficits prévus */}
+                      <td style={{ padding: "10px 8px", textAlign: "center" }}>
+                        {(() => {
+                          // Trouver le dernier poids mesuré avant ou pendant cette semaine
+                          let dernierPoids = null;
+                          let derniereSem = 0;
+                          for (let s = 1; s <= p.sem; s++) {
+                            const w = getWeek(s);
+                            const po = parseFloat(w.poidsLundi);
+                            if (!isNaN(po) && po > 0) { dernierPoids = po; derniereSem = s; }
+                          }
+                          if (dernierPoids === null) return <span style={{ color: "#334155" }}>—</span>;
+                          // Calculer la perte estimée depuis derniereSem jusqu'à p.sem
+                          let perteEstimee = 0;
+                          for (let s = derniereSem; s <= p.sem; s++) {
+                            const planS = PLAN[s-1];
+                            const defCible = DEFICIT_CIBLE[s] || 0;
+                            // Perte hebdomadaire = déficit cible / 7700 kcal/kg
+                            perteEstimee += defCible / 7700;
+                          }
+                          const poidsRecalc = (dernierPoids - perteEstimee).toFixed(1);
+                          const diff = (poidsRecalc - p.ciblePoids).toFixed(1);
+                          const couleur = Math.abs(diff) < 0.3 ? "#64748b" : diff > 0 ? "#ef4444" : "#10b981";
+                          return (
+                            <div>
+                              <span style={{ fontSize: 12, color: couleur, fontWeight: 600 }}>{poidsRecalc} kg</span>
+                              {derniereSem < p.sem && (
+                                <div style={{ fontSize: 10, color: "#64748b", marginTop: 1 }}>
+                                  depuis S{derniereSem}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+                      </td>
+                      {/* Nouvelle estimation depuis dernier poids réel */}
+                      <td style={{ padding: "10px 8px", textAlign: "center" }}>
+                        {(() => {
+                          // Trouver le dernier poids réel mesuré
+                          let lastPoids = null, lastSem = 0;
+                          PLAN.forEach(pp => {
+                            const ww = getWeek(pp.sem);
+                            const po = parseFloat(ww.poidsLundi);
+                            if (!isNaN(po) && po > 0) { lastPoids = po; lastSem = pp.sem; }
+                          });
+                          if (lastPoids === null) return <span style={{ color: "#334155" }}>—</span>;
+                          if (p.sem < lastSem) return <span style={{ color: "#334155" }}>—</span>;
+                          if (p.sem === lastSem) return <span style={{ fontSize: 12, color: "#6366f1", fontWeight: 600 }}>{lastPoids} kg ←</span>;
+                          // Appliquer déficits cumulés depuis lastSem
+                          let po = lastPoids;
+                          for (let s = lastSem + 1; s <= p.sem; s++) {
+                            const def = DEFICIT_CIBLE[s] || 0;
+                            po = Math.round((po - def / 7700) * 10) / 10;
+                          }
+                          const diff = Math.round((po - p.ciblePoids) * 10) / 10;
+                          const color = Math.abs(diff) < 0.3 ? "#10b981" : po > p.ciblePoids ? "#ef4444" : "#6366f1";
+                          return (
+                            <div>
+                              <span style={{ fontSize: 12, color, fontWeight: 600 }}>{po} kg</span>
+                              <div style={{ fontSize: 10, color: "#64748b" }}>
+                                {diff > 0 ? "+" : ""}{diff} vs plan
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </td>
                       {/* Déficit cible */}
                       <td style={{ padding: "10px 8px", textAlign: "center" }}>
@@ -940,10 +1007,10 @@ function App() {
                     mesure: parseFloat(w.poidsLundi) || null,
                   };
                 });
-                const W = 600, H = 220;
-                const pad = { t: 10, r: 20, b: 30, l: 44 };
+                const W = 600, H = 320;
+                const pad = { t: 16, r: 20, b: 36, l: 44 };
                 const cW = W - pad.l - pad.r, cH = H - pad.t - pad.b;
-                const yMin = 62, yMax = 71;
+                const yMin = 57, yMax = 72;
                 const xS = i => pad.l + (i / (chartData.length - 1)) * cW;
                 const yS = v => pad.t + cH - ((v - yMin) / (yMax - yMin)) * cH;
                 const segs = (key) => {
@@ -956,13 +1023,13 @@ function App() {
                   return s;
                 };
                 return (
-                  <svg viewBox={"0 0 "+W+" "+H} style={{ width: "100%", height: H }}>
+                  <svg viewBox={"0 0 "+W+" "+H} preserveAspectRatio="xMidYMid meet" style={{ width: "100%", display: "block", minHeight: 260 }}>
                     {[0,0.25,0.5,0.75,1].map(t => {
                       const y = pad.t + t * cH;
                       const v = (yMax - t*(yMax-yMin)).toFixed(1);
                       return <g key={t}>
-                        <line x1={pad.l} y1={y} x2={W-pad.r} y2={y} stroke="#1e293b" strokeWidth="1"/>
-                        <text x={pad.l-4} y={y+4} textAnchor="end" fill="#64748b" fontSize="10">{v}</text>
+                        <line x1={pad.l} y1={y} x2={W-pad.r} y2={y} stroke="#334155" strokeWidth="1"/>
+                        <text x={pad.l-4} y={y+4} textAnchor="end" fill="#94a3b8" fontSize="14">{v}</text>
                       </g>;
                     })}
                     {chartData.filter((_,i) => i % 3 === 0).map((d,_,arr) => {
@@ -970,13 +1037,13 @@ function App() {
                       return <text key={i} x={xS(i)} y={H-6} textAnchor="middle" fill="#64748b" fontSize="10">{d.sem}</text>;
                     })}
                     {/* Objectif plan */}
-                    {segs("objectif").map((s,i) => <polyline key={"o"+i} points={s.join(" ")} fill="none" stroke="#334155" strokeWidth="1.5" strokeDasharray="4,4"/>)}
+                    {segs("objectif").map((s,i) => <polyline key={"o"+i} points={s.join(" ")} fill="none" stroke="#475569" strokeWidth="2" strokeDasharray="6,4"/>)}
                     {/* Poids estimé */}
-                    {segs("estime").map((s,i) => <polyline key={"e"+i} points={s.join(" ")} fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="6,3"/>)}
+                    {segs("estime").map((s,i) => <polyline key={"e"+i} points={s.join(" ")} fill="none" stroke="#f59e0b" strokeWidth="2" strokeDasharray="8,4"/>)}
                     {/* Poids mesuré */}
-                    {segs("mesure").map((s,i) => <polyline key={"m"+i} points={s.join(" ")} fill="none" stroke="#6366f1" strokeWidth="2.5"/>)}
+                    {segs("mesure").map((s,i) => <polyline key={"m"+i} points={s.join(" ")} fill="none" stroke="#6366f1" strokeWidth="3"/>)}
                     {chartData.map((d,i) => d.mesure != null ? (
-                      <circle key={"dot"+i} cx={xS(i)} cy={yS(d.mesure)} r="5" fill="#6366f1"/>
+                      <circle key={"dot"+i} cx={xS(i)} cy={yS(d.mesure)} r="7" fill="#6366f1" stroke="#0f172a" strokeWidth="2"/>
                     ) : null)}
                   </svg>
                 );
