@@ -799,8 +799,7 @@ function App() {
                   <th style={{ padding: "8px 12px", textAlign: "left", color: "#64748b", borderBottom: "1px solid #1e293b" }}>Phase</th>
                   <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>⚖️ Poids réel</th>
                   <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>📉 Plan</th>
-                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🔄 Recalc.</th>
-                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🔮 Nouvelle estim.</th>
+                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🔮 Projection</th>
                   <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🔥 Déficit cible</th>
                   <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🍽️ Déficit réel</th>
                   <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b" }}>🏃 Sport</th>
@@ -855,42 +854,8 @@ function App() {
                       <td style={{ padding: "10px 8px", textAlign: "center" }}>
                         <span style={{ fontSize: 12, color: "#475569" }}>{p.ciblePoids} kg</span>
                       </td>
-                      {/* Poids recalculé depuis dernier poids réel + déficits prévus */}
-                      <td style={{ padding: "10px 8px", textAlign: "center" }}>
-                        {(() => {
-                          // Trouver le dernier poids mesuré avant ou pendant cette semaine
-                          let dernierPoids = null;
-                          let derniereSem = 0;
-                          for (let s = 1; s <= p.sem; s++) {
-                            const w = getWeek(s);
-                            const po = parseFloat(w.poidsLundi);
-                            if (!isNaN(po) && po > 0) { dernierPoids = po; derniereSem = s; }
-                          }
-                          if (dernierPoids === null) return <span style={{ color: "#334155" }}>—</span>;
-                          // Calculer la perte estimée depuis derniereSem jusqu'à p.sem
-                          let perteEstimee = 0;
-                          for (let s = derniereSem; s <= p.sem; s++) {
-                            const planS = PLAN[s-1];
-                            const defCible = DEFICIT_CIBLE[s] || 0;
-                            // Perte hebdomadaire = déficit cible / 7700 kcal/kg
-                            perteEstimee += defCible / 7700;
-                          }
-                          const poidsRecalc = (dernierPoids - perteEstimee).toFixed(1);
-                          const diff = (poidsRecalc - p.ciblePoids).toFixed(1);
-                          const couleur = Math.abs(diff) < 0.3 ? "#64748b" : diff > 0 ? "#ef4444" : "#10b981";
-                          return (
-                            <div>
-                              <span style={{ fontSize: 12, color: couleur, fontWeight: 600 }}>{poidsRecalc} kg</span>
-                              {derniereSem < p.sem && (
-                                <div style={{ fontSize: 10, color: "#64748b", marginTop: 1 }}>
-                                  depuis S{derniereSem}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })()}
-                      </td>
-                      {/* Nouvelle estimation depuis dernier poids réel */}
+
+                      {/* Projection depuis dernier poids réel mesuré */}
                       <td style={{ padding: "10px 8px", textAlign: "center" }}>
                         {(() => {
                           // Trouver le dernier poids réel mesuré
