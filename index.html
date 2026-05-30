@@ -254,7 +254,11 @@ function App() {
   const [data, setData] = useState({});
   const [activeSem, setActiveSem] = useState(1);
   const [activeTab, setActiveTab] = useState("saisie");
-  const [activeJour, setActiveJour] = useState(0);
+  const [activeJour, setActiveJour] = useState(() => {
+    // Trouver le dernier jour avec données (sport ou calories)
+    // On ne peut pas accéder à data ici (pas encore initialisé), on part sur 0
+    return 0;
+  });
   const [loaded, setLoaded] = useState(false);
   const [loadingMacros, setLoadingMacros] = useState({});
   const [showExport, setShowExport] = useState(false);
@@ -262,17 +266,38 @@ function App() {
   const [showImport, setShowImport] = useState(false);
   const [copyMsg, setCopyMsg] = useState("");
 
+  // Load from storage + set last encoded day
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("suivi-marathon-v1");
-      if (saved) setData(JSON.parse(saved));
-    } catch(e) {}
-    setLoaded(true);
+    (async () => {
+      try {
+        const res = await window.storage.get("suivi-data");
+        if (res?.value) {
+          const parsed = JSON.parse(res.value);
+          setData(parsed);
+          // Trouver la semaine courante et le dernier jour encodé
+          const semKeys = Object.keys(parsed).map(Number).filter(Boolean).sort((a,b) => a-b);
+          if (semKeys.length > 0) {
+            const lastSem = semKeys[semKeys.length - 1];
+            const lastWeek = parsed[lastSem];
+            if (lastWeek?.jours) {
+              let lastDay = 0;
+              lastWeek.jours.forEach((j, i) => {
+                if (j.sportFait?.trim() || j.kCalTotales?.trim() || j.garminKcal?.trim()) lastDay = i;
+              });
+              setActiveJour(lastDay);
+              setActiveSem(lastSem);
+            }
+          }
+        }
+      } catch {}
+      setLoaded(true);
+    })();
   }, []);
 
-  const save = (newData) => {
+  // Save to storage
+  const save = async (newData) => {
     setData(newData);
-    try { localStorage.setItem("suivi-marathon-v1", JSON.stringify(newData)); } catch(e) {}
+    try { await window.storage.set("suivi-data", JSON.stringify(newData)); } catch {}
   };
 
   const resetAll = () => {
@@ -379,33 +404,39 @@ function App() {
     const faitSessions = joursData.filter(j => j.sportFait.trim() !== "").length;
     const sportOk = planSessions === 0 ? null : faitSessions >= planSessions;
 
-    // Par jour : vert si déficit du jour atteint
-    // déficit jour = garmin brûlé - kcal mangées >= déficit cible journalier
+    // Par jour : deux critères séparés
     const deficitCibleJour = Math.round((DEFICIT_CIBLE[s] || 0) / 7);
-    const joursOk = joursData.map((j, i) => {
+
+    // sportJourOk : vert si sport fait ou pas prévu, rouge si prévu mais pas fait
+    const sportJourOk = joursData.map((j, i) => {
+      const planSport = w.planningSport[i]?.trim() !== "";
+      const faitSport = j.sportFait.trim() !== "";
+      if (!planSport && !faitSport) return null;
+      if (planSport && faitSport) return true;
+      if (planSport && !faitSport) return false;
+      if (!planSport && faitSport) return true; // bonus
+      return null;
+    });
+
+    // caloriesJourOk : vert si déficit atteint (ou objectif calories respecté)
+    const caloriesJourOk = joursData.map((j, i) => {
       const kcal = kcals[i];
       const garmin = parseFloat(j.garminKcal) || null;
       const cibleJour = cibleKcalDyn[i];
-      const planSport = w.planningSport[i]?.trim() !== "";
-      const faitSport = j.sportFait.trim() !== "";
-
-      if (!kcal && !planSport) return null; // pas de données
-
-      // Sport planifié mais pas fait → rouge
-      if (planSport && !faitSport) return false;
-
-      if (kcal) {
-        if (garmin !== null) {
-          // On a Garmin : on vérifie le déficit réel du jour
-          const deficitJour = garmin - kcal;
-          return deficitJour >= deficitCibleJour - 50;
-        } else {
-          // Pas de Garmin : on compare aux calories cibles du jour
-          return kcal <= cibleJour + 80;
-        }
+      if (!kcal) return null;
+      if (garmin !== null) {
+        return (garmin - kcal) >= deficitCibleJour - 50;
       }
+      return kcal <= cibleJour + 80;
+    });
 
-      if (faitSport) return true;
+    // joursOk global (pour compatibilité) = les deux ok
+    const joursOk = joursData.map((j, i) => {
+      const s = sportJourOk[i];
+      const c = caloriesJourOk[i];
+      if (s === null && c === null) return null;
+      if (s === false || c === false) return false;
+      if (s === true || c === true) return true;
       return null;
     });
 
@@ -435,7 +466,7 @@ function App() {
     }
     const deficitOk = deficitReel !== null && deficitReel >= deficitCible * 0.85;
 
-    return { poids, poidsOk, moyKcal, cibleMoyenne, kcalOk: deficitOk, faitSessions, planSessions, sportOk, joursOk, deficitCible, deficitReel, deficitOk, deficitSource };
+    return { poids, poidsOk, moyKcal, cibleMoyenne, kcalOk: deficitOk, faitSessions, planSessions, sportOk, joursOk, sportJourOk, caloriesJourOk, deficitCible, deficitReel, deficitOk, deficitSource };
   };
 
   const plan = PLAN[activeSem - 1];
@@ -682,14 +713,23 @@ function App() {
                 const ok = kpi.joursOk[i];
                 return (
                   <button key={i} onClick={() => setActiveJour(i)} style={{
-                    flex: 1, padding: "8px 4px", borderRadius: 8, border: "none",
+                    flex: 1, padding: "8px 4px", borderRadius: 8,
+                    border: `2px solid ${activeJour === i ? "#6366f1"
+                      : kpi.caloriesJourOk[i] === true ? "#10b981"
+                      : kpi.caloriesJourOk[i] === false ? "#ef4444" : "#334155"}`,
                     fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-                    background: activeJour === i ? "#6366f1"
-                      : ok === true ? "#064e3b" : ok === false ? "#450a0a" : "#1e293b",
-                    color: activeJour === i ? "white" : ok === true ? "#6ee7b7" : ok === false ? "#fca5a5" : "#64748b",
+                    background: activeJour === i ? "#6366f1" : "#1e293b",
+                    color: activeJour === i ? "white" : "#e2e8f0",
+                    position: "relative",
                   }}>
                     {j}<br />
-                    <span style={{ fontSize: 10, opacity: 0.7 }}>{dot(ok)}</span>
+                    <span style={{
+                      fontSize: 10,
+                      color: kpi.sportJourOk[i] === true ? "#10b981"
+                        : kpi.sportJourOk[i] === false ? "#ef4444" : "#475569",
+                    }}>
+                      {kpi.sportJourOk[i] === true ? "●" : kpi.sportJourOk[i] === false ? "●" : "○"}
+                    </span>
                   </button>
                 );
               })}
@@ -918,7 +958,7 @@ function App() {
                         ) : <span style={{ color: "#334155" }}>—</span>}
                       </td>
                       {/* Jours */}
-                      {k.joursOk.map((ok, i) => (
+                      {k.sportJourOk.map((ok, i) => (
                         <td key={i} style={{ padding: "8px 4px", textAlign: "center" }}>
                           <div style={{
                             width: 28, height: 28, borderRadius: 6, margin: "0 auto",
