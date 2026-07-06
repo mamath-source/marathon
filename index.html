@@ -514,7 +514,7 @@ function App() {
             {/* Sélecteur semaine */}
             {/* Compteur jours */}
             {(() => {
-              const totalJours = 154;
+              const totalJours = 112;
               const joursOk = PLAN.reduce((acc, p) => {
                 const w = getWeek(p.sem);
                 return acc + w.jours.filter(j => j.kCalTotales || j.garminKcal).length;
