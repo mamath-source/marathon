@@ -60,64 +60,48 @@ const { useState, useEffect } = React;
 
 
 // ── PLAN (déficit & poids cible par semaine) ──────────────────────────────────
-// cibleKcalJours : objectif calorique par jour [Lun, Mar, Mer, Jeu, Ven, Sam, Dim]
-// Phase 1 : maintenance 1750 tous les jours
-// Phase 2 : 2 jours repos à 1550, 5 jours sport à 1650
-// Phase 3 : 1 jour repos à 1550, 5 jours sport à 1650, 1 jour sortie longue à 2000
-// Vacances : 2000 tous les jours
-
-const P2 = [1650, 1650, 1550, 1650, 1650, 1550, 1650]; // Phase 2 : repos mer+sam
-const P3 = [1650, 1650, 1550, 1650, 1650, 2000, 1650]; // Phase 3 : repos mer, SL sam
+const P16 = [1650, 1650, 1550, 1650, 1650, 2000, 1650]; // Phase 3 : repos mer, SL sam
 const VAC = [2000, 2000, 2000, 2000, 2000, 2000, 2000];
-const PH1 = [1750, 1750, 1750, 1750, 1750, 1750, 1750];
-const AFF = [1900, 1900, 1900, 1900, 1900, 1900, 1900];
+const AFF = [1650, 1650, 1550, 1650, 1650, 1900, 1650]; // Affûtage : SL réduite
 
-// Déficit calorique cible par semaine (kcal) basé sur notre plan
 const DEFICIT_CIBLE = {
-  1:0, 2:0, 3:2128, 4:2128, 5:2128, 6:2128,
-  7:2214, 8:2214, 9:2214, 10:2214, 11:2716,
-  12:0, 13:0,
-  14:2596, 15:2596,
-  16:2453, 17:2453, 18:2453, 19:2453, 20:2453, 21:2453,
-  22:0,
+  1:2426, 2:2426, 3:2426, 4:2426, 5:2426,
+  6:0, 7:0,
+  8:2426, 9:2426, 10:2426, 11:2426, 12:2426, 13:2426,
+  14:2426, 15:2426, 16:0,
 };
 
 const PLAN = [
-  { sem: 1,  lundi: "25 mai",    phase: "Phase 1",  cibleKcalJours: PH1, ciblePoids: 70.0, sessionsTargets: 2 },
-  { sem: 2,  lundi: "1 juin",    phase: "Phase 1",  cibleKcalJours: PH1, ciblePoids: 70.0, sessionsTargets: 2 },
-  { sem: 3,  lundi: "8 juin",    phase: "Phase 2",  cibleKcalJours: P2,  ciblePoids: 70.0, sessionsTargets: 5 },
-  { sem: 4,  lundi: "15 juin",   phase: "Phase 2",  cibleKcalJours: P2,  ciblePoids: 69.7, sessionsTargets: 5 },
-  { sem: 5,  lundi: "22 juin",   phase: "Phase 2",  cibleKcalJours: P2,  ciblePoids: 69.4, sessionsTargets: 5 },
-  { sem: 6,  lundi: "29 juin",   phase: "Phase 2",  cibleKcalJours: P2,  ciblePoids: 69.2, sessionsTargets: 5 },
-  { sem: 7,  lundi: "6 juil",    phase: "Phase 3",  cibleKcalJours: P3,  ciblePoids: 68.9, sessionsTargets: 6 },
-  { sem: 8,  lundi: "13 juil",   phase: "Phase 3",  cibleKcalJours: P3,  ciblePoids: 68.6, sessionsTargets: 6 },
-  { sem: 9,  lundi: "20 juil",   phase: "Phase 3",  cibleKcalJours: P3,  ciblePoids: 68.3, sessionsTargets: 6 },
-  { sem: 10, lundi: "27 juil",   phase: "Phase 3",  cibleKcalJours: P3,  ciblePoids: 68.0, sessionsTargets: 6 },
-  { sem: 11, lundi: "3 août",    phase: "Phase 3",  cibleKcalJours: P3,  ciblePoids: 67.7, sessionsTargets: 6 },
-  { sem: 12, lundi: "10 août",   phase: "Vacances", cibleKcalJours: VAC, ciblePoids: 67.4, sessionsTargets: 4 },
-  { sem: 13, lundi: "17 août",   phase: "Vacances", cibleKcalJours: VAC, ciblePoids: 67.4, sessionsTargets: 4 },
-  { sem: 14, lundi: "24 août",   phase: "Phase 3",  cibleKcalJours: P3,  ciblePoids: 67.4, sessionsTargets: 6 },
-  { sem: 15, lundi: "31 août",   phase: "Phase 3",  cibleKcalJours: P3,  ciblePoids: 67.1, sessionsTargets: 6 },
-  { sem: 16, lundi: "7 sept",    phase: "Phase 3",  cibleKcalJours: P3,  ciblePoids: 66.7, sessionsTargets: 6 },
-  { sem: 17, lundi: "14 sept",   phase: "Phase 3",  cibleKcalJours: P3,  ciblePoids: 66.4, sessionsTargets: 6 },
-  { sem: 18, lundi: "21 sept",   phase: "Phase 3",  cibleKcalJours: P3,  ciblePoids: 66.1, sessionsTargets: 6 },
-  { sem: 19, lundi: "28 sept",   phase: "Phase 3",  cibleKcalJours: P3,  ciblePoids: 65.8, sessionsTargets: 6 },
-  { sem: 20, lundi: "5 oct",     phase: "Phase 3",  cibleKcalJours: P3,  ciblePoids: 65.5, sessionsTargets: 6 },
-  { sem: 21, lundi: "12 oct",    phase: "Phase 3",  cibleKcalJours: P3,  ciblePoids: 65.1, sessionsTargets: 6 },
-  { sem: 22, lundi: "19 oct",    phase: "Phase 3",  cibleKcalJours: AFF, ciblePoids: 64.8, sessionsTargets: 3 },
+  { sem: 1,  lundi: "6 juil",   phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 69.6, sessionsTargets: 4 },
+  { sem: 2,  lundi: "13 juil",  phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 69.3, sessionsTargets: 4 },
+  { sem: 3,  lundi: "20 juil",  phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 69.0, sessionsTargets: 4 },
+  { sem: 4,  lundi: "27 juil",  phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 68.7, sessionsTargets: 4 },
+  { sem: 5,  lundi: "3 août",   phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 68.3, sessionsTargets: 4 },
+  { sem: 6,  lundi: "10 août",  phase: "Vacances",  cibleKcalJours: VAC, ciblePoids: 68.0, sessionsTargets: 3 },
+  { sem: 7,  lundi: "17 août",  phase: "Vacances",  cibleKcalJours: VAC, ciblePoids: 68.0, sessionsTargets: 3 },
+  { sem: 8,  lundi: "24 août",  phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 68.0, sessionsTargets: 4 },
+  { sem: 9,  lundi: "31 août",  phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 67.7, sessionsTargets: 4 },
+  { sem: 10, lundi: "7 sept",   phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 67.4, sessionsTargets: 4 },
+  { sem: 11, lundi: "14 sept",  phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 67.1, sessionsTargets: 4 },
+  { sem: 12, lundi: "21 sept",  phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 66.8, sessionsTargets: 4 },
+  { sem: 13, lundi: "28 sept",  phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 66.4, sessionsTargets: 4 },
+  { sem: 14, lundi: "5 oct",    phase: "Marathon",  cibleKcalJours: AFF, ciblePoids: 66.1, sessionsTargets: 3 },
+  { sem: 15, lundi: "12 oct",   phase: "Marathon",  cibleKcalJours: AFF, ciblePoids: 65.8, sessionsTargets: 3 },
+  { sem: 16, lundi: "19 oct",   phase: "Marathon",  cibleKcalJours: AFF, ciblePoids: 65.5, sessionsTargets: 2 },
 ];
+
 
 const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 const PHASE_COLORS = {
-  "Phase 1": "#64748b", "Phase 2": "#f59e0b",
-  "Phase 3": "#6366f1", "Vacances": "#10b981",
+  "Marathon": "#6366f1",
+  "Vacances": "#10b981",
+  "Affûtage": "#6366f1",
 };
 
 const EMPTY_JOUR = () => ({
   sportFait: "",
   garminKcal: "",
   kCalTotales: "",
-  petitDejText: "", dejeunerText: "", collationText: "", dinerText: "",
   petitDejMacros: null, dejeunerMacros: null, collationMacros: null, dinerMacros: null,
 });
 
@@ -492,7 +476,7 @@ function App() {
                 🏃 Mon suivi marathon
               </h1>
               <p style={{ margin: "4px 0 0", fontSize: 13, color: "#64748b" }}>
-                Venise · 25 octobre · Objectif 64,8 kg
+                Venise · 25 octobre · Objectif 65 kg
               </p>
             </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -984,7 +968,7 @@ function App() {
                 const W = 600, H = 480;
                 const pad = { t: 20, r: 20, b: 40, l: 48 };
                 const cW = W - pad.l - pad.r, cH = H - pad.t - pad.b;
-                const yMin = 61, yMax = 71;
+                const yMin = 64, yMax = 70;
                 const xS = i => pad.l + (i / (chartData.length - 1)) * cW;
                 const yS = v => pad.t + cH - ((v - yMin) / (yMax - yMin)) * cH;
                 const segs = (key) => {
