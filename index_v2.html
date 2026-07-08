@@ -158,15 +158,140 @@ function getCibleKcalDynamique(plan, planningSport) {
 }
 
 
+
+// ── RÉSUMÉ SEMAINE ────────────────────────────────────────────────────────────
+function WeekSummary({ weekSport, joursData }) {
+  const sport = weekSport || { coursesPrevues: [], renfoPrevus: [], autresPrevus: 0, planningJours: Array(7).fill([]) };
+
+  // Sessions planifiées = agrégation de tout ce qui est dans la colonne "Planifié" des 7 jours
+  const planningJours = sport.planningJours || Array(7).fill([]);
+  const prevues = planningJours.flatMap(jour => (jour||[]).flatMap(s => s === "RAB" ? ["RA", "RB"] : [s]));
+
+  // Sessions réalisées (toutes les journées)
+  const faites = joursData.flatMap(j => {
+    const sessions = [...(j.sessionsFaites || [])];
+    // RAB → compte comme RA + RB
+    return sessions.flatMap(s => s === "RAB" ? ["RA", "RB", "RAB"] : [s]);
+  });
+
+  // Boxes fixes à afficher dans l'ordre
+  const BOXES = [
+    { code: "EF",  idx: 0, label: "EF",  color: "#6366f1", cat: "course" },
+    { code: "EF",  idx: 1, label: "EF",  color: "#6366f1", cat: "course" },
+    { code: "SL",  idx: 0, label: "SL",  color: "#8b5cf6", cat: "course" },
+    { code: "VMA", idx: 0, label: "VMA", color: "#a855f7", cat: "course" },
+    { code: "RJ",  idx: 0, label: "RJ",  color: "#10b981", cat: "renfo" },
+    { code: "RA",  idx: 0, label: "RA",  color: "#059669", cat: "renfo" },
+    { code: "RB",  idx: 0, label: "RB",  color: "#047857", cat: "renfo" },
+  ];
+
+  // Pour chaque box, combien de fois le code apparaît dans prévues/faites
+  const countIn = (arr, code) => arr.filter(s => s === code).length;
+
+  // Box EF : besoin de savoir si la 1ère / 2ème est planifiée/faite
+  const efPrevues = countIn(prevues, "EF");
+  const efFaites = countIn(faites, "EF");
+
+  const isPlanned = (code, idx) => {
+    if (code === "EF") return efPrevues > idx;
+    return prevues.includes(code);
+  };
+
+  const isDone = (code, idx) => {
+    if (code === "EF") return efFaites > idx;
+    return faites.includes(code);
+  };
+
+  // Critères validation
+  const courseOk = efFaites >= 1 && faites.includes("SL") && faites.includes("VMA");
+  const renfoOk = faites.includes("RJ") || (faites.includes("RA") && faites.includes("RB")) || faites.includes("RAB");
+
+  return (
+    <div style={{ background: "#0f172a", borderRadius: 10, padding: "12px 14px", marginBottom: 12, border: "1px solid #1e293b" }}>
+      <div style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>
+        Vue semaine
+      </div>
+      <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+        {/* Course */}
+        <div>
+          <div style={{ fontSize: 10, color: courseOk ? "#10b981" : "#475569", marginBottom: 6, fontWeight: 600 }}>
+            🏃 COURSE {courseOk ? "✓" : ""}
+          </div>
+          <div style={{ display: "flex", gap: 5 }}>
+            {BOXES.filter(b => b.cat === "course").map((b, i) => {
+              const planned = isPlanned(b.code, b.idx);
+              const done = isDone(b.code, b.idx);
+              return (
+                <div key={i} style={{
+                  width: 38, height: 38, borderRadius: 8,
+                  background: done ? "#10b98133" : "#1e293b",
+                  border: `2px solid ${done ? "#10b981" : planned ? "#10b98166" : "#334155"}`,
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                  position: "relative",
+                }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: done ? "#10b981" : planned ? "#10b98199" : "#475569" }}>
+                    {b.label}
+                  </span>
+                  {planned && !done && (
+                    <div style={{
+                      width: 6, height: 6, borderRadius: "50%",
+                      background: "#10b981", position: "absolute", bottom: 4,
+                    }} />
+                  )}
+                  {done && (
+                    <div style={{ fontSize: 8, color: "#10b981" }}>✓</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Renfo */}
+        <div>
+          <div style={{ fontSize: 10, color: renfoOk ? "#8b5cf6" : "#475569", marginBottom: 6, fontWeight: 600 }}>
+            💪 RENFO {renfoOk ? "✓" : ""}
+          </div>
+          <div style={{ display: "flex", gap: 5 }}>
+            {BOXES.filter(b => b.cat === "renfo").map((b, i) => {
+              const planned = isPlanned(b.code, b.idx);
+              const done = isDone(b.code, b.idx);
+              return (
+                <div key={i} style={{
+                  width: 38, height: 38, borderRadius: 8,
+                  background: done ? "#10b98133" : "#1e293b",
+                  border: `2px solid ${done ? "#10b981" : planned ? "#10b98166" : "#334155"}`,
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                  position: "relative",
+                }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: done ? "#10b981" : planned ? "#10b98199" : "#475569" }}>
+                    {b.label}
+                  </span>
+                  {planned && !done && (
+                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", position: "absolute", bottom: 4 }} />
+                  )}
+                  {done && (
+                    <div style={{ fontSize: 8, color: "#10b981" }}>✓</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── SPORT PANEL v2 ────────────────────────────────────────────────────────────
 const SESSION_DEFS = {
-  EF:  { label: "EF",  desc: "Endurance fondamentale", color: "#6366f1", cat: "course" },
-  SL:  { label: "SL",  desc: "Sortie longue",           color: "#8b5cf6", cat: "course" },
-  VMA: { label: "VMA", desc: "Vitesse maximale",         color: "#a855f7", cat: "course" },
-  RJ:  { label: "RJ",  desc: "Renfo jambes",             color: "#10b981", cat: "renfo" },
-  RA:  { label: "RA",  desc: "Renfo bras",               color: "#059669", cat: "renfo" },
-  RB:  { label: "RB",  desc: "Renfo bras B",             color: "#047857", cat: "renfo" },
-  RAB: { label: "RAB", desc: "Renfo bras+jambes (light)",color: "#34d399", cat: "renfo" },
+  EF:  { label: "EF",  desc: "Endurance fondamentale", color: "#10b981", cat: "course" },
+  SL:  { label: "SL",  desc: "Sortie longue",           color: "#059669", cat: "course" },
+  VMA: { label: "VMA", desc: "Vitesse maximale",         color: "#34d399", cat: "course" },
+  RJ:  { label: "RJ",  desc: "Renfo jambes",             color: "#8b5cf6", cat: "renfo" },
+  RA:  { label: "RA",  desc: "Renfo bras",               color: "#a855f7", cat: "renfo" },
+  RB:  { label: "RB",  desc: "Renfo bras B",             color: "#7c3aed", cat: "renfo" },
+  RAB: { label: "RAB", desc: "Renfo bras+jambes (light)",color: "#6d28d9", cat: "renfo" },
 };
 
 function SessionBadge({ code, active, onClick, small }) {
@@ -190,7 +315,7 @@ function SessionBadge({ code, active, onClick, small }) {
   );
 }
 
-function SportWeekPanel({ weekSport, onUpdate }) {
+function SportWeekPanel({ weekSport, joursData, onUpdate }) {
   const sport = weekSport || { coursesPrevues: [], renfoPrevus: [], autresPrevus: 0, planningJours: Array(7).fill([]) };
 
   const toggleCourse = (s) => {
@@ -230,1128 +355,15 @@ function SportWeekPanel({ weekSport, onUpdate }) {
         📋 Planning semaine
       </div>
 
+      {/* Résumé visuel */}
+      <WeekSummary weekSport={weekSport} joursData={joursData || []} />
+
       {/* Course */}
       <div style={{ marginBottom: 10 }}>
-        <div style={{ fontSize: 11, color: "#6366f1", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>
+        <div style={{ fontSize: 11, color: "#10b981", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>
           🏃 Course {courseValide ? "✓" : ""}
         </div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
           {/* EF avec compteur */}
           <div style={{ display: "flex", alignItems: "center", gap: 4, border: "2px solid #334155", borderRadius: 99, padding: "4px 8px" }}>
-            <button onClick={removeEF} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 14, lineHeight: 1 }}>−</button>
-            <span style={{ color: efCount > 0 ? "#6366f1" : "#64748b", fontWeight: 700, fontSize: 13, minWidth: 24, textAlign: "center" }}>
-              {efCount}×EF
-            </span>
-            <button onClick={addEF} style={{ background: "none", border: "none", color: "#6366f1", cursor: "pointer", fontSize: 14, lineHeight: 1 }}>+</button>
-          </div>
-          {["SL", "VMA"].map(s => (
-            <SessionBadge key={s} code={s}
-              active={(sport.coursesPrevues||[]).includes(s)}
-              onClick={() => toggleCourse(s)} />
-          ))}
-        </div>
-      </div>
-
-      {/* Renfo */}
-      <div style={{ marginBottom: 10 }}>
-        <div style={{ fontSize: 11, color: "#10b981", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>
-          💪 Renfo {renfoValide ? "✓" : ""}
-        </div>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          {["RJ", "RA", "RB", "RAB"].map(s => (
-            <SessionBadge key={s} code={s}
-              active={(sport.renfoPrevus||[]).includes(s)}
-              onClick={() => toggleRendoSem(s)} />
-          ))}
-        </div>
-      </div>
-
-      {/* Autre */}
-      <div>
-        <div style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>➕ Autre</div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button onClick={() => onUpdate({ ...sport, autresPrevus: Math.max(0, autresCount-1) })}
-            style={{ background: "#1e293b", border: "1px solid #334155", color: "#64748b", borderRadius: 6, width: 28, height: 28, cursor: "pointer", fontSize: 16 }}>−</button>
-          <span style={{ color: autresCount > 0 ? "#f59e0b" : "#64748b", fontWeight: 700, fontSize: 14 }}>{autresCount}</span>
-          <button onClick={() => onUpdate({ ...sport, autresPrevus: autresCount+1 })}
-            style={{ background: "#1e293b", border: "1px solid #334155", color: "#f59e0b", borderRadius: 6, width: 28, height: 28, cursor: "pointer", fontSize: 16 }}>+</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SportDayPanel({ jour, jourIdx, weekSport, activeSem, updateJour, updateWeekSport }) {
-  const faites = jour.sessionsFaites || [];
-  const sport = weekSport || { coursesPrevues: [], renfoPrevus: [], autresPrevus: 0, planningJours: Array(7).fill([]) };
-  const planningJours = sport.planningJours || Array(7).fill([]);
-  const prevues = planningJours[jourIdx] || [];
-
-  const toggleFaite = (s) => {
-    const arr = [...faites];
-    const i = arr.indexOf(s);
-    if (i >= 0) arr.splice(i, 1); else arr.push(s);
-    updateJour(activeSem, jourIdx, "sessionsFaites", arr);
-  };
-
-  const togglePrevue = (s) => {
-    const newPlanning = (planningJours).map((d, i) => i === jourIdx ? (() => {
-      const arr = [...(d||[])];
-      const idx = arr.indexOf(s);
-      if (idx >= 0) arr.splice(idx, 1); else arr.push(s);
-      return arr;
-    })() : d);
-    updateWeekSport({ ...sport, planningJours: newPlanning });
-  };
-
-  // Autres planifiés/faits ce jour
-  const autresPrevusJour = prevues.filter(s => s === "AUTRE").length;
-  const autresFaitsJour = faites.filter(s => s === "AUTRE").length;
-
-  const allSessions = ["EF", "SL", "VMA", "RJ", "RA", "RB", "RAB"];
-
-  return (
-    <div style={{ background: "#1e293b", borderRadius: 14, padding: "16px", border: "1px solid #334155" }}>
-      <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600, marginBottom: 12 }}>🏃 Sport</div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
-        <div style={{ fontSize: 11, color: "#6366f1", textAlign: "center", paddingBottom: 4, borderBottom: "1px solid #1e293b" }}>Planifié</div>
-        <div style={{ fontSize: 11, color: "#10b981", textAlign: "center", paddingBottom: 4, borderBottom: "1px solid #1e293b" }}>Réalisé</div>
-      </div>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        {allSessions.map(s => {
-          const isPrevue = prevues.includes(s);
-          const isFaite = faites.includes(s);
-          const def = SESSION_DEFS[s];
-          return (
-            <div key={s} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, alignItems: "center" }}>
-              <button onClick={() => togglePrevue(s)} style={{
-                padding: "5px 10px", borderRadius: 99,
-                border: `1.5px solid ${isPrevue ? def.color : "#1e293b"}`,
-                background: isPrevue ? def.color + "22" : "#0f172a",
-                color: isPrevue ? def.color : "#334155",
-                fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-              }}>{def.label}</button>
-              <button onClick={() => toggleFaite(s)} style={{
-                padding: "5px 10px", borderRadius: 99,
-                border: `1.5px solid ${isFaite ? def.color : "#1e293b"}`,
-                background: isFaite ? def.color + "33" : "#0f172a",
-                color: isFaite ? def.color : "#334155",
-                fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-              }}>{isFaite ? "✓ " : ""}{def.label}</button>
-            </div>
-          );
-        })}
-
-        {/* Autre */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, alignItems: "center", marginTop: 4 }}>
-          <div style={{ display: "flex", gap: 4, alignItems: "center", justifyContent: "center" }}>
-            <button onClick={() => {
-              const np = planningJours.map((d,i) => i===jourIdx ? [...d.filter(s=>s!=="AUTRE"), ...Array(Math.max(0,autresPrevusJour-1)).fill("AUTRE")] : d);
-              updateWeekSport({...sport, planningJours: np});
-            }} style={{ background:"#0f172a",border:"1px solid #334155",color:"#64748b",borderRadius:6,width:22,height:22,cursor:"pointer",fontSize:13 }}>−</button>
-            <span style={{ color: autresPrevusJour>0?"#f59e0b":"#334155", fontSize:12, fontWeight:700, minWidth:16, textAlign:"center" }}>{autresPrevusJour>0?`${autresPrevusJour}×`:""} Autre</span>
-            <button onClick={() => {
-              const np = planningJours.map((d,i) => i===jourIdx ? [...(d||[]), "AUTRE"] : d);
-              updateWeekSport({...sport, planningJours: np});
-            }} style={{ background:"#0f172a",border:"1px solid #334155",color:"#f59e0b",borderRadius:6,width:22,height:22,cursor:"pointer",fontSize:13 }}>+</button>
-          </div>
-          <div style={{ display:"flex", gap:4, alignItems:"center", justifyContent:"center" }}>
-            <button onClick={() => updateJour(activeSem, jourIdx, "sessionsFaites", faites.filter(s=>s!=="AUTRE").concat(Array(Math.max(0,autresFaitsJour-1)).fill("AUTRE")))}
-              style={{ background:"#0f172a",border:"1px solid #334155",color:"#64748b",borderRadius:6,width:22,height:22,cursor:"pointer",fontSize:13 }}>−</button>
-            <span style={{ color: autresFaitsJour>0?"#f59e0b":"#334155", fontSize:12, fontWeight:700, minWidth:16, textAlign:"center" }}>{autresFaitsJour>0?`${autresFaitsJour}×`:""} Autre</span>
-            <button onClick={() => updateJour(activeSem, jourIdx, "sessionsFaites", [...faites, "AUTRE"])}
-              style={{ background:"#0f172a",border:"1px solid #334155",color:"#f59e0b",borderRadius:6,width:22,height:22,cursor:"pointer",fontSize:13 }}>+</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── NUTRITION PANEL with AI macro calculation ─────────────────────────────────
-function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJour, updateJour }) {
-  const repas = [
-    { key: "petitDejMacros", label: "🌅 Petit déj" },
-    { key: "dejeunerMacros",  label: "☀️ Déjeuner" },
-    { key: "collationMacros", label: "🍎 Collation" },
-    { key: "dinerMacros",     label: "🌙 Dîner" },
-  ];
-
-  // Total : priorité total manuel > somme repas
-  const sommeRepas = repas.reduce((acc, r) => acc + (jour[r.key]?.kcal || 0), 0);
-  const totalManuel = parseFloat(jour.kCalTotales) || 0;
-  const totalEffectif = totalManuel > 0 ? totalManuel : sommeRepas;
-  const hasTotaux = totalEffectif > 0;
-
-  // Budget basé sur Garmin si dispo
-  const garmin = parseFloat(jour.garminKcal) || 0;
-  const budgetMax = garmin > 0 ? Math.round(garmin - (deficitCibleJour || 0)) : cibleKcal;
-  const restant = budgetMax - totalEffectif;
-  const kcalOk = hasTotaux && totalEffectif <= budgetMax + 80;
-
-  return (
-    <div style={{ background: "#1e293b", borderRadius: 14, padding: "16px 20px", border: "1px solid #334155" }}>
-      {/* Header budget */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-        <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>🍽️ Nutrition</div>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          {/* Déficit cible : toujours visible */}
-          <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 11, background: "#f59e0b22", color: "#f59e0b" }}>
-            🎯 Déficit visé : {deficitCibleJour} kcal
-          </span>
-          {garmin > 0 ? (
-            <>
-              <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 11, background: "#10b98122", color: "#10b981" }}>
-                ⌚ Brûlé : {garmin} kcal
-              </span>
-              <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 11, fontWeight: 700, background: "#6366f122", color: "#6366f1" }}>
-                💡 Budget : {budgetMax} kcal
-              </span>
-            </>
-          ) : (
-            <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 11, background: "#6366f122", color: "#6366f1" }}>
-              🎯 Objectif calories : {cibleKcal} kcal
-            </span>
-          )}
-          {hasTotaux && (
-            <span style={{
-              padding: "2px 8px", borderRadius: 99, fontSize: 11, fontWeight: 700,
-              background: kcalOk ? "#064e3b" : "#450a0a",
-              color: kcalOk ? "#6ee7b7" : "#fca5a5",
-            }}>{totalEffectif} kcal {kcalOk ? "✓" : "✗"}</span>
-          )}
-        </div>
-      </div>
-
-      {/* Barre de progression */}
-      {hasTotaux && (
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-          <div style={{ flex: 1, background: "#0f172a", borderRadius: 99, height: 6, overflow: "hidden" }}>
-            <div style={{
-              height: "100%", borderRadius: 99,
-              width: `${Math.min((totalEffectif / budgetMax) * 100, 100)}%`,
-              background: totalEffectif > budgetMax ? "#ef4444" : totalEffectif > budgetMax * 0.9 ? "#f59e0b" : "#10b981",
-              transition: "width 0.3s",
-            }} />
-          </div>
-          <span style={{ fontSize: 12, fontWeight: 700, whiteSpace: "nowrap",
-            color: totalEffectif > budgetMax ? "#ef4444" : totalEffectif > budgetMax * 0.9 ? "#f59e0b" : "#10b981" }}>
-            {restant >= 0 ? `reste ${restant}` : `dépassé ${Math.abs(restant)}`}
-          </span>
-        </div>
-      )}
-
-      {/* Total journée uniquement */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
-        <span style={{ fontSize: 13, color: "#94a3b8", whiteSpace: "nowrap" }}>📅 Calories du jour</span>
-        <input type="number"
-          value={jour.kCalTotales}
-          onChange={e => updateJour(activeSem, activeJour, "kCalTotales", e.target.value)}
-          placeholder="ex: 1650"
-          style={{
-            width: 130, padding: "10px 14px", borderRadius: 8,
-            border: `1.5px solid ${jour.kCalTotales ? "#10b981" : "#334155"}`,
-            background: "#0f172a", color: "#f8fafc", fontSize: 15, fontFamily: "inherit",
-          }}
-        />
-        <span style={{ fontSize: 13, color: "#64748b" }}>kcal</span>
-      </div>
-    </div>
-  );
-}
-
-
-function App() {
-  const [data, setData] = useState({});
-  const [activeSem, setActiveSem] = useState(1);
-  const [activeTab, setActiveTab] = useState("saisie");
-  const [activeJour, setActiveJour] = useState(0);
-  const [loaded, setLoaded] = useState(false);
-  const [loadingMacros, setLoadingMacros] = useState({});
-  const [showExport, setShowExport] = useState(false);
-  const [importText, setImportText] = useState("");
-  const [showImport, setShowImport] = useState(false);
-  const [copyMsg, setCopyMsg] = useState("");
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("suivi-marathon-v2");
-      if (saved) setData(JSON.parse(saved));
-    } catch(e) {}
-    setLoaded(true);
-  }, []);
-
-  const save = (newData) => {
-    setData(newData);
-    try { localStorage.setItem("suivi-marathon-v2", JSON.stringify(newData)); } catch(e) {}
-  };
-
-  const resetAll = () => {
-    if (!window.confirm("Effacer toutes les données ?")) return;
-    try { localStorage.removeItem("suivi-marathon-v1"); } catch {}
-    save({});
-    setCopyMsg("✅ Toutes les données effacées !");
-  };
-
-  const resetWeek = (sem) => {
-    if (!window.confirm("Effacer toutes les données de S" + sem + " ? Cette action est irréversible.")) return;
-    const newData = { ...data };
-    delete newData[sem];
-    save(newData);
-    setCopyMsg("✅ Semaine S" + sem + " réinitialisée !");
-  };
-
-  // Export — copier dans le presse-papier
-  const exportData = async () => {
-    const txt = JSON.stringify(data);
-    try {
-      await navigator.clipboard.writeText(txt);
-      setCopyMsg("✅ Copié ! Colle-le dans Notes ou un doc.");
-    } catch {
-      setShowExport(true);
-    }
-  };
-
-  // Import — coller depuis le presse-papier
-  const importData = async () => {
-    try {
-      const txt = await navigator.clipboard.readText();
-      const parsed = JSON.parse(txt);
-      save(parsed);
-      setCopyMsg("✅ Données importées !");
-      setShowImport(false);
-    } catch {
-      setShowImport(true);
-    }
-  };
-
-  const doImportText = async () => {
-    try {
-      const parsed = JSON.parse(importText);
-      save(parsed);
-      setCopyMsg("✅ Données importées !");
-      setShowImport(false);
-      setImportText("");
-    } catch {
-      setCopyMsg("❌ Texte invalide, réessaie.");
-    }
-  };
-
-  const getWeek = (s) => data[s] || EMPTY_WEEK();
-
-  const updateJour = (sem, jour, field, val) => {
-    const w = { ...getWeek(sem) };
-    w.jours = w.jours.map((j, i) => i === jour ? { ...j, [field]: val } : j);
-    save({ ...data, [sem]: w });
-  };
-
-  const updateWeek = (sem, field, val) => {
-    const w = { ...getWeek(sem) };
-    w[field] = val;
-    save({ ...data, [sem]: w });
-  };
-
-  const updatePlanning = (sem, jour, val) => {
-    const w = { ...getWeek(sem) };
-    w.planningSport = w.planningSport.map((v, i) => i === jour ? val : v);
-    save({ ...data, [sem]: w });
-  };
-
-  const updateWeekSport = (sem, sportData) => {
-    const w = { ...getWeek(sem) };
-    w.sport = sportData;
-    save({ ...data, [sem]: w });
-  };
-
-  // KPI calc
-  const kpiSem = (s) => {
-    const plan = PLAN[s - 1];
-    const w = getWeek(s);
-    const joursData = w.jours;
-
-    // Poids
-    const poids = parseFloat(w.poidsLundi) || null;
-    const poidsOk = poids !== null && poids <= plan.ciblePoids + 0.2;
-
-    // Objectifs caloriques dynamiques selon planning sport
-    const cibleKcalDyn = getCibleKcalDynamique(plan, w.planningSport);
-
-    // Calories — objectif par jour
-    const kcals = joursData.map(j => {
-      const tot = parseFloat(j.kCalTotales);
-      if (!isNaN(tot) && tot > 0) return tot;
-      // Somme des macros calculés par repas
-      const macros = [j.petitDejMacros, j.dejeunerMacros, j.collationMacros, j.dinerMacros];
-      const sum = macros.reduce((a, m) => a + (m?.kcal || 0), 0);
-      return sum > 0 ? sum : null;
-    });
-    const kcalsValides = kcals.filter(k => k !== null);
-    const moyKcal = kcalsValides.length ? Math.round(kcalsValides.reduce((a, b) => a + b, 0) / kcalsValides.length) : null;
-    // Objectif moyen de la semaine
-    const cibleMoyenne = Math.round(cibleKcalDyn.reduce((a, b) => a + b, 0) / 7);
-    // kcalOk basé uniquement sur le déficit cumulé (voir deficitOk plus bas)
-
-    // Sport v2 — validation semaine
-    const sport = w.sport || { coursesPrevues: [], renfoPrevus: [], autresPrevus: 0, planningJours: Array(7).fill([]) };
-    const toutesSessionsFaites = joursData.flatMap(j => j.sessionsFaites || []);
-
-    // Critère course : SL + VMA + au moins 1 EF
-    const aEF = toutesSessionsFaites.filter(s => s === "EF").length >= 1;
-    const aSL = toutesSessionsFaites.includes("SL");
-    const aVMA = toutesSessionsFaites.includes("VMA");
-    const courseOk = aEF && aSL && aVMA;
-
-    // Critère renfo : RJ OU (RA+RB) OU RAB
-    const aRJ = toutesSessionsFaites.includes("RJ");
-    const aRA = toutesSessionsFaites.includes("RA");
-    const aRB = toutesSessionsFaites.includes("RB");
-    const aRAB = toutesSessionsFaites.includes("RAB");
-    const renfoOk = aRJ || (aRA && aRB) || aRAB;
-
-    const sportOk = toutesSessionsFaites.length === 0 ? null : (courseOk && renfoOk);
-    const planSessions = sport.coursesPrevues.length + sport.renfoPrevus.length + sport.autresPrevus;
-    const faitSessions = toutesSessionsFaites.length;
-
-    // Par jour : deux critères séparés
-    const deficitCibleJour = Math.round((DEFICIT_CIBLE[s] || 0) / 7);
-
-    // sportJourOk : compare planning jour vs sessions faites ce jour
-    const planningJours = sport.planningJours || Array(7).fill([]);
-    const sportJourOk = joursData.map((j, i) => {
-      const prevues = planningJours[i] || [];
-      const faites = j.sessionsFaites || [];
-      if (prevues.length === 0 && faites.length === 0) return null;
-      if (prevues.length === 0 && faites.length > 0) return true; // bonus
-      // Toutes les sessions prévues ont été faites ?
-      const toutFait = prevues.every(s => faites.includes(s));
-      return toutFait ? true : false;
-    });
-
-    // caloriesJourOk : vert si déficit atteint (ou objectif calories respecté)
-    const caloriesJourOk = joursData.map((j, i) => {
-      const kcal = kcals[i];
-      const garmin = parseFloat(j.garminKcal) || null;
-      const cibleJour = cibleKcalDyn[i];
-      if (!kcal) return null;
-      if (garmin !== null) {
-        return (garmin - kcal) >= deficitCibleJour - 50;
-      }
-      return kcal <= cibleJour + 80;
-    });
-
-    // joursOk global (pour compatibilité) = les deux ok
-    const joursOk = joursData.map((j, i) => {
-      const s = sportJourOk[i];
-      const c = caloriesJourOk[i];
-      if (s === null && c === null) return null;
-      if (s === false || c === false) return false;
-      if (s === true || c === true) return true;
-      return null;
-    });
-
-    // Déficit réel = somme kcal brûlées estimées - kcal mangées (sur jours avec données)
-    const deficitCible = DEFICIT_CIBLE[s] || 0;
-
-    // Déficit réel = somme cumulée des déficits journaliers (Garmin - calories)
-    // Uniquement sur les jours où les deux valeurs sont saisies
-    const apportCibleSem = cibleKcalDyn.reduce((a, b) => a + b, 0);
-    let deficitReel = null;
-    let deficitSource = "—";
-    let deficitCumul = 0;
-    let joursComplets = 0;
-
-    joursData.forEach((j, i) => {
-      const garmin = parseFloat(j.garminKcal);
-      const cal = parseFloat(j.kCalTotales) || kcals[i];
-      if (!isNaN(garmin) && garmin > 0 && cal !== null && cal > 0) {
-        deficitCumul += garmin - cal;
-        joursComplets++;
-      }
-    });
-
-    if (joursComplets > 0) {
-      deficitReel = Math.round(deficitCumul);
-      deficitSource = "garmin";
-    }
-    const deficitOk = deficitReel !== null && deficitReel >= deficitCible * 0.85;
-
-    return { poids, poidsOk, moyKcal, cibleMoyenne, kcalOk: deficitOk, faitSessions, planSessions, sportOk, joursOk, sportJourOk, caloriesJourOk, deficitCible, deficitReel, deficitOk, deficitSource };
-  };
-
-  const plan = PLAN[activeSem - 1];
-  const week = getWeek(activeSem);
-  const kpi = kpiSem(activeSem);
-
-  // Chart data
-  const chartData = PLAN.map(p => {
-    const w = getWeek(p.sem);
-    const poids = parseFloat(w.poidsLundi) || null;
-    return { sem: `S${p.sem}`, cible: p.ciblePoids, reel: poids };
-  }).filter(d => d.reel !== null || PLAN.findIndex(p => `S${p.sem}` === d.sem) <= activeSem);
-
-  const kcalChart = PLAN.map(p => {
-    const k = kpiSem(p.sem);
-    return { sem: `S${p.sem}`, cible: p.cibleKcal, reel: k.moyKcal };
-  }).filter(d => d.reel !== null);
-
-  const dot = (ok) => ok === true ? "🟢" : ok === false ? "🔴" : "⚪";
-  const badge = (ok, txt) => (
-    <span style={{
-      padding: "3px 10px", borderRadius: 99, fontSize: 12, fontWeight: 600,
-      background: ok === true ? "#d1fae5" : ok === false ? "#fee2e2" : "#f1f5f9",
-      color: ok === true ? "#065f46" : ok === false ? "#991b1b" : "#64748b",
-      border: `1px solid ${ok === true ? "#6ee7b7" : ok === false ? "#fca5a5" : "#e2e8f0"}`,
-    }}>{txt}</span>
-  );
-
-  if (!loaded) return <div style={{ color: "#94a3b8", padding: 40, textAlign: "center", fontFamily: "Georgia" }}>Chargement...</div>;
-
-  return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#0a0f1e",
-      fontFamily: "'Georgia', serif",
-      color: "#e2e8f0",
-    }}>
-      {/* Header */}
-      <div style={{
-        background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
-        borderBottom: "1px solid #1e293b",
-        padding: "20px 24px",
-      }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-            <div>
-              <h1 style={{ margin: 0, fontSize: 22, color: "#f8fafc", letterSpacing: "-0.5px" }}>
-                🏃 Mon suivi marathon
-              </h1>
-              <p style={{ margin: "4px 0 0", fontSize: 13, color: "#64748b" }}>
-                Venise · 25 octobre · Objectif 65 kg
-              </p>
-            </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {["saisie", "tableau", "graphiques"].map(t => (
-                <button key={t} onClick={() => setActiveTab(t)} style={{
-                  padding: "7px 16px", borderRadius: 8, fontSize: 13, cursor: "pointer",
-                  fontFamily: "inherit", border: "none", transition: "all 0.2s",
-                  background: activeTab === t ? "#6366f1" : "#1e293b",
-                  color: activeTab === t ? "white" : "#94a3b8",
-                }}>
-                  {t === "saisie" ? "📝 Saisie" : t === "tableau" ? "📅 Tableau" : "📈 Graphiques"}
-                </button>
-              ))}
-              <button onClick={exportData} style={{
-                padding: "7px 14px", borderRadius: 8, fontSize: 13, cursor: "pointer",
-                fontFamily: "inherit", border: "1px solid #334155",
-                background: "transparent", color: "#10b981",
-              }}>💾 Sauver</button>
-              <button onClick={importData} style={{
-                padding: "7px 14px", borderRadius: 8, fontSize: 13, cursor: "pointer",
-                fontFamily: "inherit", border: "1px solid #334155",
-                background: "transparent", color: "#f59e0b",
-              }}>📂 Charger</button>
-
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "24px 16px" }}>
-
-        {/* ── SAISIE ──────────────────────────────────────────────── */}
-        {activeTab === "saisie" && (
-          <div>
-            {/* Sélecteur semaine */}
-            {/* Compteur jours */}
-            {(() => {
-              const totalJours = 112;
-              const joursOk = PLAN.reduce((acc, p) => {
-                const w = getWeek(p.sem);
-                return acc + w.jours.filter(j => j.kCalTotales || j.garminKcal).length;
-              }, 0);
-              const pct = joursOk / totalJours;
-              const r = 44, cx = 52, cy = 52, stroke = 6;
-              const circ = 2 * Math.PI * r;
-              const dash = pct * circ;
-              const col = pct < 0.33 ? "#6366f1" : pct < 0.66 ? "#f59e0b" : "#10b981";
-              return (
-                <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20, padding: "12px 16px", background: "#1e293b", borderRadius: 14, border: "1px solid #334155" }}>
-                  <svg width={104} height={104}>
-                    <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1e293b" strokeWidth={stroke}/>
-                    <circle cx={cx} cy={cy} r={r} fill="none" stroke="#0f172a" strokeWidth={stroke+2}/>
-                    <circle cx={cx} cy={cy} r={r} fill="none" stroke={col} strokeWidth={stroke}
-                      strokeDasharray={`${dash} ${circ}`}
-                      strokeLinecap="round"
-                      transform={`rotate(-90 ${cx} ${cy})`}
-                      style={{ transition: "stroke-dasharray 0.5s ease" }}
-                    />
-                    <text x={cx} y={cy-6} textAnchor="middle" fill="#f8fafc" fontSize="16" fontWeight="bold">{joursOk}</text>
-                    <text x={cx} y={cy+10} textAnchor="middle" fill="#64748b" fontSize="11">/{totalJours}</text>
-                    <text x={cx} y={cy+24} textAnchor="middle" fill={col} fontSize="10">{Math.round(pct*100)}%</text>
-                  </svg>
-                  <div>
-                    <div style={{ fontSize: 15, color: "#f8fafc", fontWeight: 600 }}>Progression</div>
-                    <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 4 }}>
-                      {joursOk} jour{joursOk > 1 ? "s" : ""} saisi{joursOk > 1 ? "s" : ""}
-                    </div>
-                    <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
-                      sur {totalJours} jours au total
-                    </div>
-                    <div style={{ fontSize: 12, color: col, marginTop: 4, fontWeight: 600 }}>
-                      {totalJours - joursOk} jours restants
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
-              {PLAN.map(p => {
-                const k = kpiSem(p.sem);
-                const hasData = (() => {
-                  const w = data[p.sem];
-                  if (!w) return false;
-                  if (w.poidsLundi) return true;
-                  if (w.planningSport?.some(s => s?.trim())) return true;
-                  if (w.jours?.some(j => j.sportFait?.trim() || j.garminKcal?.trim() || j.kCalTotales?.trim() ||
-                    j.petitDejMacros || j.dejeunerMacros || j.collationMacros || j.dinerMacros)) return true;
-                  return false;
-                })();
-                return (
-                  <button key={p.sem} onClick={() => setActiveSem(p.sem)} style={{
-                    width: 38, height: 38, borderRadius: 8, border: "none",
-                    fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-                    background: activeSem === p.sem ? "#6366f1"
-                      : !hasData ? "#1e293b"
-                      : (k.poidsOk === false || k.kcalOk === false || k.sportOk === false)
-                        ? "#450a0a" : "#064e3b",
-                    outline: activeSem === p.sem ? "2px solid #818cf8" : "none",
-                  }}>S{p.sem}</button>
-                );
-              })}
-            </div>
-
-            {/* Semaine header */}
-            <div style={{
-              background: "#1e293b", borderRadius: 14, padding: "16px 20px",
-              marginBottom: 20, border: "1px solid #334155",
-              display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center",
-            }}>
-              <div>
-                <div style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase", letterSpacing: 1 }}>
-                  Semaine {activeSem} · {plan.lundi}
-                </div>
-                <div style={{ fontSize: 15, color: "#f8fafc", fontWeight: 600, marginTop: 4 }}>
-                  <span style={{
-                    display: "inline-block", padding: "2px 10px", borderRadius: 99, fontSize: 12,
-                    background: PHASE_COLORS[plan.phase] + "33",
-                    color: PHASE_COLORS[plan.phase], marginRight: 8,
-                  }}>{plan.phase}</span>
-                  Objectif {plan.ciblePoids} kg
-                </div>
-                {/* Détail calories par jour — dynamique selon planning */}
-                <div style={{ marginTop: 8, display: "flex", gap: 4, flexWrap: "wrap" }}>
-                  {JOURS.map((j, i) => {
-                    const kcal = getCibleKcalDynamique(plan, week.planningSport)[i];
-                    const color = kcal === 1550 ? "#ef4444" : kcal === 2000 ? "#10b981" : kcal === 1750 ? "#64748b" : "#6366f1";
-                    return (
-                      <div key={i} style={{
-                        padding: "2px 8px", borderRadius: 6, fontSize: 11,
-                        background: color + "22", color, border: `1px solid ${color}44`,
-                      }}>
-                        {j} {kcal}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Poids lundi */}
-              <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
-                <label style={{ fontSize: 13, color: "#94a3b8" }}>⚖️ Poids lundi</label>
-                <input
-                  type="number" step="0.1"
-                  value={week.poidsLundi}
-                  onChange={e => updateWeek(activeSem, "poidsLundi", e.target.value)}
-                  placeholder="69.5"
-                  style={{
-                    width: 80, padding: "6px 10px", borderRadius: 8,
-                    border: "1.5px solid #334155", background: "#0f172a",
-                    color: "#f8fafc", fontSize: 14, fontFamily: "inherit", textAlign: "center",
-                  }}
-                />
-                <span style={{ fontSize: 13, color: "#64748b" }}>kg</span>
-                {kpi.poids && badge(kpi.poidsOk, kpi.poidsOk ? `✓ ${kpi.poids} kg` : `✗ ${kpi.poids} kg`)}
-              <button onClick={() => resetWeek(activeSem)} style={{
-                marginLeft: "auto", padding: "4px 10px", borderRadius: 6, border: "1px solid #450a0a",
-                background: "transparent", color: "#ef4444", fontSize: 11, cursor: "pointer", fontFamily: "inherit",
-              }}>🗑 Réinit. semaine</button>
-              </div>
-            </div>
-
-            {/* Planning sport semaine v2 */}
-            <SportWeekPanel
-              weekSport={week.sport}
-              onUpdate={(sportData) => updateWeekSport(activeSem, sportData)}
-            />
-
-            {/* Sélecteur jour */}
-            <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
-              {JOURS.map((j, i) => {
-                const ok = kpi.joursOk[i];
-                return (
-                  <button key={i} onClick={() => setActiveJour(i)} style={{
-                    flex: 1, padding: "8px 4px", borderRadius: 8, border: "none",
-                    fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-                    background: activeJour === i ? "#6366f1"
-                      : ok === true ? "#064e3b" : ok === false ? "#450a0a" : "#1e293b",
-                    color: activeJour === i ? "white" : ok === true ? "#6ee7b7" : ok === false ? "#fca5a5" : "#64748b",
-                  }}>
-                    {j}<br />
-                    <span style={{ fontSize: 10, opacity: 0.7 }}>{dot(ok)}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Saisie jour */}
-            {(() => {
-              const j = week.jours[activeJour];
-              return (
-                <div style={{ display: "grid", gap: 12 }}>
-                  {/* Sport v2 */}
-                  <SportDayPanel
-                    jour={j}
-                    jourIdx={activeJour}
-                    weekSport={week.sport}
-                    activeSem={activeSem}
-                    updateJour={updateJour}
-                    updateWeekSport={(sportData) => updateWeekSport(activeSem, sportData)}
-                  />
-                  {/* Garmin */}
-                  <div style={{ background: "#1e293b", borderRadius: 14, padding: "14px 16px", border: "1px solid #334155" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <span style={{ fontSize: 18 }}>⌚</span>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 11, color: "#64748b", marginBottom: 6 }}>Calories brûlées Garmin (total journée)</div>
-                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                          <input type="number"
-                            value={j.garminKcal}
-                            onChange={e => updateJour(activeSem, activeJour, "garminKcal", e.target.value)}
-                            placeholder="ex: 2150"
-                            style={{
-                              width: 120, padding: "8px 12px", borderRadius: 8,
-                              border: `1.5px solid ${j.garminKcal ? "#10b981" : "#334155"}`,
-                              background: "#0f172a", color: "#f8fafc", fontSize: 13, fontFamily: "inherit",
-                            }}
-                          />
-                          <span style={{ fontSize: 12, color: "#64748b" }}>kcal</span>
-                          {j.garminKcal && j.kCalTotales && (
-                            <span style={{
-                              fontSize: 12, padding: "3px 8px", borderRadius: 6,
-                              background: parseFloat(j.garminKcal) - parseFloat(j.kCalTotales||0) > 0 ? "#064e3b" : "#450a0a",
-                              color: parseFloat(j.garminKcal) - parseFloat(j.kCalTotales||0) > 0 ? "#6ee7b7" : "#fca5a5",
-                            }}>
-                              Déficit : {Math.round(parseFloat(j.garminKcal) - parseFloat(j.kCalTotales||0))} kcal
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Nutrition avec saisie texte + calcul IA */}
-                  <NutritionPanel
-                    jour={j}
-                    activeJour={activeJour}
-                    activeSem={activeSem}
-                    cibleKcal={getCibleKcalDynamique(plan, week.planningSport)[activeJour]}
-                    deficitCibleJour={Math.round((DEFICIT_CIBLE[activeSem] || 0) / 7)}
-                    updateJour={updateJour}
-                  />
-                </div>
-              );
-            })()}
-
-            {/* KPI semaine */}
-            <div style={{
-              marginTop: 20, background: "#1e293b", borderRadius: 14,
-              padding: "16px 20px", border: "1px solid #334155",
-            }}>
-              <div style={{ fontSize: 13, color: "#94a3b8", marginBottom: 12, fontWeight: 600 }}>
-                📊 KPI de la semaine
-              </div>
-              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                {badge(kpi.poidsOk,
-                  kpi.poids ? `⚖️ ${kpi.poids} kg (cible ${plan.ciblePoids})` : "⚖️ Poids non saisi"
-                )}
-                {badge(kpi.kcalOk,
-                  kpi.deficitReel !== null
-                    ? `🍽️ Déficit : ${kpi.deficitReel} kcal (cible ${kpi.deficitCible} kcal)`
-                    : "🍽️ Pas assez de données (Garmin + calories)"
-                )}
-                {badge(kpi.sportOk,
-                  kpi.planSessions === 0
-                    ? "🏃 Aucun sport planifié"
-                    : `🏃 ${kpi.faitSessions}/${kpi.planSessions} sessions`
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── TABLEAU ──────────────────────────────────────────────── */}
-        {activeTab === "tableau" && (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
-              <thead>
-                <tr>
-                  <th style={{ padding: "8px 12px", textAlign: "left", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>Semaine</th>
-                  <th style={{ padding: "8px 12px", textAlign: "left", color: "#64748b", borderBottom: "1px solid #1e293b" }}>Phase</th>
-                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>⚖️ Poids réel</th>
-                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>📉 Plan</th>
-                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🔮 Projection</th>
-                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🔥 Déficit cible</th>
-                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🍽️ Déficit réel</th>
-                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b" }}>🏃 Sport</th>
-                  {JOURS.map(j => (
-                    <th key={j} style={{ padding: "8px 8px", color: "#64748b", borderBottom: "1px solid #1e293b", textAlign: "center" }}>{j}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {PLAN.map(p => {
-                  const k = kpiSem(p.sem);
-                  const hasData = (() => {
-                  const w = data[p.sem];
-                  if (!w) return false;
-                  if (w.poidsLundi) return true;
-                  if (w.planningSport?.some(s => s?.trim())) return true;
-                  if (w.jours?.some(j => j.sportFait?.trim() || j.garminKcal?.trim() || j.kCalTotales?.trim() ||
-                    j.petitDejMacros || j.dejeunerMacros || j.collationMacros || j.dinerMacros)) return true;
-                  return false;
-                })();
-                  const isActive = p.sem === activeSem;
-                  return (
-                    <tr key={p.sem}
-                      onClick={() => { setActiveSem(p.sem); setActiveTab("saisie"); }}
-                      style={{
-                        cursor: "pointer",
-                        background: isActive ? "#1e293b33" : "transparent",
-                        borderBottom: "1px solid #0f172a",
-                      }}
-                    >
-                      <td style={{ padding: "10px 12px", color: "#f8fafc", fontWeight: isActive ? 700 : 400, whiteSpace: "nowrap" }}>
-                        S{p.sem} · {p.lundi}
-                      </td>
-                      <td style={{ padding: "10px 12px" }}>
-                        <span style={{
-                          padding: "2px 8px", borderRadius: 99, fontSize: 11,
-                          background: PHASE_COLORS[p.phase] + "22",
-                          color: PHASE_COLORS[p.phase],
-                        }}>{p.phase}</span>
-                      </td>
-                      {/* Poids réel */}
-                      <td style={{ padding: "10px 8px", textAlign: "center" }}>
-                        {hasData ? (
-                          <span style={{
-                            padding: "2px 8px", borderRadius: 6, fontSize: 12,
-                            background: k.poidsOk ? "#064e3b" : k.poids ? "#450a0a" : "#1e293b",
-                            color: k.poidsOk ? "#6ee7b7" : k.poids ? "#fca5a5" : "#64748b",
-                          }}>{k.poids ? `${k.poids} kg` : "—"}</span>
-                        ) : <span style={{ color: "#334155" }}>—</span>}
-                      </td>
-                      {/* Poids estimé selon plan */}
-                      <td style={{ padding: "10px 8px", textAlign: "center" }}>
-                        <span style={{ fontSize: 12, color: "#475569" }}>{p.ciblePoids} kg</span>
-                      </td>
-
-                      {/* Projection depuis dernier poids réel mesuré */}
-                      <td style={{ padding: "10px 8px", textAlign: "center" }}>
-                        {(() => {
-                          // Trouver le dernier poids réel mesuré
-                          let lastPoids = null, lastSem = 0;
-                          PLAN.forEach(pp => {
-                            const ww = getWeek(pp.sem);
-                            const po = parseFloat(ww.poidsLundi);
-                            if (!isNaN(po) && po > 0) { lastPoids = po; lastSem = pp.sem; }
-                          });
-                          if (lastPoids === null) return <span style={{ color: "#334155" }}>—</span>;
-                          if (p.sem < lastSem) return <span style={{ color: "#334155" }}>—</span>;
-                          if (p.sem === lastSem) return <span style={{ fontSize: 12, color: "#6366f1", fontWeight: 600 }}>{lastPoids} kg ←</span>;
-                          // Appliquer déficits cumulés depuis lastSem
-                          let po = lastPoids;
-                          for (let s = lastSem + 1; s <= p.sem; s++) {
-                            const def = DEFICIT_CIBLE[s] || 0;
-                            po = Math.round((po - def / 7700) * 10) / 10;
-                          }
-                          const diff = Math.round((po - p.ciblePoids) * 10) / 10;
-                          const color = Math.abs(diff) < 0.3 ? "#10b981" : po > p.ciblePoids ? "#ef4444" : "#6366f1";
-                          return (
-                            <div>
-                              <span style={{ fontSize: 12, color, fontWeight: 600 }}>{po} kg</span>
-                              <div style={{ fontSize: 10, color: "#64748b" }}>
-                                {diff > 0 ? "+" : ""}{diff} vs plan
-                              </div>
-                            </div>
-                          );
-                        })()}
-                      </td>
-                      {/* Déficit cible */}
-                      <td style={{ padding: "10px 8px", textAlign: "center" }}>
-                        <span style={{ fontSize: 12, color: k.deficitCible > 0 ? "#f59e0b" : "#334155" }}>
-                          {k.deficitCible > 0 ? `${k.deficitCible} kcal` : "—"}
-                        </span>
-                      </td>
-                      {/* Déficit réel */}
-                      <td style={{ padding: "10px 8px", textAlign: "center" }}>
-                        {hasData && k.deficitReel !== null ? (
-                          <div>
-                            <span style={{
-                              padding: "2px 8px", borderRadius: 6, fontSize: 12,
-                              background: k.deficitOk ? "#064e3b" : "#450a0a",
-                              color: k.deficitOk ? "#6ee7b7" : "#fca5a5",
-                            }}>{k.deficitReel} kcal</span>
-                            <div style={{ fontSize: 10, color: "#10b981", marginTop: 2 }}>
-                              ⌚ cumulé
-                            </div>
-                          </div>
-                        ) : <span style={{ color: "#334155" }}>—</span>}
-                      </td>
-                      {/* Sport */}
-                      <td style={{ padding: "10px 8px", textAlign: "center" }}>
-                        {hasData ? (
-                          <span style={{
-                            padding: "2px 8px", borderRadius: 6, fontSize: 12,
-                            background: k.sportOk === true ? "#064e3b" : k.sportOk === false ? "#450a0a" : "#1e293b",
-                            color: k.sportOk === true ? "#6ee7b7" : k.sportOk === false ? "#fca5a5" : "#64748b",
-                          }}>{k.planSessions > 0 ? `${k.faitSessions}/${k.planSessions}` : "—"}</span>
-                        ) : <span style={{ color: "#334155" }}>—</span>}
-                      </td>
-                      {/* Jours */}
-                      {k.sportJourOk.map((ok, i) => (
-                        <td key={i} style={{ padding: "8px 4px", textAlign: "center" }}>
-                          <div style={{
-                            width: 28, height: 28, borderRadius: 6, margin: "0 auto",
-                            background: ok === true ? "#064e3b" : ok === false ? "#450a0a" : "#1e293b",
-                            display: "flex", alignItems: "center", justifyContent: "center",
-                            fontSize: 14,
-                          }}>
-                            {ok === true ? "✓" : ok === false ? "✗" : ""}
-                          </div>
-                        </td>
-                      ))}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-            <div style={{ marginTop: 12, fontSize: 12, color: "#64748b" }}>
-              💡 Clique sur une ligne pour saisir les données de la semaine
-            </div>
-          </div>
-        )}
-
-        {/* ── GRAPHIQUES ──────────────────────────────────────────── */}
-        {activeTab === "graphiques" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-            {/* Poids — graphe SVG avec 3 courbes */}
-            <div style={{ background: "#1e293b", borderRadius: 14, padding: "20px", border: "1px solid #334155" }}>
-              <div style={{ fontSize: 14, color: "#f8fafc", fontWeight: 600, marginBottom: 8 }}>
-                ⚖️ Évolution du poids
-              </div>
-              <div style={{ display: "flex", gap: 16, marginBottom: 12, flexWrap: "wrap" }}>
-                <span style={{ fontSize: 11, color: "#334155", display: "flex", alignItems: "center", gap: 4 }}>
-                  <span style={{ display: "inline-block", width: 20, height: 2, background: "#334155" }}/>
-                  Objectif plan
-                </span>
-                <span style={{ fontSize: 11, color: "#f59e0b", display: "flex", alignItems: "center", gap: 4 }}>
-                  <span style={{ display: "inline-block", width: 20, height: 2, background: "#f59e0b", borderTop: "2px dashed #f59e0b" }}/>
-                  Poids estimé
-                </span>
-                <span style={{ fontSize: 11, color: "#6366f1", display: "flex", alignItems: "center", gap: 4 }}>
-                  <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "#6366f1" }}/>
-                  Poids mesuré
-                </span>
-              </div>
-              {(() => {
-                const chartData = PLAN.map(p => {
-                  const w = getWeek(p.sem);
-                  return {
-                    sem: "S"+p.sem,
-                    objectif: p.ciblePoids,
-                    estime: p.ciblePoids, // même que objectif = poids estimé selon plan
-                    mesure: parseFloat(w.poidsLundi) || null,
-                  };
-                });
-                const W = 600, H = 480;
-                const pad = { t: 20, r: 20, b: 40, l: 48 };
-                const cW = W - pad.l - pad.r, cH = H - pad.t - pad.b;
-                const yMin = 64, yMax = 70;
-                const xS = i => pad.l + (i / (chartData.length - 1)) * cW;
-                const yS = v => pad.t + cH - ((v - yMin) / (yMax - yMin)) * cH;
-                const segs = (key) => {
-                  const s = []; let cur = [];
-                  chartData.forEach((d, i) => {
-                    if (d[key] != null) cur.push(xS(i)+","+yS(d[key]));
-                    else if (cur.length) { s.push(cur); cur = []; }
-                  });
-                  if (cur.length) s.push(cur);
-                  return s;
-                };
-                return (
-                  <svg viewBox={"0 0 "+W+" "+H} preserveAspectRatio="xMidYMid meet" style={{ width: "100%", display: "block", minHeight: 380 }}>
-                    {[0,0.25,0.5,0.75,1].map(t => {
-                      const y = pad.t + t * cH;
-                      const v = (yMax - t*(yMax-yMin)).toFixed(1);
-                      return <g key={t}>
-                        <line x1={pad.l} y1={y} x2={W-pad.r} y2={y} stroke="#334155" strokeWidth="1"/>
-                        <text x={pad.l-4} y={y+4} textAnchor="end" fill="#94a3b8" fontSize="14">{v}</text>
-                      </g>;
-                    })}
-                    {chartData.filter((_,i) => i % 3 === 0).map((d,_,arr) => {
-                      const i = chartData.indexOf(d);
-                      return <text key={i} x={xS(i)} y={H-6} textAnchor="middle" fill="#64748b" fontSize="10">{d.sem}</text>;
-                    })}
-                    {/* Objectif plan */}
-                    {segs("objectif").map((s,i) => <polyline key={"o"+i} points={s.join(" ")} fill="none" stroke="#475569" strokeWidth="2" strokeDasharray="6,4"/>)}
-                    {/* Poids estimé */}
-                    {segs("estime").map((s,i) => <polyline key={"e"+i} points={s.join(" ")} fill="none" stroke="#f59e0b" strokeWidth="2" strokeDasharray="8,4"/>)}
-                    {/* Poids mesuré */}
-                    {segs("mesure").map((s,i) => <polyline key={"m"+i} points={s.join(" ")} fill="none" stroke="#6366f1" strokeWidth="3"/>)}
-                    {chartData.map((d,i) => d.mesure != null ? (
-                      <circle key={"dot"+i} cx={xS(i)} cy={yS(d.mesure)} r="7" fill="#6366f1" stroke="#0f172a" strokeWidth="2"/>
-                    ) : null)}
-                  </svg>
-                );
-              })()}
-            </div>
-
-            {/* Sport */}
-            <div style={{ background: "#1e293b", borderRadius: 14, padding: "20px", border: "1px solid #334155" }}>
-              <div style={{ fontSize: 14, color: "#f8fafc", fontWeight: 600, marginBottom: 16 }}>
-                🏃 Sessions sport réalisées vs planifiées
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                {PLAN.map(p => {
-                  const k = kpiSem(p.sem);
-                  if (k.planSessions === 0) return null;
-                  const pct = k.planSessions > 0 ? (k.faitSessions / k.planSessions) : 0;
-                  return (
-                    <div key={p.sem} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div style={{ width: 30, fontSize: 11, color: "#64748b" }}>S{p.sem}</div>
-                      <div style={{ flex: 1, background: "#0f172a", borderRadius: 4, height: 16, overflow: "hidden" }}>
-                        <div style={{
-                          height: "100%", borderRadius: 4,
-                          width: `${Math.min(pct * 100, 100)}%`,
-                          background: pct >= 1 ? "#10b981" : pct > 0.5 ? "#f59e0b" : "#ef4444",
-                          transition: "width 0.4s",
-                        }} />
-                      </div>
-                      <div style={{ width: 40, fontSize: 11, color: "#94a3b8", textAlign: "right" }}>
-                        {k.faitSessions}/{k.planSessions}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Message copie */}
-        {copyMsg && (
-          <div style={{
-            position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
-            background: "#1e293b", border: "1px solid #334155", borderRadius: 12,
-            padding: "12px 20px", fontSize: 13, color: "#e2e8f0", zIndex: 100,
-            display: "flex", gap: 12, alignItems: "center", boxShadow: "0 8px 32px #0008",
-          }}>
-            {copyMsg}
-            <button onClick={() => setCopyMsg("")} style={{
-              background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 16,
-            }}>✕</button>
-          </div>
-        )}
-
-        {/* Modal export texte (fallback si clipboard bloqué) */}
-        {showExport && (
-          <div style={{
-            position: "fixed", inset: 0, background: "#000a", zIndex: 200,
-            display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
-          }}>
-            <div style={{ background: "#1e293b", borderRadius: 16, padding: 24, maxWidth: 500, width: "100%" }}>
-              <div style={{ fontSize: 15, color: "#f8fafc", fontWeight: 600, marginBottom: 12 }}>
-                💾 Sauvegarde manuelle
-              </div>
-              <p style={{ fontSize: 13, color: "#94a3b8", marginBottom: 12 }}>
-                Copie ce texte et colle-le dans Notes ou un email à toi-même :
-              </p>
-              <textarea
-                readOnly
-                value={JSON.stringify(data)}
-                rows={6}
-                style={{
-                  width: "100%", padding: 10, borderRadius: 8, background: "#0f172a",
-                  border: "1px solid #334155", color: "#94a3b8", fontSize: 11,
-                  fontFamily: "monospace", boxSizing: "border-box", resize: "none",
-                }}
-                onFocus={e => e.target.select()}
-              />
-              <button onClick={() => setShowExport(false)} style={{
-                marginTop: 12, padding: "8px 20px", borderRadius: 8, border: "none",
-                background: "#6366f1", color: "white", cursor: "pointer", fontFamily: "inherit",
-              }}>Fermer</button>
-            </div>
-          </div>
-        )}
-
-        {/* Modal import texte (fallback si clipboard bloqué) */}
-        {showImport && (
-          <div style={{
-            position: "fixed", inset: 0, background: "#000a", zIndex: 200,
-            display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
-          }}>
-            <div style={{ background: "#1e293b", borderRadius: 16, padding: 24, maxWidth: 500, width: "100%" }}>
-              <div style={{ fontSize: 15, color: "#f8fafc", fontWeight: 600, marginBottom: 12 }}>
-                📂 Charger mes données
-              </div>
-              <p style={{ fontSize: 13, color: "#94a3b8", marginBottom: 12 }}>
-                Colle ici le texte sauvegardé précédemment :
-              </p>
-              <textarea
-                value={importText}
-                onChange={e => setImportText(e.target.value)}
-                rows={6}
-                placeholder='Colle ton JSON ici...'
-                style={{
-                  width: "100%", padding: 10, borderRadius: 8, background: "#0f172a",
-                  border: "1px solid #334155", color: "#e2e8f0", fontSize: 11,
-                  fontFamily: "monospace", boxSizing: "border-box", resize: "none",
-                }}
-              />
-              <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-                <button onClick={doImportText} style={{
-                  flex: 1, padding: "8px 20px", borderRadius: 8, border: "none",
-                  background: "#6366f1", color: "white", cursor: "pointer", fontFamily: "inherit",
-                }}>Importer</button>
-                <button onClick={() => setShowImport(false)} style={{
-                  padding: "8px 20px", borderRadius: 8, border: "1px solid #334155",
-                  background: "none", color: "#94a3b8", cursor: "pointer", fontFamily: "inherit",
-                }}>Annuler</button>
-              </div>
-            </div>
-          </div>
-        )}
-
-      </div>
-    </div>
-  );
-}
-
-
-ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
-</script>
-</body>
-</html>
+   
