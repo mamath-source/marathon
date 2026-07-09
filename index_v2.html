@@ -57,20 +57,20 @@ loadNext();
 </script>
 <script id="app-code" type="text/plain">
 const { useState, useEffect } = React;
- 
- 
+
+
 // ── PLAN (déficit & poids cible par semaine) ──────────────────────────────────
 const P16 = [1650, 1650, 1550, 1650, 1650, 2000, 1650]; // Phase 3 : repos mer, SL sam
 const VAC = [2000, 2000, 2000, 2000, 2000, 2000, 2000];
 const AFF = [1650, 1650, 1550, 1650, 1650, 1900, 1650]; // Affûtage : SL réduite
- 
+
 const DEFICIT_CIBLE = {
   1:2426, 2:2426, 3:2426, 4:2426, 5:2426,
   6:0, 7:0,
   8:2426, 9:2426, 10:2426, 11:2426, 12:2426, 13:2426,
   14:2426, 15:2426, 16:0,
 };
- 
+
 const PLAN = [
   { sem: 1,  lundi: "6 juil",   phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 69.60, sessionsTargets: 4 },
   { sem: 2,  lundi: "13 juil",  phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 69.28, sessionsTargets: 4 },
@@ -89,25 +89,25 @@ const PLAN = [
   { sem: 15, lundi: "12 oct",   phase: "Marathon",  cibleKcalJours: AFF, ciblePoids: 65.82, sessionsTargets: 3 },
   { sem: 16, lundi: "19 oct",   phase: "Marathon",  cibleKcalJours: AFF, ciblePoids: 65.50, sessionsTargets: 2 },
 ];
- 
- 
+
+
 const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 const PHASE_COLORS = {
   "Marathon": "#6366f1",
   "Vacances": "#10b981",
   "Affûtage": "#6366f1",
 };
- 
+
 // Sessions disponibles
 const SESSIONS_COURSE = ["EF", "SL", "VMA"];
 const SESSIONS_RENFO = ["RJ", "RA", "RB", "RAB"];
- 
+
 const EMPTY_JOUR = () => ({
   sessionsFaites: [],   // ex: ["EF", "RA"]
   garminKcal: "",
   kCalTotales: "",
 });
- 
+
 const EMPTY_WEEK_SPORT = () => ({
   // Planning semaine : sessions prévues (liste globale)
   coursesPrevues: [],   // ex: ["EF", "EF", "SL", "VMA"]
@@ -116,7 +116,7 @@ const EMPTY_WEEK_SPORT = () => ({
   // Placement par jour : sessions planifiées par jour
   planningJours: Array(7).fill(null).map(() => []),
 });
- 
+
 const EMPTY_WEEK = () => ({
   poidsLundi: "",
   // Ancien planning texte (deprecated mais gardé pour compat)
@@ -125,9 +125,9 @@ const EMPTY_WEEK = () => ({
   sport: EMPTY_WEEK_SPORT(),
   jours: Array(7).fill(null).map(() => EMPTY_JOUR()),
 });
- 
- 
- 
+
+
+
 // ── CALCUL DYNAMIQUE DES OBJECTIFS CALORIQUES ────────────────────────────────
 // Détecte le type de session depuis le texte du planning
 function detectSessionType(text) {
@@ -135,11 +135,11 @@ function detectSessionType(text) {
   if (/sortie.?long|long.?run|sl\b|1h[23456]|1h[23456]0/i.test(text)) return "longue";
   return "sport";
 }
- 
+
 function getCibleKcalDynamique(plan, planningSport) {
   // Phase 1 et Vacances : objectifs fixes
   if (plan.phase === "Phase 1" || plan.phase === "Vacances") return plan.cibleKcalJours;
- 
+
   // Phase 2 : 1550 si repos, 1650 sinon (pas de sortie longue)
   if (plan.phase === "Phase 2") {
     return planningSport.map(s => {
@@ -147,7 +147,7 @@ function getCibleKcalDynamique(plan, planningSport) {
       return type === "repos" ? 1550 : 1650;
     });
   }
- 
+
   // Phase 3 : 1550 repos, 2000 sortie longue, 1650 sport normal
   return planningSport.map(s => {
     const type = detectSessionType(s);
@@ -156,24 +156,24 @@ function getCibleKcalDynamique(plan, planningSport) {
     return 1650;
   });
 }
- 
- 
- 
+
+
+
 // ── RÉSUMÉ SEMAINE ────────────────────────────────────────────────────────────
 function WeekSummary({ weekSport, joursData }) {
   const sport = weekSport || { coursesPrevues: [], renfoPrevus: [], autresPrevus: 0, planningJours: Array(7).fill([]) };
- 
+
   // Sessions planifiées = agrégation de tout ce qui est dans la colonne "Planifié" des 7 jours
   const planningJours = sport.planningJours || Array(7).fill([]);
   const prevues = planningJours.flatMap(jour => (jour||[]).flatMap(s => s === "RAB" ? ["RA", "RB"] : [s]));
- 
+
   // Sessions réalisées (toutes les journées)
   const faites = joursData.flatMap(j => {
     const sessions = [...(j.sessionsFaites || [])];
     // RAB → compte comme RA + RB
     return sessions.flatMap(s => s === "RAB" ? ["RA", "RB", "RAB"] : [s]);
   });
- 
+
   // Boxes fixes à afficher dans l'ordre
   const BOXES = [
     { code: "EF",  idx: 0, label: "EF",  color: "#6366f1", cat: "course" },
@@ -184,28 +184,28 @@ function WeekSummary({ weekSport, joursData }) {
     { code: "RA",  idx: 0, label: "RA",  color: "#059669", cat: "renfo" },
     { code: "RB",  idx: 0, label: "RB",  color: "#047857", cat: "renfo" },
   ];
- 
+
   // Pour chaque box, combien de fois le code apparaît dans prévues/faites
   const countIn = (arr, code) => arr.filter(s => s === code).length;
- 
+
   // Box EF : besoin de savoir si la 1ère / 2ème est planifiée/faite
   const efPrevues = countIn(prevues, "EF");
   const efFaites = countIn(faites, "EF");
- 
+
   const isPlanned = (code, idx) => {
     if (code === "EF") return efPrevues > idx;
     return prevues.includes(code);
   };
- 
+
   const isDone = (code, idx) => {
     if (code === "EF") return efFaites > idx;
     return faites.includes(code);
   };
- 
+
   // Critères validation
   const courseOk = efFaites >= 1 && faites.includes("SL") && faites.includes("VMA");
   const renfoOk = faites.includes("RJ") || (faites.includes("RA") && faites.includes("RB")) || faites.includes("RAB");
- 
+
   return (
     <div style={{ background: "#0f172a", borderRadius: 10, padding: "12px 14px", marginBottom: 12, border: "1px solid #1e293b" }}>
       <div style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>
@@ -221,35 +221,35 @@ function WeekSummary({ weekSport, joursData }) {
             {BOXES.filter(b => b.cat === "course").map((b, i) => {
               const planned = isPlanned(b.code, b.idx);
               const done = isDone(b.code, b.idx);
-              const isCourse = b.cat === "course";
-              const colorDark = isCourse ? "#059669" : "#7c3aed";
+              const colorPlan = "#f59e0b";  // orange = planifié
+              const colorDone = "#10b981";  // vert = réalisé
               return (
                 <div key={i} style={{
                   width: 38, height: 38, borderRadius: 8,
-                  background: done ? colorDark + "33" : "#1e293b",
-                  border: `2px solid ${done ? colorDark : "#334155"}`,
+                  background: done ? colorDone + "22" : "#1e293b",
+                  border: `2px solid ${done ? colorDone : "#334155"}`,
                   display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
                   position: "relative",
                 }}>
                   <span style={{ fontSize: 10, fontWeight: 700,
-                    color: done || planned ? colorDark : "#475569" }}>
+                    color: done ? colorDone : planned ? colorPlan : "#475569" }}>
                     {b.label}
                   </span>
                   {planned && !done && (
                     <div style={{
                       width: 7, height: 7, borderRadius: "50%",
-                      background: colorDark, position: "absolute", bottom: 4,
+                      background: colorPlan, position: "absolute", bottom: 4,
                     }} />
                   )}
                   {done && (
-                    <div style={{ fontSize: 8, color: colorDark }}>✓</div>
+                    <div style={{ fontSize: 8, color: colorDone }}>✓</div>
                   )}
                 </div>
               );
             })}
           </div>
         </div>
- 
+
         {/* Renfo */}
         <div>
           <div style={{ fontSize: 10, color: renfoOk ? "#8b5cf6" : "#475569", marginBottom: 6, fontWeight: 600 }}>
@@ -285,7 +285,7 @@ function WeekSummary({ weekSport, joursData }) {
     </div>
   );
 }
- 
+
 // ── SPORT PANEL v2 ────────────────────────────────────────────────────────────
 const SESSION_DEFS = {
   EF:  { label: "EF",  desc: "Endurance fondamentale", color: "#10b981", cat: "course" },
@@ -296,7 +296,7 @@ const SESSION_DEFS = {
   RB:  { label: "RB",  desc: "Renfo bras B",             color: "#7c3aed", cat: "renfo" },
   RAB: { label: "RAB", desc: "Renfo bras+jambes (light)",color: "#6d28d9", cat: "renfo" },
 };
- 
+
 function SessionBadge({ code, active, onClick, small }) {
   const def = SESSION_DEFS[code] || { label: code, color: "#64748b", cat: "autre" };
   return (
@@ -317,24 +317,24 @@ function SessionBadge({ code, active, onClick, small }) {
     </button>
   );
 }
- 
+
 function SportWeekPanel({ weekSport, joursData, onUpdate }) {
   const sport = weekSport || { coursesPrevues: [], renfoPrevus: [], autresPrevus: 0, planningJours: Array(7).fill([]) };
- 
+
   const toggleCourse = (s) => {
     const arr = [...(sport.coursesPrevues || [])];
     const idx = arr.indexOf(s);
     if (idx >= 0) arr.splice(idx, 1); else arr.push(s);
     onUpdate({ ...sport, coursesPrevues: arr });
   };
- 
+
   const toggleRendoSem = (s) => {
     const arr = [...(sport.renfoPrevus || [])];
     const idx = arr.indexOf(s);
     if (idx >= 0) arr.splice(idx, 1); else arr.push(s);
     onUpdate({ ...sport, renfoPrevus: arr });
   };
- 
+
   // Count EF planned
   const efCount = (sport.coursesPrevues || []).filter(s => s === "EF").length;
   const addEF = () => onUpdate({ ...sport, coursesPrevues: [...(sport.coursesPrevues||[]), "EF"] });
@@ -344,23 +344,23 @@ function SportWeekPanel({ weekSport, joursData, onUpdate }) {
     if (i >= 0) arr.splice(i, 1);
     onUpdate({ ...sport, coursesPrevues: arr });
   };
- 
+
   const autresCount = sport.autresPrevus || 0;
- 
+
   // Validation
   const toutPlanifie = [...(sport.coursesPrevues||[]), ...(sport.renfoPrevus||[])];
   const courseValide = toutPlanifie.includes("SL") && toutPlanifie.includes("VMA") && toutPlanifie.includes("EF");
   const renfoValide = toutPlanifie.includes("RJ") || (toutPlanifie.includes("RA") && toutPlanifie.includes("RB")) || toutPlanifie.includes("RAB");
- 
+
   return (
     <div style={{ background: "#1e293b", borderRadius: 14, padding: "16px", border: "1px solid #334155", marginBottom: 12 }}>
       <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600, marginBottom: 12 }}>
         📋 Planning semaine
       </div>
- 
+
       {/* Résumé visuel */}
       <WeekSummary weekSport={weekSport} joursData={joursData || []} />
- 
+
       {/* Course */}
       <div style={{ marginBottom: 10 }}>
         <div style={{ fontSize: 11, color: "#10b981", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>
@@ -382,7 +382,7 @@ function SportWeekPanel({ weekSport, joursData, onUpdate }) {
           ))}
         </div>
       </div>
- 
+
       {/* Renfo */}
       <div style={{ marginBottom: 10 }}>
         <div style={{ fontSize: 11, color: "#10b981", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>
@@ -396,7 +396,7 @@ function SportWeekPanel({ weekSport, joursData, onUpdate }) {
           ))}
         </div>
       </div>
- 
+
       {/* Autre */}
       <div>
         <div style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>➕ Autre</div>
@@ -411,20 +411,20 @@ function SportWeekPanel({ weekSport, joursData, onUpdate }) {
     </div>
   );
 }
- 
+
 function SportDayPanel({ jour, jourIdx, weekSport, activeSem, updateJour, updateWeekSport }) {
   const faites = jour.sessionsFaites || [];
   const sport = weekSport || { coursesPrevues: [], renfoPrevus: [], autresPrevus: 0, planningJours: Array(7).fill([]) };
   const planningJours = sport.planningJours || Array(7).fill([]);
   const prevues = planningJours[jourIdx] || [];
- 
+
   const toggleFaite = (s) => {
     const arr = [...faites];
     const i = arr.indexOf(s);
     if (i >= 0) arr.splice(i, 1); else arr.push(s);
     updateJour(activeSem, jourIdx, "sessionsFaites", arr);
   };
- 
+
   const togglePrevue = (s) => {
     const newPlanning = (planningJours).map((d, i) => i === jourIdx ? (() => {
       const arr = [...(d||[])];
@@ -434,22 +434,22 @@ function SportDayPanel({ jour, jourIdx, weekSport, activeSem, updateJour, update
     })() : d);
     updateWeekSport({ ...sport, planningJours: newPlanning });
   };
- 
+
   // Autres planifiés/faits ce jour
   const autresPrevusJour = prevues.filter(s => s === "AUTRE").length;
   const autresFaitsJour = faites.filter(s => s === "AUTRE").length;
- 
+
   const allSessions = ["EF", "SL", "VMA", "RJ", "RA", "RB", "RAB"];
- 
+
   return (
     <div style={{ background: "#1e293b", borderRadius: 14, padding: "16px", border: "1px solid #334155" }}>
       <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600, marginBottom: 12 }}>🏃 Sport</div>
- 
+
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
-        <div style={{ fontSize: 11, color: "#6366f1", textAlign: "center", paddingBottom: 4, borderBottom: "1px solid #1e293b" }}>Planifié</div>
+        <div style={{ fontSize: 11, color: "#f59e0b", textAlign: "center", paddingBottom: 4, borderBottom: "1px solid #1e293b" }}>Planifié</div>
         <div style={{ fontSize: 11, color: "#10b981", textAlign: "center", paddingBottom: 4, borderBottom: "1px solid #1e293b" }}>Réalisé</div>
       </div>
- 
+
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         {allSessions.map(s => {
           const isPrevue = prevues.includes(s);
@@ -479,7 +479,7 @@ function SportDayPanel({ jour, jourIdx, weekSport, activeSem, updateJour, update
             </div>
           );
         })}
- 
+
         {/* Autre — 1 bouton planifié / 1 bouton réalisé */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, alignItems: "center", marginTop: 4 }}>
           <button onClick={() => {
@@ -515,7 +515,129 @@ function SportDayPanel({ jour, jourIdx, weekSport, activeSem, updateJour, update
     </div>
   );
 }
- 
+
+
+// ── COLLAPSIBLE SPORT PANEL ───────────────────────────────────────────────────
+function CollapsibleSportPanel({ jour, jourIdx, weekSport, activeSem, updateJour, updateWeekSport }) {
+  const [collapsed, setCollapsed] = useState(false);
+  const faites = jour.sessionsFaites || [];
+  const sport = weekSport || { planningJours: Array(7).fill([]) };
+  const planningJours = sport.planningJours || Array(7).fill([]);
+  const prevues = planningJours[jourIdx] || [];
+
+  const toggleFaite = (s) => {
+    const arr = [...faites];
+    const i = arr.indexOf(s);
+    if (i >= 0) arr.splice(i, 1); else arr.push(s);
+    updateJour(activeSem, jourIdx, "sessionsFaites", arr);
+  };
+
+  const togglePrevue = (s) => {
+    const newPlanning = planningJours.map((d, i) => {
+      if (i !== jourIdx) return d;
+      const arr = [...(d||[])];
+      const idx = arr.indexOf(s);
+      if (idx >= 0) arr.splice(idx, 1); else arr.push(s);
+      return arr;
+    });
+    updateWeekSport({ ...sport, planningJours: newPlanning });
+  };
+
+  const allSessions = ["EF", "SL", "VMA", "RJ", "RA", "RB", "RAB"];
+  const autresPrevus = prevues.filter(s => s === "AUTRE").length;
+  const autresFaits = faites.filter(s => s === "AUTRE").length;
+
+  // A row is "active" if at least one side (planned or done) is selected
+  const isActive = (s) => prevues.includes(s) || faites.includes(s);
+  const autreActive = autresPrevus > 0 || autresFaits > 0;
+
+  return (
+    <div style={{ background: "#1e293b", borderRadius: 14, border: "1px solid #334155" }}>
+      {/* Header */}
+      <div style={{ padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>🏃 Sport</div>
+        <button onClick={() => setCollapsed(!collapsed)} style={{
+          background: "#0f172a", border: "1px solid #334155", color: "#94a3b8",
+          borderRadius: 6, width: 28, height: 28, cursor: "pointer",
+          fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center",
+          fontFamily: "inherit",
+        }}>{collapsed ? "▼" : "▲"}</button>
+      </div>
+
+      {/* Column headers - always visible */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, padding: "0 16px 8px", borderTop: "1px solid #0f172a" }}>
+        <div style={{ fontSize: 11, color: "#f59e0b", textAlign: "center", paddingBottom: 4 }}>Planifié</div>
+        <div style={{ fontSize: 11, color: "#10b981", textAlign: "center", paddingBottom: 4 }}>Réalisé</div>
+      </div>
+
+      {/* Rows - filtered when collapsed */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "0 16px 16px" }}>
+        {allSessions
+          .filter(s => !collapsed || isActive(s))
+          .map(s => {
+            const isPrevue = prevues.includes(s);
+            const isFaite = faites.includes(s);
+            const def = SESSION_DEFS[s];
+            const c = def.cat === "course" ? "#10b981" : "#8b5cf6";
+            return (
+              <div key={s} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                <button onClick={() => togglePrevue(s)} style={{
+                  padding: "5px 10px", borderRadius: 99,
+                  border: `1.5px solid ${isPrevue ? "#f59e0b" : "#1e293b"}`,
+                  background: isPrevue ? "#f59e0b22" : "#0f172a",
+                  color: isPrevue ? "#f59e0b" : "#334155",
+                  fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                }}>{s}</button>
+                <button onClick={() => toggleFaite(s)} style={{
+                  padding: "5px 10px", borderRadius: 99,
+                  border: `1.5px solid ${isFaite ? c : "#1e293b"}`,
+                  background: isFaite ? c + "33" : "#0f172a",
+                  color: isFaite ? c : "#334155",
+                  fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                }}>{isFaite ? "✓ " : ""}{s}</button>
+              </div>
+            );
+          })
+        }
+
+        {/* Autre - show if active or not collapsed */}
+        {(!collapsed || autreActive) && (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 4 }}>
+            <button onClick={() => {
+              const np = planningJours.map((d, i) => {
+                if (i !== jourIdx) return d;
+                const arr = [...(d||[])];
+                const idx = arr.indexOf("AUTRE");
+                if (idx >= 0) arr.splice(idx, 1); else arr.push("AUTRE");
+                return arr;
+              });
+              updateWeekSport({ ...sport, planningJours: np });
+            }} style={{
+              padding: "5px 10px", borderRadius: 99,
+              border: `1.5px solid ${autresPrevus > 0 ? "#f59e0b" : "#1e293b"}`,
+              background: autresPrevus > 0 ? "#f59e0b22" : "#0f172a",
+              color: autresPrevus > 0 ? "#f59e0b" : "#334155",
+              fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+            }}>Autre</button>
+            <button onClick={() => {
+              const arr = [...faites];
+              const idx = arr.indexOf("AUTRE");
+              if (idx >= 0) arr.splice(idx, 1); else arr.push("AUTRE");
+              updateJour(activeSem, jourIdx, "sessionsFaites", arr);
+            }} style={{
+              padding: "5px 10px", borderRadius: 99,
+              border: `1.5px solid ${autresFaits > 0 ? "#10b981" : "#1e293b"}`,
+              background: autresFaits > 0 ? "#10b98133" : "#0f172a",
+              color: autresFaits > 0 ? "#10b981" : "#334155",
+              fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+            }}>{autresFaits > 0 ? "✓ " : ""}Autre</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── NUTRITION PANEL with AI macro calculation ─────────────────────────────────
 function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJour, updateJour }) {
   const repas = [
@@ -524,19 +646,19 @@ function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJo
     { key: "collationMacros", label: "🍎 Collation" },
     { key: "dinerMacros",     label: "🌙 Dîner" },
   ];
- 
+
   // Total : priorité total manuel > somme repas
   const sommeRepas = repas.reduce((acc, r) => acc + (jour[r.key]?.kcal || 0), 0);
   const totalManuel = parseFloat(jour.kCalTotales) || 0;
   const totalEffectif = totalManuel > 0 ? totalManuel : sommeRepas;
   const hasTotaux = totalEffectif > 0;
- 
+
   // Budget basé sur Garmin si dispo
   const garmin = parseFloat(jour.garminKcal) || 0;
   const budgetMax = garmin > 0 ? Math.round(garmin - (deficitCibleJour || 0)) : cibleKcal;
   const restant = budgetMax - totalEffectif;
   const kcalOk = hasTotaux && totalEffectif <= budgetMax + 80;
- 
+
   return (
     <div style={{ background: "#1e293b", borderRadius: 14, padding: "16px 20px", border: "1px solid #334155" }}>
       {/* Header budget */}
@@ -570,7 +692,7 @@ function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJo
           )}
         </div>
       </div>
- 
+
       {/* Barre de progression */}
       {hasTotaux && (
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
@@ -588,27 +710,52 @@ function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJo
           </span>
         </div>
       )}
- 
-      {/* Total journée uniquement */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
-        <span style={{ fontSize: 13, color: "#94a3b8", whiteSpace: "nowrap" }}>📅 Calories du jour</span>
+
+      {/* Calories consommées */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4, marginBottom: 12 }}>
+        <span style={{ fontSize: 13, color: "#94a3b8", whiteSpace: "nowrap" }}>🍴 Calories consommées</span>
         <input type="number"
           value={jour.kCalTotales}
           onChange={e => updateJour(activeSem, activeJour, "kCalTotales", e.target.value)}
           placeholder="ex: 1650"
           style={{
-            width: 130, padding: "10px 14px", borderRadius: 8,
+            width: 120, padding: "10px 14px", borderRadius: 8,
             border: `1.5px solid ${jour.kCalTotales ? "#10b981" : "#334155"}`,
             background: "#0f172a", color: "#f8fafc", fontSize: 15, fontFamily: "inherit",
           }}
         />
         <span style={{ fontSize: 13, color: "#64748b" }}>kcal</span>
       </div>
+      {/* Garmin */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 10, borderTop: "1px solid #1e293b" }}>
+        <span style={{ fontSize: 16 }}>⌚</span>
+        <span style={{ fontSize: 13, color: "#94a3b8", whiteSpace: "nowrap" }}>Calories brûlées</span>
+        <input type="number"
+          value={jour.garminKcal}
+          onChange={e => updateJour(activeSem, activeJour, "garminKcal", e.target.value)}
+          placeholder="ex: 2150"
+          style={{
+            width: 120, padding: "8px 12px", borderRadius: 8,
+            border: `1.5px solid ${jour.garminKcal ? "#10b981" : "#334155"}`,
+            background: "#0f172a", color: "#f8fafc", fontSize: 13, fontFamily: "inherit",
+          }}
+        />
+        <span style={{ fontSize: 12, color: "#64748b" }}>kcal</span>
+        {jour.garminKcal && jour.kCalTotales && (
+          <span style={{
+            fontSize: 12, padding: "3px 8px", borderRadius: 6,
+            background: parseFloat(jour.garminKcal) - parseFloat(jour.kCalTotales||0) > 0 ? "#064e3b" : "#450a0a",
+            color: parseFloat(jour.garminKcal) - parseFloat(jour.kCalTotales||0) > 0 ? "#6ee7b7" : "#fca5a5",
+          }}>
+            Déficit : {Math.round(parseFloat(jour.garminKcal) - parseFloat(jour.kCalTotales||0))} kcal
+          </span>
+        )}
+      </div>
     </div>
   );
 }
- 
- 
+
+
 function App() {
   const [data, setData] = useState({});
   const [activeSem, setActiveSem] = useState(1);
@@ -620,7 +767,7 @@ function App() {
   const [importText, setImportText] = useState("");
   const [showImport, setShowImport] = useState(false);
   const [copyMsg, setCopyMsg] = useState("");
- 
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem("suivi-marathon-v2");
@@ -628,19 +775,19 @@ function App() {
     } catch(e) {}
     setLoaded(true);
   }, []);
- 
+
   const save = (newData) => {
     setData(newData);
     try { localStorage.setItem("suivi-marathon-v2", JSON.stringify(newData)); } catch(e) {}
   };
- 
+
   const resetAll = () => {
     if (!window.confirm("Effacer toutes les données ?")) return;
     try { localStorage.removeItem("suivi-marathon-v1"); } catch {}
     save({});
     setCopyMsg("✅ Toutes les données effacées !");
   };
- 
+
   const resetWeek = (sem) => {
     if (!window.confirm("Effacer toutes les données de S" + sem + " ? Cette action est irréversible.")) return;
     const newData = { ...data };
@@ -648,7 +795,7 @@ function App() {
     save(newData);
     setCopyMsg("✅ Semaine S" + sem + " réinitialisée !");
   };
- 
+
   // Export — copier dans le presse-papier
   const exportData = async () => {
     const txt = JSON.stringify(data);
@@ -659,7 +806,7 @@ function App() {
       setShowExport(true);
     }
   };
- 
+
   // Import — coller depuis le presse-papier
   const importData = async () => {
     try {
@@ -672,7 +819,7 @@ function App() {
       setShowImport(true);
     }
   };
- 
+
   const doImportText = async () => {
     try {
       const parsed = JSON.parse(importText);
@@ -684,46 +831,46 @@ function App() {
       setCopyMsg("❌ Texte invalide, réessaie.");
     }
   };
- 
+
   const getWeek = (s) => data[s] || EMPTY_WEEK();
- 
+
   const updateJour = (sem, jour, field, val) => {
     const w = { ...getWeek(sem) };
     w.jours = w.jours.map((j, i) => i === jour ? { ...j, [field]: val } : j);
     save({ ...data, [sem]: w });
   };
- 
+
   const updateWeek = (sem, field, val) => {
     const w = { ...getWeek(sem) };
     w[field] = val;
     save({ ...data, [sem]: w });
   };
- 
+
   const updatePlanning = (sem, jour, val) => {
     const w = { ...getWeek(sem) };
     w.planningSport = w.planningSport.map((v, i) => i === jour ? val : v);
     save({ ...data, [sem]: w });
   };
- 
+
   const updateWeekSport = (sem, sportData) => {
     const w = { ...getWeek(sem) };
     w.sport = sportData;
     save({ ...data, [sem]: w });
   };
- 
+
   // KPI calc
   const kpiSem = (s) => {
     const plan = PLAN[s - 1];
     const w = getWeek(s);
     const joursData = w.jours;
- 
+
     // Poids
     const poids = parseFloat(w.poidsLundi) || null;
     const poidsOk = poids !== null && poids <= plan.ciblePoids + 0.2;
- 
+
     // Objectifs caloriques dynamiques selon planning sport
     const cibleKcalDyn = getCibleKcalDynamique(plan, w.planningSport);
- 
+
     // Calories — objectif par jour
     const kcals = joursData.map(j => {
       const tot = parseFloat(j.kCalTotales);
@@ -738,31 +885,31 @@ function App() {
     // Objectif moyen de la semaine
     const cibleMoyenne = Math.round(cibleKcalDyn.reduce((a, b) => a + b, 0) / 7);
     // kcalOk basé uniquement sur le déficit cumulé (voir deficitOk plus bas)
- 
+
     // Sport v2 — validation semaine
     const sport = w.sport || { coursesPrevues: [], renfoPrevus: [], autresPrevus: 0, planningJours: Array(7).fill([]) };
     const toutesSessionsFaites = joursData.flatMap(j => j.sessionsFaites || []);
- 
+
     // Critère course : SL + VMA + au moins 1 EF
     const aEF = toutesSessionsFaites.filter(s => s === "EF").length >= 1;
     const aSL = toutesSessionsFaites.includes("SL");
     const aVMA = toutesSessionsFaites.includes("VMA");
     const courseOk = aEF && aSL && aVMA;
- 
+
     // Critère renfo : RJ OU (RA+RB) OU RAB
     const aRJ = toutesSessionsFaites.includes("RJ");
     const aRA = toutesSessionsFaites.includes("RA");
     const aRB = toutesSessionsFaites.includes("RB");
     const aRAB = toutesSessionsFaites.includes("RAB");
     const renfoOk = aRJ || (aRA && aRB) || aRAB;
- 
+
     const sportOk = toutesSessionsFaites.length === 0 ? null : (courseOk && renfoOk);
     const planSessions = sport.coursesPrevues.length + sport.renfoPrevus.length + sport.autresPrevus;
     const faitSessions = toutesSessionsFaites.length;
- 
+
     // Par jour : deux critères séparés
     const deficitCibleJour = Math.round((DEFICIT_CIBLE[s] || 0) / 7);
- 
+
     // sportJourOk : compare planning jour vs sessions faites ce jour
     const planningJours = sport.planningJours || Array(7).fill([]);
     const sportJourOk = joursData.map((j, i) => {
@@ -774,7 +921,7 @@ function App() {
       const toutFait = prevues.every(s => faites.includes(s));
       return toutFait ? true : false;
     });
- 
+
     // caloriesJourOk : vert si déficit atteint (ou objectif calories respecté)
     const caloriesJourOk = joursData.map((j, i) => {
       const kcal = kcals[i];
@@ -786,7 +933,7 @@ function App() {
       }
       return kcal <= cibleJour + 80;
     });
- 
+
     // joursOk global (pour compatibilité) = les deux ok
     const joursOk = joursData.map((j, i) => {
       const s = sportJourOk[i];
@@ -796,10 +943,10 @@ function App() {
       if (s === true || c === true) return true;
       return null;
     });
- 
+
     // Déficit réel = somme kcal brûlées estimées - kcal mangées (sur jours avec données)
     const deficitCible = DEFICIT_CIBLE[s] || 0;
- 
+
     // Déficit réel = somme cumulée des déficits journaliers (Garmin - calories)
     // Uniquement sur les jours où les deux valeurs sont saisies
     const apportCibleSem = cibleKcalDyn.reduce((a, b) => a + b, 0);
@@ -807,7 +954,7 @@ function App() {
     let deficitSource = "—";
     let deficitCumul = 0;
     let joursComplets = 0;
- 
+
     joursData.forEach((j, i) => {
       const garmin = parseFloat(j.garminKcal);
       const cal = parseFloat(j.kCalTotales) || kcals[i];
@@ -816,32 +963,32 @@ function App() {
         joursComplets++;
       }
     });
- 
+
     if (joursComplets > 0) {
       deficitReel = Math.round(deficitCumul);
       deficitSource = "garmin";
     }
     const deficitOk = deficitReel !== null && deficitReel >= deficitCible * 0.85;
- 
+
     return { poids, poidsOk, moyKcal, cibleMoyenne, kcalOk: deficitOk, faitSessions, planSessions, sportOk, joursOk, sportJourOk, caloriesJourOk, deficitCible, deficitReel, deficitOk, deficitSource };
   };
- 
+
   const plan = PLAN[activeSem - 1];
   const week = getWeek(activeSem);
   const kpi = kpiSem(activeSem);
- 
+
   // Chart data
   const chartData = PLAN.map(p => {
     const w = getWeek(p.sem);
     const poids = parseFloat(w.poidsLundi) || null;
     return { sem: `S${p.sem}`, cible: p.ciblePoids, reel: poids };
   }).filter(d => d.reel !== null || PLAN.findIndex(p => `S${p.sem}` === d.sem) <= activeSem);
- 
+
   const kcalChart = PLAN.map(p => {
     const k = kpiSem(p.sem);
     return { sem: `S${p.sem}`, cible: p.cibleKcal, reel: k.moyKcal };
   }).filter(d => d.reel !== null);
- 
+
   const dot = (ok) => ok === true ? "🟢" : ok === false ? "🔴" : "⚪";
   const badge = (ok, txt) => (
     <span style={{
@@ -851,9 +998,9 @@ function App() {
       border: `1px solid ${ok === true ? "#6ee7b7" : ok === false ? "#fca5a5" : "#e2e8f0"}`,
     }}>{txt}</span>
   );
- 
+
   if (!loaded) return <div style={{ color: "#94a3b8", padding: 40, textAlign: "center", fontFamily: "Georgia" }}>Chargement...</div>;
- 
+
   return (
     <div style={{
       minHeight: "100vh",
@@ -898,19 +1045,18 @@ function App() {
                 fontFamily: "inherit", border: "1px solid #334155",
                 background: "transparent", color: "#f59e0b",
               }}>📂 Charger</button>
- 
+
             </div>
           </div>
         </div>
       </div>
- 
+
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "24px 16px" }}>
- 
+
         {/* ── SAISIE ──────────────────────────────────────────────── */}
         {activeTab === "saisie" && (
           <div>
-            {/* Sélecteur semaine */}
-            {/* Compteur jours */}
+            {/* 1. Compteur jours */}
             {(() => {
               const totalJours = 112;
               const joursOk = PLAN.reduce((acc, p) => {
@@ -952,6 +1098,8 @@ function App() {
                 </div>
               );
             })()}
+
+            {/* 2. Sélecteur semaine */}
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
               {PLAN.map(p => {
                 const k = kpiSem(p.sem);
@@ -961,7 +1109,8 @@ function App() {
                   if (w.poidsLundi) return true;
                   if (w.planningSport?.some(s => s?.trim())) return true;
                   if (w.jours?.some(j => j.sportFait?.trim() || j.garminKcal?.trim() || j.kCalTotales?.trim() ||
-                    j.petitDejMacros || j.dejeunerMacros || j.collationMacros || j.dinerMacros)) return true;
+                    j.petitDejMacros || j.dejeunerMacros || j.collationMacros || j.dinerMacros ||
+                    (j.sessionsFaites && j.sessionsFaites.length > 0))) return true;
                   return false;
                 })();
                 return (
@@ -977,11 +1126,32 @@ function App() {
                 );
               })}
             </div>
- 
-            {/* Semaine header */}
+
+            {/* 3. KPI de la semaine */}
+            <div style={{
+              marginBottom: 16, background: "#1e293b", borderRadius: 14,
+              padding: "14px 20px", border: "1px solid #334155",
+            }}>
+              <div style={{ fontSize: 12, color: "#64748b", marginBottom: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>
+                📊 KPI semaine
+              </div>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                {badge(kpi.poidsOk,
+                  kpi.poids ? `⚖️ ${kpi.poids} kg (cible ${plan.ciblePoids})` : "⚖️ Poids non saisi"
+                )}
+                {badge(kpi.kcalOk,
+                  kpi.deficitReel !== null
+                    ? `🍽️ Déficit : ${kpi.deficitReel} kcal (cible ${kpi.deficitCible})`
+                    : "🍽️ Pas assez de données"
+                )}
+                {badge(kpi.sportOk, "🏃 Sport")}
+              </div>
+            </div>
+
+            {/* 4. Semaine header avec poids */}
             <div style={{
               background: "#1e293b", borderRadius: 14, padding: "16px 20px",
-              marginBottom: 20, border: "1px solid #334155",
+              marginBottom: 16, border: "1px solid #334155",
               display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center",
             }}>
               <div>
@@ -996,11 +1166,8 @@ function App() {
                   }}>{plan.phase}</span>
                   Objectif {plan.ciblePoids} kg
                 </div>
- 
               </div>
- 
-              {/* Poids lundi */}
-              <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                 <label style={{ fontSize: 13, color: "#94a3b8" }}>⚖️ Poids lundi</label>
                 <input
                   type="number" step="0.1"
@@ -1014,18 +1181,22 @@ function App() {
                   }}
                 />
                 <span style={{ fontSize: 13, color: "#64748b" }}>kg</span>
-                {kpi.poids && badge(kpi.poidsOk, kpi.poidsOk ? `✓ ${kpi.poids} kg` : `✗ ${kpi.poids} kg`)}
-              <button onClick={() => resetWeek(activeSem)} style={{
-                marginLeft: "auto", padding: "4px 10px", borderRadius: 6, border: "1px solid #450a0a",
-                background: "transparent", color: "#ef4444", fontSize: 11, cursor: "pointer", fontFamily: "inherit",
-              }}>🗑 Réinit. semaine</button>
+                <button onClick={() => resetWeek(activeSem)} style={{
+                  padding: "4px 10px", borderRadius: 6, border: "1px solid #450a0a",
+                  background: "transparent", color: "#ef4444", fontSize: 11, cursor: "pointer", fontFamily: "inherit",
+                }}>🗑 Réinit.</button>
               </div>
             </div>
- 
-            {/* Résumé visuel semaine */}
-            <WeekSummary weekSport={week.sport} joursData={week.jours || []} />
- 
-            {/* Sélecteur jour */}
+
+            {/* 5. Sport de la semaine (vue résumé) */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8, fontWeight: 600 }}>
+                Sport de la semaine
+              </div>
+              <WeekSummary weekSport={week.sport} joursData={week.jours || []} />
+            </div>
+
+            {/* 6. Sélecteur jour */}
             <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
               {JOURS.map((j, i) => {
                 const ok = kpi.joursOk[i];
@@ -1043,14 +1214,14 @@ function App() {
                 );
               })}
             </div>
- 
-            {/* Saisie jour */}
+
+            {/* 7. Saisie jour */}
             {(() => {
               const j = week.jours[activeJour];
               return (
                 <div style={{ display: "grid", gap: 12 }}>
-                  {/* Sport v2 */}
-                  <SportDayPanel
+                  {/* Sport collapsible */}
+                  <CollapsibleSportPanel
                     jour={j}
                     jourIdx={activeJour}
                     weekSport={week.sport}
@@ -1058,39 +1229,8 @@ function App() {
                     updateJour={updateJour}
                     updateWeekSport={(sportData) => updateWeekSport(activeSem, sportData)}
                   />
-                  {/* Garmin */}
-                  <div style={{ background: "#1e293b", borderRadius: 14, padding: "14px 16px", border: "1px solid #334155" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <span style={{ fontSize: 18 }}>⌚</span>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 11, color: "#64748b", marginBottom: 6 }}>Calories brûlées Garmin (total journée)</div>
-                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                          <input type="number"
-                            value={j.garminKcal}
-                            onChange={e => updateJour(activeSem, activeJour, "garminKcal", e.target.value)}
-                            placeholder="ex: 2150"
-                            style={{
-                              width: 120, padding: "8px 12px", borderRadius: 8,
-                              border: `1.5px solid ${j.garminKcal ? "#10b981" : "#334155"}`,
-                              background: "#0f172a", color: "#f8fafc", fontSize: 13, fontFamily: "inherit",
-                            }}
-                          />
-                          <span style={{ fontSize: 12, color: "#64748b" }}>kcal</span>
-                          {j.garminKcal && j.kCalTotales && (
-                            <span style={{
-                              fontSize: 12, padding: "3px 8px", borderRadius: 6,
-                              background: parseFloat(j.garminKcal) - parseFloat(j.kCalTotales||0) > 0 ? "#064e3b" : "#450a0a",
-                              color: parseFloat(j.garminKcal) - parseFloat(j.kCalTotales||0) > 0 ? "#6ee7b7" : "#fca5a5",
-                            }}>
-                              Déficit : {Math.round(parseFloat(j.garminKcal) - parseFloat(j.kCalTotales||0))} kcal
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
- 
-                  {/* Nutrition avec saisie texte + calcul IA */}
+
+                  {/* Nutrition + Garmin */}
                   <NutritionPanel
                     jour={j}
                     activeJour={activeJour}
@@ -1102,34 +1242,9 @@ function App() {
                 </div>
               );
             })()}
- 
-            {/* KPI semaine */}
-            <div style={{
-              marginTop: 20, background: "#1e293b", borderRadius: 14,
-              padding: "16px 20px", border: "1px solid #334155",
-            }}>
-              <div style={{ fontSize: 13, color: "#94a3b8", marginBottom: 12, fontWeight: 600 }}>
-                📊 KPI de la semaine
-              </div>
-              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                {badge(kpi.poidsOk,
-                  kpi.poids ? `⚖️ ${kpi.poids} kg (cible ${plan.ciblePoids})` : "⚖️ Poids non saisi"
-                )}
-                {badge(kpi.kcalOk,
-                  kpi.deficitReel !== null
-                    ? `🍽️ Déficit : ${kpi.deficitReel} kcal (cible ${kpi.deficitCible} kcal)`
-                    : "🍽️ Pas assez de données (Garmin + calories)"
-                )}
-                {badge(kpi.sportOk,
-                  kpi.sportOk === null
-                    ? "🏃 Sport"
-                    : `🏃 Sport`
-                )}
-              </div>
-            </div>
           </div>
         )}
- 
+
         {/* ── TABLEAU ──────────────────────────────────────────────── */}
         {activeTab === "tableau" && (
           <div style={{ overflowX: "auto" }}>
@@ -1195,7 +1310,7 @@ function App() {
                       <td style={{ padding: "10px 8px", textAlign: "center" }}>
                         <span style={{ fontSize: 12, color: "#475569" }}>{p.ciblePoids} kg</span>
                       </td>
- 
+
                       {/* Projection : delta constant depuis dernier poids mesuré */}
                       <td style={{ padding: "10px 8px", textAlign: "center" }}>
                         {(() => {
@@ -1280,7 +1395,7 @@ function App() {
             </div>
           </div>
         )}
- 
+
         {/* ── GRAPHIQUES ──────────────────────────────────────────── */}
         {activeTab === "graphiques" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
@@ -1355,7 +1470,7 @@ function App() {
                 );
               })()}
             </div>
- 
+
             {/* Sport */}
             <div style={{ background: "#1e293b", borderRadius: 14, padding: "20px", border: "1px solid #334155" }}>
               <div style={{ fontSize: 14, color: "#f8fafc", fontWeight: 600, marginBottom: 16 }}>
@@ -1387,7 +1502,7 @@ function App() {
             </div>
           </div>
         )}
- 
+
         {/* Message copie */}
         {copyMsg && (
           <div style={{
@@ -1402,7 +1517,7 @@ function App() {
             }}>✕</button>
           </div>
         )}
- 
+
         {/* Modal export texte (fallback si clipboard bloqué) */}
         {showExport && (
           <div style={{
@@ -1434,7 +1549,7 @@ function App() {
             </div>
           </div>
         )}
- 
+
         {/* Modal import texte (fallback si clipboard bloqué) */}
         {showImport && (
           <div style={{
@@ -1472,14 +1587,14 @@ function App() {
             </div>
           </div>
         )}
- 
+
       </div>
     </div>
   );
 }
- 
- 
+
+
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
 </script>
 </body>
-</html>
+  </html>
