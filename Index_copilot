@@ -1,1 +1,1908 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Marathon Venise" />
+  <meta name="theme-color" content="#0a0f1e" />
 
+  data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iIzBmMTcyYSIvPjxjaXJjbGUgY3g9IjMyMCIgY3k9IjEwMCIgcj0iNDUiIGZpbGw9IiM2MzY2ZjEiLz48cGF0aCBkPSJNMjgwIDE1NSBMMjIwIDI4MCBMMjYwIDI4MCBMMjAwIDQyMCBMMzIwIDI4MCBMMjc1IDI4MCBMMzQwIDE1NSBaIiBmaWxsPSIjNjM2NmYxIi8+PHBhdGggZD0iTTE4MCAyMDAgUTE2MCAyNjAgMTgwIDMyMCIgc3Ryb2tlPSIjMTBiOTgxIiBzdHJva2Utd2lkdGg9IjE4IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMzQwIDIwMCBRMzcwIDI2MCAzNDAgMzIwIiBzdHJva2U9IiMxMGI5ODEiIHN0cm9rZS13aWR0aD0iMTgiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==
+  data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iIzBmMTcyYSIvPjxjaXJjbGUgY3g9IjMyMCIgY3k9IjEwMCIgcj0iNDUiIGZpbGw9IiM2MzY2ZjEiLz48cGF0aCBkPSJNMjgwIDE1NSBMMjIwIDI4MCBMMjYwIDI4MCBMMjAwIDQyMCBMMzIwIDI4MCBMMjc1IDI4MCBMMzQwIDE1NSBaIiBmaWxsPSIjNjM2NmYxIi8+PHBhdGggZD0iTTE4MCAyMDAgUTE2MCAyNjAgMTgwIDMyMCIgc3Ryb2tlPSIjMTBiOTgxIiBzdHJva2Utd2lkdGg9IjE4IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMzQwIDIwMCBRMzcwIDI2MCAzNDAgMzIwIiBzdHJva2U9IiMxMGI5ODEiIHN0cm9rZS13aWR0aD0iMTgiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==
+
+  <title>Suivi Marathon Venise 🏃</title>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0a0f1e;
+      font-family: Georgia, serif;
+      color: #e2e8f0;
+    }
+    input, button, textarea {
+      font-family: Georgia, serif;
+    }
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+    #root {
+      min-height: 100vh;
+    }
+    #loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #94a3b8;
+      font-size: 18px;
+      flex-direction: column;
+      gap: 16px;
+    }
+  </style>
+</head>
+
+<body>
+<div id="loading">
+  <div>🏃 Chargement...</div>
+  <div style="font-size:13px;color:#475569">Première ouverture : quelques secondes</div>
+</div>
+
+<div id="root" style="display:none"></div>
+
+<script>
+var scripts = [
+  "https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js",
+  "https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js",
+  "https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"
+];
+
+var idx = 0;
+
+function loadNext() {
+  if (idx >= scripts.length) {
+    startApp();
+    return;
+  }
+
+  var s = document.createElement("script");
+  s.src = scripts[idx++];
+  s.onload = loadNext;
+  s.onerror = function() {
+    document.getElementById("loading").innerHTML =
+      '<div>❌ Erreur réseau</div><div style="font-size:13px;color:#64748b">Vérifie ta connexion et recharge</div>';
+  };
+  document.head.appendChild(s);
+}
+
+function startApp() {
+  try {
+    var appCode = document.getElementById("app-code").textContent;
+    var transformed = Babel.transform(appCode, { presets: ["react"] }).code;
+    eval(transformed);
+
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("root").style.display = "block";
+  } catch(e) {
+    document.getElementById("loading").innerHTML =
+      '<div>❌ Erreur : ' + e.message.substring(0, 140) + '</div>';
+    console.error(e);
+  }
+}
+
+loadNext();
+</script>
+
+<script id="app-code" type="text/plain">
+const { useState, useEffect } = React;
+
+const STORAGE_KEY = "suivi-marathon-v2";
+
+const MARATHON = [1650, 1650, 1550, 1650, 1650, 2000, 1650];
+const VACANCES = [2000, 2000, 2000, 2000, 2000, 2000, 2000];
+
+// Phase toujours "Marathon", mais sortie longue réduite en fin de préparation.
+const MARATHON_FIN = [1650, 1650, 1550, 1650, 1650, 1900, 1650];
+
+const DEFICIT_CIBLE = {
+  1: 2426, 2: 2426, 3: 2426, 4: 2426, 5: 2426,
+  6: 0, 7: 0,
+  8: 2426, 9: 2426, 10: 2426, 11: 2426, 12: 2426, 13: 2426,
+  14: 2426, 15: 2426, 16: 0,
+};
+
+const PLAN = [
+  { sem: 1,  lundi: "6 juil",  phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 69.60, sessionsTargets: 4 },
+  { sem: 2,  lundi: "13 juil", phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 69.28, sessionsTargets: 4 },
+  { sem: 3,  lundi: "20 juil", phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 68.97, sessionsTargets: 4 },
+  { sem: 4,  lundi: "27 juil", phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 68.65, sessionsTargets: 4 },
+  { sem: 5,  lundi: "3 août",  phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 68.34, sessionsTargets: 4 },
+
+  { sem: 6,  lundi: "10 août", phase: "Vacances", cibleKcalJours: VACANCES,     ciblePoids: 68.02, sessionsTargets: 3 },
+  { sem: 7,  lundi: "17 août", phase: "Vacances", cibleKcalJours: VACANCES,     ciblePoids: 68.02, sessionsTargets: 3 },
+
+  { sem: 8,  lundi: "24 août", phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 68.02, sessionsTargets: 4 },
+  { sem: 9,  lundi: "31 août", phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 67.71, sessionsTargets: 4 },
+  { sem: 10, lundi: "7 sept",  phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 67.39, sessionsTargets: 4 },
+  { sem: 11, lundi: "14 sept", phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 67.08, sessionsTargets: 4 },
+  { sem: 12, lundi: "21 sept", phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 66.76, sessionsTargets: 4 },
+  { sem: 13, lundi: "28 sept", phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 66.45, sessionsTargets: 4 },
+
+  { sem: 14, lundi: "5 oct",   phase: "Marathon", cibleKcalJours: MARATHON_FIN, ciblePoids: 66.13, sessionsTargets: 3 },
+  { sem: 15, lundi: "12 oct",  phase: "Marathon", cibleKcalJours: MARATHON_FIN, ciblePoids: 65.82, sessionsTargets: 3 },
+  { sem: 16, lundi: "19 oct",  phase: "Marathon", cibleKcalJours: MARATHON_FIN, ciblePoids: 65.50, sessionsTargets: 2 },
+];
+
+const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+
+const PHASE_COLORS = {
+  Marathon: "#6366f1",
+  Vacances: "#10b981",
+};
+
+const SESSION_DEFS = {
+  EF:  { label: "EF",  desc: "Endurance fondamentale", color: "#10b981", cat: "course" },
+  SL:  { label: "SL",  desc: "Sortie longue",           color: "#059669", cat: "course" },
+  VMA: { label: "VMA", desc: "Vitesse maximale",         color: "#34d399", cat: "course" },
+  RJ:  { label: "RJ",  desc: "Renfo jambes",             color: "#8b5cf6", cat: "renfo" },
+  RA:  { label: "RA",  desc: "Renfo bras",               color: "#a855f7", cat: "renfo" },
+  RB:  { label: "RB",  desc: "Renfo bras B",             color: "#7c3aed", cat: "renfo" },
+  RAB: { label: "RAB", desc: "Renfo bras + jambes",      color: "#6d28d9", cat: "renfo" },
+  AUTRE: { label: "Autre", desc: "Autre sport",          color: "#f59e0b", cat: "autre" },
+};
+
+const EMPTY_JOUR = () => ({
+  sessionsFaites: [],
+  garminKcal: "",
+  kCalTotales: "",
+});
+
+const EMPTY_WEEK_SPORT = () => ({
+  planningJours: Array.from({ length: 7 }, () => []),
+});
+
+const EMPTY_WEEK = () => ({
+  poidsLundi: "",
+  sport: EMPTY_WEEK_SPORT(),
+  jours: Array.from({ length: 7 }, () => EMPTY_JOUR()),
+});
+
+function normalizeWeek(rawWeek) {
+  const empty = EMPTY_WEEK();
+  const raw = rawWeek || {};
+
+  return {
+    ...empty,
+    ...raw,
+    sport: {
+      ...empty.sport,
+      ...(raw.sport || {}),
+      planningJours: Array.from({ length: 7 }, (_, i) =>
+        raw.sport?.planningJours?.[i] || []
+      ),
+    },
+    jours: Array.from({ length: 7 }, (_, i) => ({
+      ...EMPTY_JOUR(),
+      ...(raw.jours?.[i] || {}),
+      sessionsFaites: raw.jours?.[i]?.sessionsFaites || [],
+    })),
+  };
+}
+
+function hasWeekData(rawWeek) {
+  if (!rawWeek) return false;
+
+  const w = normalizeWeek(rawWeek);
+
+  if (w.poidsLundi) return true;
+  if (w.sport?.planningJours?.some(j => j && j.length > 0)) return true;
+
+  return w.jours.some(j =>
+    j.garminKcal ||
+    j.kCalTotales ||
+    (j.sessionsFaites && j.sessionsFaites.length > 0)
+  );
+}
+
+function getCibleKcalDynamique(plan, weekSport) {
+  if (plan.phase === "Vacances") {
+    return plan.cibleKcalJours;
+  }
+
+  const planningJours = weekSport?.planningJours || Array.from({ length: 7 }, () => []);
+
+  return planningJours.map((jour, i) => {
+    const sessions = jour || [];
+
+    if (sessions.length === 0) return 1550;
+
+    if (sessions.includes("SL")) {
+      return plan.cibleKcalJours?.[i] ?? 2000;
+    }
+
+    return plan.cibleKcalJours?.[i] ?? 1650;
+  });
+}
+
+function count(arr, code) {
+  return (arr || []).filter(x => x === code).length;
+}
+
+function badge(ok, txt) {
+  return (
+    <span style={{
+      padding: "3px 10px",
+      borderRadius: 99,
+      fontSize: 12,
+      fontWeight: 600,
+      background: ok === true ? "#d1fae5" : ok === false ? "#fee2e2" : "#f1f5f9",
+      color: ok === true ? "#065f46" : ok === false ? "#991b1b" : "#64748b",
+      border: `1px solid ${ok === true ? "#6ee7b7" : ok === false ? "#fca5a5" : "#e2e8f0"}`,
+      whiteSpace: "nowrap",
+    }}>
+      {txt}
+    </span>
+  );
+}
+
+function dot(ok) {
+  return ok === true ? "🟢" : ok === false ? "🔴" : "⚪";
+}
+
+function WeekSummary({ weekSport, joursData }) {
+  const planningJours = weekSport?.planningJours || Array.from({ length: 7 }, () => []);
+  const prevues = planningJours.flat();
+  const faites = (joursData || []).flatMap(j => j.sessionsFaites || []);
+
+  const courseOk =
+    count(faites, "EF") >= 1 &&
+    faites.includes("SL") &&
+    faites.includes("VMA");
+
+  const renfoOk =
+    faites.includes("RJ") ||
+    (faites.includes("RA") && faites.includes("RB")) ||
+    faites.includes("RAB");
+
+  const boxes = [
+    { code: "EF", idx: 0, label: "EF", cat: "course" },
+    { code: "EF", idx: 1, label: "EF", cat: "course" },
+    { code: "SL", idx: 0, label: "SL", cat: "course" },
+    { code: "VMA", idx: 0, label: "VMA", cat: "course" },
+    { code: "RJ", idx: 0, label: "RJ", cat: "renfo" },
+    { code: "RA", idx: 0, label: "RA", cat: "renfo" },
+    { code: "RB", idx: 0, label: "RB", cat: "renfo" },
+  ];
+
+  const isPlanned = (code, idx) => {
+    if (code === "EF") return count(prevues, "EF") > idx;
+    return prevues.includes(code);
+  };
+
+  const isDone = (code, idx) => {
+    if (code === "EF") return count(faites, "EF") > idx;
+    return faites.includes(code);
+  };
+
+  const renderBox = (b, i) => {
+    const planned = isPlanned(b.code, b.idx);
+    const done = isDone(b.code, b.idx);
+    const colorPlan = "#f59e0b";
+    const colorDone = b.cat === "course" ? "#10b981" : "#8b5cf6";
+
+    return (
+      <div key={i} style={{
+        width: 38,
+        height: 38,
+        borderRadius: 8,
+        background: done ? colorDone + "22" : "#1e293b",
+        border: `2px solid ${done ? colorDone : "#334155"}`,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+      }}>
+        <span style={{
+          fontSize: 10,
+          fontWeight: 700,
+          color: done ? colorDone : planned ? colorPlan : "#475569",
+        }}>
+          {b.label}
+        </span>
+
+        {planned && !done && (
+          <div style={{
+            width: 7,
+            height: 7,
+            borderRadius: "50%",
+            background: colorPlan,
+            position: "absolute",
+            bottom: 4,
+          }} />
+        )}
+
+        {done && <div style={{ fontSize: 8, color: colorDone }}>✓</div>}
+      </div>
+    );
+  };
+
+  return (
+    <div style={{
+      background: "#0f172a",
+      borderRadius: 10,
+      padding: "12px 14px",
+      marginBottom: 12,
+      border: "1px solid #1e293b",
+    }}>
+      <div style={{
+        fontSize: 11,
+        color: "#64748b",
+        textTransform: "uppercase",
+        letterSpacing: 1,
+        marginBottom: 10,
+      }}>
+        Vue semaine
+      </div>
+
+      <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+        <div>
+          <div style={{
+            fontSize: 10,
+            color: courseOk ? "#10b981" : "#475569",
+            marginBottom: 6,
+            fontWeight: 600,
+          }}>
+            🏃 COURSE {courseOk ? "✓" : ""}
+          </div>
+          <div style={{ display: "flex", gap: 5 }}>
+            {boxes.filter(b => b.cat === "course").map(renderBox)}
+          </div>
+        </div>
+
+        <div>
+          <div style={{
+            fontSize: 10,
+            color: renfoOk ? "#8b5cf6" : "#475569",
+            marginBottom: 6,
+            fontWeight: 600,
+          }}>
+            💪 RENFO {renfoOk ? "✓" : ""}
+          </div>
+          <div style={{ display: "flex", gap: 5 }}>
+            {boxes.filter(b => b.cat === "renfo").map(renderBox)}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CollapsibleSportPanel({ jour, jourIdx, weekSport, activeSem, updateJour, updateWeekSport }) {
+  const [collapsed, setCollapsed] = useState(false);
+
+  const faites = jour.sessionsFaites || [];
+  const planningJours = weekSport?.planningJours || Array.from({ length: 7 }, () => []);
+  const prevues = planningJours[jourIdx] || [];
+  const allSessions = ["EF", "SL", "VMA", "RJ", "RA", "RB", "RAB"];
+
+  const toggleFaite = (s) => {
+    const arr = [...faites];
+    const i = arr.indexOf(s);
+    if (i >= 0) arr.splice(i, 1);
+    else arr.push(s);
+
+    updateJour(activeSem, jourIdx, "sessionsFaites", arr);
+  };
+
+  const togglePrevue = (s) => {
+    const newPlanning = planningJours.map((d, i) => {
+      if (i !== jourIdx) return d || [];
+
+      const arr = [...(d || [])];
+      const idx = arr.indexOf(s);
+      if (idx >= 0) arr.splice(idx, 1);
+      else arr.push(s);
+
+      return arr;
+    });
+
+    updateWeekSport({
+      ...(weekSport || EMPTY_WEEK_SPORT()),
+      planningJours: newPlanning,
+    });
+  };
+
+  const isActive = (s) => prevues.includes(s) || faites.includes(s);
+
+  return (
+    <div style={{
+      background: "#1e293b",
+      borderRadius: 14,
+      border: "1px solid #334155",
+    }}>
+      <div style={{
+        padding: "12px 16px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}>
+        <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>
+          🏃 Sport
+        </div>
+
+        <button onClick={() => setCollapsed(!collapsed)} style={{
+          background: "#0f172a",
+          border: "1px solid #334155",
+          color: "#94a3b8",
+          borderRadius: 6,
+          width: 28,
+          height: 28,
+          cursor: "pointer",
+          fontSize: 12,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}>
+          {collapsed ? "▼" : "▲"}
+        </button>
+      </div>
+
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 8,
+        padding: "0 10px 6px",
+      }}>
+        <div style={{ fontSize: 11, color: "#f59e0b", textAlign: "center" }}>Planifié</div>
+        <div style={{ fontSize: 11, color: "#10b981", textAlign: "center" }}>Réalisé</div>
+      </div>
+
+      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 6,
+        padding: "0 10px 12px",
+      }}>
+        {allSessions
+          .filter(s => !collapsed || isActive(s))
+          .map(s => {
+            const def = SESSION_DEFS[s];
+            const isPrevue = prevues.includes(s);
+            const isFaite = faites.includes(s);
+            const doneColor = def.cat === "course" ? "#10b981" : "#8b5cf6";
+
+            return (
+              <div key={s} style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 8,
+              }}>
+                <button onClick={() => togglePrevue(s)} style={{
+                  padding: "5px 4px",
+                  borderRadius: 99,
+                  width: "100%",
+                  border: `1.5px solid ${isPrevue ? "#f59e0b" : "#1e293b"}`,
+                  background: isPrevue ? "#f59e0b22" : "#0f172a",
+                  color: isPrevue ? "#f59e0b" : "#334155",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}>
+                  {s}
+                </button>
+
+                <button onClick={() => toggleFaite(s)} style={{
+                  padding: "5px 4px",
+                  borderRadius: 99,
+                  width: "100%",
+                  border: `1.5px solid ${isFaite ? doneColor : "#1e293b"}`,
+                  background: isFaite ? doneColor + "33" : "#0f172a",
+                  color: isFaite ? doneColor : "#334155",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}>
+                  {isFaite ? "✓ " : ""}{s}
+                </button>
+              </div>
+            );
+          })}
+
+        {(!collapsed || prevues.includes("AUTRE") || faites.includes("AUTRE")) && (
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 8,
+            marginTop: 4,
+          }}>
+            <button onClick={() => togglePrevue("AUTRE")} style={{
+              padding: "5px 10px",
+              borderRadius: 99,
+              border: `1.5px solid ${prevues.includes("AUTRE") ? "#f59e0b" : "#1e293b"}`,
+              background: prevues.includes("AUTRE") ? "#f59e0b22" : "#0f172a",
+              color: prevues.includes("AUTRE") ? "#f59e0b" : "#334155",
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}>
+              Autre
+            </button>
+
+            <button onClick={() => toggleFaite("AUTRE")} style={{
+              padding: "5px 10px",
+              borderRadius: 99,
+              border: `1.5px solid ${faites.includes("AUTRE") ? "#10b981" : "#1e293b"}`,
+              background: faites.includes("AUTRE") ? "#10b98133" : "#0f172a",
+              color: faites.includes("AUTRE") ? "#10b981" : "#334155",
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}>
+              {faites.includes("AUTRE") ? "✓ " : ""}Autre
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJour, updateJour }) {
+  const kcal = parseFloat(jour.kCalTotales) || 0;
+  const garmin = parseFloat(jour.garminKcal) || 0;
+
+  const hasKcal = kcal > 0;
+  const hasGarmin = garmin > 0;
+
+  const budgetMax = hasGarmin
+    ? Math.round(garmin - deficitCibleJour)
+    : cibleKcal;
+
+  const restant = budgetMax - kcal;
+
+  const kcalOk = hasKcal && kcal <= budgetMax + 80;
+
+  return (
+    <div style={{
+      background: "#1e293b",
+      borderRadius: 14,
+      padding: "14px",
+      border: "1px solid #334155",
+      width: "100%",
+    }}>
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 14,
+        flexWrap: "wrap",
+        gap: 8,
+      }}>
+        <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>
+          🍽️ Nutrition
+        </div>
+
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          <span style={{
+            padding: "2px 8px",
+            borderRadius: 6,
+            fontSize: 11,
+            background: "#f59e0b22",
+            color: "#f59e0b",
+          }}>
+            🎯 Déficit visé : {deficitCibleJour} kcal
+          </span>
+
+          {hasGarmin ? (
+            <>
+              <span style={{
+                padding: "2px 8px",
+                borderRadius: 6,
+                fontSize: 11,
+                background: "#10b98122",
+                color: "#10b981",
+              }}>
+                ⌚ Brûlé : {garmin} kcal
+              </span>
+
+              <span style={{
+                padding: "2px 8px",
+                borderRadius: 6,
+                fontSize: 11,
+                fontWeight: 700,
+                background: "#6366f122",
+                color: "#6366f1",
+              }}>
+                💡 Budget : {budgetMax} kcal
+              </span>
+            </>
+          ) : (
+            <span style={{
+              padding: "2px 8px",
+              borderRadius: 6,
+              fontSize: 11,
+              background: "#6366f122",
+              color: "#6366f1",
+            }}>
+              🎯 Objectif calories : {cibleKcal} kcal
+            </span>
+          )}
+
+          {hasKcal && (
+            <span style={{
+              padding: "2px 8px",
+              borderRadius: 99,
+              fontSize: 11,
+              fontWeight: 700,
+              background: kcalOk ? "#064e3b" : "#450a0a",
+              color: kcalOk ? "#6ee7b7" : "#fca5a5",
+            }}>
+              {kcal} kcal {kcalOk ? "✓" : "✗"}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {hasKcal && (
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          marginBottom: 14,
+        }}>
+          <div style={{
+            flex: 1,
+            background: "#0f172a",
+            borderRadius: 99,
+            height: 6,
+            overflow: "hidden",
+          }}>
+            <div style={{
+              height: "100%",
+              borderRadius: 99,
+              width: `${Math.min((kcal / budgetMax) * 100, 100)}%`,
+              background: kcal > budgetMax ? "#ef4444" : kcal > budgetMax * 0.9 ? "#f59e0b" : "#10b981",
+              transition: "width 0.3s",
+            }} />
+          </div>
+
+          <span style={{
+            fontSize: 12,
+            fontWeight: 700,
+            whiteSpace: "nowrap",
+            color: kcal > budgetMax ? "#ef4444" : kcal > budgetMax * 0.9 ? "#f59e0b" : "#10b981",
+          }}>
+            {restant >= 0 ? `reste ${restant}` : `dépassé ${Math.abs(restant)}`}
+          </span>
+        </div>
+      )}
+
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        marginTop: 4,
+        marginBottom: 12,
+        flexWrap: "wrap",
+      }}>
+        <span style={{ fontSize: 13, color: "#94a3b8", whiteSpace: "nowrap" }}>
+          🍴 Calories consommées
+        </span>
+
+        <input
+          type="number"
+          value={jour.kCalTotales}
+          onChange={e => updateJour(activeSem, activeJour, "kCalTotales", e.target.value)}
+          placeholder="ex: 1650"
+          style={{
+            width: 120,
+            padding: "10px 14px",
+            borderRadius: 8,
+            border: `1.5px solid ${jour.kCalTotales ? "#10b981" : "#334155"}`,
+            background: "#0f172a",
+            color: "#f8fafc",
+            fontSize: 15,
+          }}
+        />
+
+        <span style={{ fontSize: 13, color: "#64748b" }}>kcal</span>
+      </div>
+
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        paddingTop: 10,
+        borderTop: "1px solid #1e293b",
+        flexWrap: "wrap",
+      }}>
+        <span style={{ fontSize: 16 }}>⌚</span>
+
+        <span style={{ fontSize: 13, color: "#94a3b8", whiteSpace: "nowrap" }}>
+          Calories brûlées
+        </span>
+
+        <input
+          type="number"
+          value={jour.garminKcal}
+          onChange={e => updateJour(activeSem, activeJour, "garminKcal", e.target.value)}
+          placeholder="ex: 2150"
+          style={{
+            width: 120,
+            padding: "8px 12px",
+            borderRadius: 8,
+            border: `1.5px solid ${jour.garminKcal ? "#10b981" : "#334155"}`,
+            background: "#0f172a",
+            color: "#f8fafc",
+            fontSize: 13,
+          }}
+        />
+
+        <span style={{ fontSize: 12, color: "#64748b" }}>kcal</span>
+
+        {hasGarmin && hasKcal && (
+          <span style={{
+            fontSize: 12,
+            padding: "3px 8px",
+            borderRadius: 6,
+            background: garmin - kcal > 0 ? "#064e3b" : "#450a0a",
+            color: garmin - kcal > 0 ? "#6ee7b7" : "#fca5a5",
+          }}>
+            Déficit : {Math.round(garmin - kcal)} kcal
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [data, setData] = useState({});
+  const [activeSem, setActiveSem] = useState(1);
+  const [activeTab, setActiveTab] = useState("saisie");
+  const [activeJour, setActiveJour] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+  const [showExport, setShowExport] = useState(false);
+  const [showImport, setShowImport] = useState(false);
+  const [importText, setImportText] = useState("");
+  const [copyMsg, setCopyMsg] = useState("");
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) setData(JSON.parse(saved));
+    } catch(e) {}
+    setLoaded(true);
+  }, []);
+
+  const save = (newData) => {
+    setData(newData);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
+    } catch(e) {}
+  };
+
+  const getWeek = (s) => normalizeWeek(data[s]);
+
+  const updateJour = (sem, jour, field, val) => {
+    const w = normalizeWeek(data[sem]);
+    w.jours = w.jours.map((j, i) =>
+      i === jour ? { ...j, val } : j
+    );
+    save({ ...data, w });
+  };
+
+  const updateWeek = (sem, field, val) => {
+    const w = normalizeWeek(data[sem]);
+    w[field] = val;
+    save({ ...data, w });
+  };
+
+  const updateWeekSport = (sem, sportData) => {
+    const w = normalizeWeek(data[sem]);
+    w.sport = {
+      ...EMPTY_WEEK_SPORT(),
+      ...sportData,
+      planningJours: Array.from({ length: 7 }, (_, i) =>
+        sportData?.planningJours?.[i] || []
+      ),
+    };
+    save({ ...data, w });
+  };
+
+  const resetWeek = (sem) => {
+    if (!window.confirm("Effacer toutes les données de S" + sem + " ? Cette action est irréversible.")) return;
+
+    const newData = { ...data };
+    delete newData[sem];
+
+    save(newData);
+    setCopyMsg("✅ Semaine S" + sem + " réinitialisée !");
+  };
+
+  const resetAll = () => {
+    if (!window.confirm("Effacer toutes les données ?")) return;
+
+    try {
+      localStorage.removeItem("suivi-marathon-v1");
+      localStorage.removeItem("suivi-marathon-v2");
+      localStorage.removeItem(STORAGE_KEY);
+    } catch(e) {}
+
+    save({});
+    setCopyMsg("✅ Toutes les données effacées !");
+  };
+
+  const exportData = async () => {
+    const txt = JSON.stringify(data);
+
+    try {
+      await navigator.clipboard.writeText(txt);
+      setCopyMsg("✅ Copié ! Colle-le dans Notes ou un document.");
+    } catch(e) {
+      setShowExport(true);
+    }
+  };
+
+  const importData = async () => {
+    try {
+      const txt = await navigator.clipboard.readText();
+      const parsed = JSON.parse(txt);
+      save(parsed);
+      setCopyMsg("✅ Données importées !");
+      setShowImport(false);
+    } catch(e) {
+      setShowImport(true);
+    }
+  };
+
+  const doImportText = () => {
+    try {
+      const parsed = JSON.parse(importText);
+      save(parsed);
+      setCopyMsg("✅ Données importées !");
+      setShowImport(false);
+      setImportText("");
+    } catch(e) {
+      setCopyMsg("❌ Texte invalide, réessaie.");
+    }
+  };
+
+  const kpiSem = (s) => {
+    const plan = PLAN[s - 1];
+    const w = getWeek(s);
+    const joursData = w.jours;
+    const sport = w.sport || EMPTY_WEEK_SPORT();
+    const planningJours = sport.planningJours || Array.from({ length: 7 }, () => []);
+    const cibleKcalDyn = getCibleKcalDynamique(plan, sport);
+
+    const poids = parseFloat(w.poidsLundi) || null;
+    const poidsOk = poids !== null && poids <= plan.ciblePoids + 0.2;
+
+    const kcals = joursData.map(j => {
+      const tot = parseFloat(j.kCalTotales);
+      return !isNaN(tot) && tot > 0 ? tot : null;
+    });
+
+    const kcalsValides = kcals.filter(k => k !== null);
+    const moyKcal = kcalsValides.length
+      ? Math.round(kcalsValides.reduce((a, b) => a + b, 0) / kcalsValides.length)
+      : null;
+
+    const toutesSessionsFaites = joursData.flatMap(j => j.sessionsFaites || []);
+
+    const courseOk =
+      count(toutesSessionsFaites, "EF") >= 1 &&
+      toutesSessionsFaites.includes("SL") &&
+      toutesSessionsFaites.includes("VMA");
+
+    const renfoOk =
+      toutesSessionsFaites.includes("RJ") ||
+      (toutesSessionsFaites.includes("RA") && toutesSessionsFaites.includes("RB")) ||
+      toutesSessionsFaites.includes("RAB");
+
+    const sportOk = toutesSessionsFaites.length === 0 ? null : courseOk && renfoOk;
+
+    const planSessions = planningJours.flat().length;
+    const faitSessions = toutesSessionsFaites.length;
+
+    const deficitCible = DEFICIT_CIBLE[s] || 0;
+    const deficitCibleJour = Math.round(deficitCible / 7);
+
+    const sportJourOk = joursData.map((j, i) => {
+      const prevues = planningJours[i] || [];
+      const faites = j.sessionsFaites || [];
+
+      if (prevues.length === 0 && faites.length === 0) return null;
+      if (prevues.length === 0 && faites.length > 0) return true;
+
+      return prevues.every(session => faites.includes(session));
+    });
+
+    const caloriesJourOk = joursData.map((j, i) => {
+      const kcal = kcals[i];
+      const garmin = parseFloat(j.garminKcal) || null;
+      const cibleJour = cibleKcalDyn[i];
+
+      if (!kcal) return null;
+
+      if (garmin !== null) {
+        return garmin - kcal >= deficitCibleJour - 50;
+      }
+
+      return kcal <= cibleJour + 80;
+    });
+
+    const joursOk = joursData.map((j, i) => {
+      const sOk = sportJourOk[i];
+      const cOk = caloriesJourOk[i];
+
+      if (sOk === null && cOk === null) return null;
+      if (sOk === false || cOk === false) return false;
+      if (sOk === true || cOk === true) return true;
+
+      return null;
+    });
+
+    let deficitReel = null;
+    let deficitCumul = 0;
+    let joursComplets = 0;
+
+    joursData.forEach((j, i) => {
+      const garmin = parseFloat(j.garminKcal);
+      const cal = kcals[i];
+
+      if (!isNaN(garmin) && garmin > 0 && cal !== null && cal > 0) {
+        deficitCumul += garmin - cal;
+        joursComplets++;
+      }
+    });
+
+    if (joursComplets > 0) {
+      deficitReel = Math.round(deficitCumul);
+    }
+
+    const deficitOk = deficitReel !== null && deficitReel >= deficitCible * 0.85;
+
+    return {
+      poids,
+      poidsOk,
+      moyKcal,
+      faitSessions,
+      planSessions,
+      sportOk,
+      joursOk,
+      sportJourOk,
+      caloriesJourOk,
+      deficitCible,
+      deficitReel,
+      deficitOk,
+    };
+  };
+
+  if (!loaded) {
+    return (
+      <div style={{
+        color: "#94a3b8",
+        padding: 40,
+        textAlign: "center",
+      }}>
+        Chargement...
+      </div>
+    );
+  }
+
+  const plan = PLAN[activeSem - 1];
+  const week = getWeek(activeSem);
+  const kpi = kpiSem(activeSem);
+
+  const totalJours = 112;
+  const joursSaisis = PLAN.reduce((acc, p) => {
+    const w = getWeek(p.sem);
+    return acc + w.jours.filter(j => j.kCalTotales || j.garminKcal || (j.sessionsFaites && j.sessionsFaites.length > 0)).length;
+  }, 0);
+
+  const progression = joursSaisis / totalJours;
+
+  const r = 44;
+  const cx = 52;
+  const cy = 52;
+  const stroke = 6;
+  const circ = 2 * Math.PI * r;
+  const dash = progression * circ;
+  const col = progression < 0.33 ? "#6366f1" : progression < 0.66 ? "#f59e0b" : "#10b981";
+
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: "#0a0f1e",
+      color: "#e2e8f0",
+    }}>
+      <div style={{
+        background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+        borderBottom: "1px solid #1e293b",
+        padding: "20px 24px",
+      }}>
+        <div style={{ maxWidth: 900, margin: "0 auto" }}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 12,
+          }}>
+            <div>
+              <h1 style={{
+                margin: 0,
+                fontSize: 22,
+                color: "#f8fafc",
+                letterSpacing: "-0.5px",
+              }}>
+                🏃 Mon suivi marathon
+              </h1>
+
+              <p style={{
+                margin: "4px 0 0",
+                fontSize: 13,
+                color: "#64748b",
+              }}>
+                Venise · 25 octobre · Objectif 65 kg
+              </p>
+            </div>
+
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {["saisie", "tableau", "graphiques"].map(t => (
+                <button key={t} onClick={() => setActiveTab(t)} style={{
+                  padding: "7px 16px",
+                  borderRadius: 8,
+                  fontSize: 13,
+                  cursor: "pointer",
+                  border: "none",
+                  background: activeTab === t ? "#6366f1" : "#1e293b",
+                  color: activeTab === t ? "white" : "#94a3b8",
+                }}>
+                  {t === "saisie" ? "📝 Saisie" : t === "tableau" ? "📅 Tableau" : "📈 Graphiques"}
+                </button>
+              ))}
+
+              <button onClick={exportData} style={{
+                padding: "7px 14px",
+                borderRadius: 8,
+                fontSize: 13,
+                cursor: "pointer",
+                border: "1px solid #334155",
+                background: "transparent",
+                color: "#10b981",
+              }}>
+                💾 Sauver
+              </button>
+
+              <button onClick={importData} style={{
+                padding: "7px 14px",
+                borderRadius: 8,
+                fontSize: 13,
+                cursor: "pointer",
+                border: "1px solid #334155",
+                background: "transparent",
+                color: "#f59e0b",
+              }}>
+                📂 Charger
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 900, margin: "0 auto", padding: "24px 16px" }}>
+        {activeTab === "saisie" && (
+          <div>
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              marginBottom: 20,
+              padding: "12px 16px",
+              background: "#1e293b",
+              borderRadius: 14,
+              border: "1px solid #334155",
+            }}>
+              <svg width={104} height={104}>
+                <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1e293b" strokeWidth={stroke} />
+                <circle cx={cx} cy={cy} r={r} fill="none" stroke="#0f172a" strokeWidth={stroke + 2} />
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r={r}
+                  fill="none"
+                  stroke={col}
+                  strokeWidth={stroke}
+                  strokeDasharray={`${dash} ${circ}`}
+                  strokeLinecap="round"
+                  transform={`rotate(-90 ${cx} ${cy})`}
+                  style={{ transition: "stroke-dasharray 0.5s ease" }}
+                />
+                <text x={cx} y={cy - 6} textAnchor="middle" fill="#f8fafc" fontSize="16" fontWeight="bold">
+                  {joursSaisis}
+                </text>
+                <text x={cx} y={cy + 10} textAnchor="middle" fill="#64748b" fontSize="11">
+                  /{totalJours}
+                </text>
+                <text x={cx} y={cy + 24} textAnchor="middle" fill={col} fontSize="10">
+                  {Math.round(progression * 100)}%
+                </text>
+              </svg>
+
+              <div>
+                <div style={{ fontSize: 15, color: "#f8fafc", fontWeight: 600 }}>
+                  Progression
+                </div>
+
+                <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 4 }}>
+                  {joursSaisis} jour{joursSaisis > 1 ? "s" : ""} saisi{joursSaisis > 1 ? "s" : ""}
+                </div>
+
+                <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
+                  sur {totalJours} jours au total
+                </div>
+
+                <div style={{ fontSize: 12, color: col, marginTop: 4, fontWeight: 600 }}>
+                  {totalJours - joursSaisis} jours restants
+                </div>
+              </div>
+            </div>
+
+            <div style={{
+              display: "flex",
+              gap: 6,
+              flexWrap: "wrap",
+              marginBottom: 20,
+            }}>
+              {PLAN.map(p => {
+                const k = kpiSem(p.sem);
+                const hasData = hasWeekData(data[p.sem]);
+
+                return (
+                  <button key={p.sem} onClick={() => setActiveSem(p.sem)} style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 8,
+                    border: "none",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    background: activeSem === p.sem ? "#6366f1"
+                      : !hasData ? "#1e293b"
+                      : (k.poidsOk === false || k.deficitOk === false || k.sportOk === false)
+                        ? "#450a0a"
+                        : "#064e3b",
+                    color: activeSem === p.sem ? "white" : "#e2e8f0",
+                    outline: activeSem === p.sem ? "2px solid #818cf8" : "none",
+                  }}>
+                    S{p.sem}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div style={{
+              marginBottom: 16,
+              background: "#1e293b",
+              borderRadius: 14,
+              padding: "14px 20px",
+              border: "1px solid #334155",
+            }}>
+              <div style={{
+                fontSize: 12,
+                color: "#64748b",
+                marginBottom: 10,
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: 1,
+              }}>
+                📊 KPI semaine
+              </div>
+
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                {badge(
+                  kpi.poidsOk,
+                  kpi.poids ? `⚖️ ${kpi.poids} kg (cible ${plan.ciblePoids})` : "⚖️ Poids non saisi"
+                )}
+
+                {badge(
+                  kpi.deficitOk,
+                  kpi.deficitReel !== null
+                    ? `🍽️ Déficit : ${kpi.deficitReel} kcal (cible ${kpi.deficitCible})`
+                    : "🍽️ Pas assez de données"
+                )}
+
+                {badge(kpi.sportOk, "🏃 Sport")}
+              </div>
+            </div>
+
+            <div style={{
+              background: "#1e293b",
+              borderRadius: 14,
+              padding: "16px 20px",
+              marginBottom: 16,
+              border: "1px solid #334155",
+              display: "flex",
+              gap: 16,
+              flexWrap: "wrap",
+              alignItems: "center",
+            }}>
+              <div>
+                <div style={{
+                  fontSize: 11,
+                  color: "#64748b",
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                }}>
+                  Semaine {activeSem} · {plan.lundi}
+                </div>
+
+                <div style={{
+                  fontSize: 15,
+                  color: "#f8fafc",
+                  fontWeight: 600,
+                  marginTop: 4,
+                }}>
+                  <span style={{
+                    display: "inline-block",
+                    padding: "2px 10px",
+                    borderRadius: 99,
+                    fontSize: 12,
+                    background: PHASE_COLORS[plan.phase] + "33",
+                    color: PHASE_COLORS[plan.phase],
+                    marginRight: 8,
+                  }}>
+                    {plan.phase}
+                  </span>
+                  Objectif {plan.ciblePoids} kg
+                </div>
+              </div>
+
+              <div style={{
+                marginLeft: "auto",
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                flexWrap: "wrap",
+              }}>
+                <label style={{ fontSize: 13, color: "#94a3b8" }}>
+                  ⚖️ Poids lundi
+                </label>
+
+                <input
+                  type="number"
+                  step="0.1"
+                  value={week.poidsLundi}
+                  onChange={e => updateWeek(activeSem, "poidsLundi", e.target.value)}
+                  placeholder="69.5"
+                  style={{
+                    width: 80,
+                    padding: "6px 10px",
+                    borderRadius: 8,
+                    border: "1.5px solid #334155",
+                    background: "#0f172a",
+                    color: "#f8fafc",
+                    fontSize: 14,
+                    textAlign: "center",
+                  }}
+                />
+
+                <span style={{ fontSize: 13, color: "#64748b" }}>kg</span>
+
+                <button onClick={() => resetWeek(activeSem)} style={{
+                  padding: "4px 10px",
+                  borderRadius: 6,
+                  border: "1px solid #450a0a",
+                  background: "transparent",
+                  color: "#ef4444",
+                  fontSize: 11,
+                  cursor: "pointer",
+                }}>
+                  🗑 Réinit.
+                </button>
+              </div>
+            </div>
+
+            <WeekSummary weekSport={week.sport} joursData={week.jours || []} />
+
+            <div style={{
+              display: "flex",
+              gap: 6,
+              marginBottom: 16,
+            }}>
+              {JOURS.map((j, i) => {
+                const ok = kpi.joursOk[i];
+
+                return (
+                  <button key={i} onClick={() => setActiveJour(i)} style={{
+                    flex: 1,
+                    padding: "8px 4px",
+                    borderRadius: 8,
+                    border: "none",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    background: activeJour === i ? "#6366f1"
+                      : ok === true ? "#064e3b"
+                      : ok === false ? "#450a0a"
+                      : "#1e293b",
+                    color: activeJour === i ? "white"
+                      : ok === true ? "#6ee7b7"
+                      : ok === false ? "#fca5a5"
+                      : "#64748b",
+                  }}>
+                    {j}<br />
+                    <span style={{ fontSize: 10, opacity: 0.7 }}>{dot(ok)}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div style={{ display: "grid", gap: 12 }}>
+              <CollapsibleSportPanel
+                jour={week.jours[activeJour]}
+                jourIdx={activeJour}
+                weekSport={week.sport}
+                activeSem={activeSem}
+                updateJour={updateJour}
+                updateWeekSport={(sportData) => updateWeekSport(activeSem, sportData)}
+              />
+
+              <NutritionPanel
+                jour={week.jours[activeJour]}
+                activeJour={activeJour}
+                activeSem={activeSem}
+                cibleKcal={getCibleKcalDynamique(plan, week.sport)[activeJour]}
+                deficitCibleJour={Math.round((DEFICIT_CIBLE[activeSem] || 0) / 7)}
+                updateJour={updateJour}
+              />
+            </div>
+          </div>
+        )}
+
+        {activeTab === "tableau" && (
+          <div style={{ overflowX: "auto" }}>
+            <table style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: 12,
+            }}>
+              <thead>
+                <tr>
+                  <th style={{ padding: "8px 12px", textAlign: "left", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>Semaine</th>
+                  <th style={{ padding: "8px 12px", textAlign: "left", color: "#64748b", borderBottom: "1px solid #1e293b" }}>Phase</th>
+                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>⚖️ Réel</th>
+                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>📉 Plan</th>
+                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🔮 Projection</th>
+                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🔥 Cible</th>
+                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🍽️ Réel</th>
+                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b" }}>🏃 Sport</th>
+                  {JOURS.map(j => (
+                    <th key={j} style={{ padding: "8px 8px", color: "#64748b", borderBottom: "1px solid #1e293b", textAlign: "center" }}>{j}</th>
+                  ))}
+                </tr>
+              </thead>
+
+              <tbody>
+                {PLAN.map(p => {
+                  const k = kpiSem(p.sem);
+                  const hasData = hasWeekData(data[p.sem]);
+                  const isActive = p.sem === activeSem;
+
+                  let lastPoids = null;
+                  let lastSem = 0;
+
+                  PLAN.forEach(pp => {
+                    const ww = getWeek(pp.sem);
+                    const po = parseFloat(ww.poidsLundi);
+
+                    if (!isNaN(po) && po > 0) {
+                      lastPoids = po;
+                      lastSem = pp.sem;
+                    }
+                  });
+
+                  let projection = null;
+                  let delta = null;
+
+                  if (lastPoids !== null && p.sem >= lastSem) {
+                    const planLastSem = PLAN[lastSem - 1]?.ciblePoids || lastPoids;
+                    delta = Math.round((lastPoids - planLastSem) * 100) / 100;
+                    projection = Math.round((p.ciblePoids + delta) * 10) / 10;
+                  }
+
+                  return (
+                    <tr key={p.sem}
+                      onClick={() => {
+                        setActiveSem(p.sem);
+                        setActiveTab("saisie");
+                      }}
+                      style={{
+                        cursor: "pointer",
+                        background: isActive ? "#1e293b33" : "transparent",
+                        borderBottom: "1px solid #0f172a",
+                      }}
+                    >
+                      <td style={{ padding: "10px 12px", color: "#f8fafc", fontWeight: isActive ? 700 : 400, whiteSpace: "nowrap" }}>
+                        S{p.sem} · {p.lundi}
+                      </td>
+
+                      <td style={{ padding: "10px 12px" }}>
+                        <span style={{
+                          padding: "2px 8px",
+                          borderRadius: 99,
+                          fontSize: 11,
+                          background: PHASE_COLORS[p.phase] + "22",
+                          color: PHASE_COLORS[p.phase],
+                        }}>
+                          {p.phase}
+                        </span>
+                      </td>
+
+                      <td style={{ padding: "10px 8px", textAlign: "center" }}>
+                        {hasData ? (
+                          <span style={{
+                            padding: "2px 8px",
+                            borderRadius: 6,
+                            fontSize: 12,
+                            background: k.poidsOk ? "#064e3b" : k.poids ? "#450a0a" : "#1e293b",
+                            color: k.poidsOk ? "#6ee7b7" : k.poids ? "#fca5a5" : "#64748b",
+                          }}>
+                            {k.poids ? `${k.poids} kg` : "—"}
+                          </span>
+                        ) : <span style={{ color: "#334155" }}>—</span>}
+                      </td>
+
+                      <td style={{ padding: "10px 8px", textAlign: "center" }}>
+                        <span style={{ fontSize: 12, color: "#475569" }}>
+                          {p.ciblePoids} kg
+                        </span>
+                      </td>
+
+                      <td style={{ padding: "10px 8px", textAlign: "center" }}>
+                        {projection === null ? (
+                          <span style={{ color: "#334155" }}>—</span>
+                        ) : (
+                          <div>
+                            <span style={{
+                              fontSize: 12,
+                              color: Math.abs(delta) < 0.15 ? "#64748b" : delta < 0 ? "#6366f1" : "#ef4444",
+                              fontWeight: 600,
+                            }}>
+                              {projection} kg
+                            </span>
+
+                            {Math.abs(delta) >= 0.1 && (
+                              <div style={{ fontSize: 10, color: "#64748b" }}>
+                                {delta > 0 ? "+" : ""}{delta} vs plan
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </td>
+
+                      <td style={{ padding: "10px 8px", textAlign: "center" }}>
+                        <span style={{
+                          fontSize: 12,
+                          color: k.deficitCible > 0 ? "#f59e0b" : "#334155",
+                        }}>
+                          {k.deficitCible > 0 ? `${k.deficitCible} kcal` : "—"}
+                        </span>
+                      </td>
+
+                      <td style={{ padding: "10px 8px", textAlign: "center" }}>
+                        {hasData && k.deficitReel !== null ? (
+                          <div>
+                            <span style={{
+                              padding: "2px 8px",
+                              borderRadius: 6,
+                              fontSize: 12,
+                              background: k.deficitOk ? "#064e3b" : "#450a0a",
+                              color: k.deficitOk ? "#6ee7b7" : "#fca5a5",
+                            }}>
+                              {k.deficitReel} kcal
+                            </span>
+
+                            <div style={{ fontSize: 10, color: "#10b981", marginTop: 2 }}>
+                              ⌚ cumulé
+                            </div>
+                          </div>
+                        ) : <span style={{ color: "#334155" }}>—</span>}
+                      </td>
+
+                      <td style={{ padding: "10px 8px", textAlign: "center" }}>
+                        {hasData ? (
+                          <span style={{
+                            padding: "2px 8px",
+                            borderRadius: 6,
+                            fontSize: 12,
+                            background: k.sportOk === true ? "#064e3b" : k.sportOk === false ? "#450a0a" : "#1e293b",
+                            color: k.sportOk === true ? "#6ee7b7" : k.sportOk === false ? "#fca5a5" : "#64748b",
+                          }}>
+                            {k.planSessions > 0 ? `${k.faitSessions}/${k.planSessions}` : "—"}
+                          </span>
+                        ) : <span style={{ color: "#334155" }}>—</span>}
+                      </td>
+
+                      {k.sportJourOk.map((ok, i) => (
+                        <td key={i} style={{ padding: "8px 4px", textAlign: "center" }}>
+                          <div style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: 6,
+                            margin: "0 auto",
+                            background: ok === true ? "#064e3b" : ok === false ? "#450a0a" : "#1e293b",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: 14,
+                            color: ok === true ? "#6ee7b7" : ok === false ? "#fca5a5" : "#334155",
+                          }}>
+                            {ok === true ? "✓" : ok === false ? "✗" : ""}
+                          </div>
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+
+            <div style={{ marginTop: 12, fontSize: 12, color: "#64748b" }}>
+              💡 Clique sur une ligne pour saisir les données de la semaine.
+            </div>
+          </div>
+        )}
+
+        {activeTab === "graphiques" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+            <div style={{
+              background: "#1e293b",
+              borderRadius: 14,
+              padding: "20px",
+              border: "1px solid #334155",
+            }}>
+              <div style={{
+                fontSize: 14,
+                color: "#f8fafc",
+                fontWeight: 600,
+                marginBottom: 8,
+              }}>
+                ⚖️ Évolution du poids
+              </div>
+
+              {(() => {
+                const chartData = PLAN.map(p => {
+                  const w = getWeek(p.sem);
+                  return {
+                    sem: "S" + p.sem,
+                    objectif: p.ciblePoids,
+                    mesure: parseFloat(w.poidsLundi) || null,
+                  };
+                });
+
+                const W = 600;
+                const H = 420;
+                const pad = { t: 20, r: 20, b: 40, l: 48 };
+                const cW = W - pad.l - pad.r;
+                const cH = H - pad.t - pad.b;
+                const yMin = 64;
+                const yMax = 70;
+
+                const xS = i => pad.l + (i / (chartData.length - 1)) * cW;
+                const yS = v => pad.t + cH - ((v - yMin) / (yMax - yMin)) * cH;
+
+                const points = key =>
+                  chartData
+                    .map((d, i) => d[key] != null ? xS(i) + "," + yS(d[key]) : null)
+                    .filter(Boolean)
+                    .join(" ");
+
+                return (
+                  <svg viewBox={"0 0 " + W + " " + H} preserveAspectRatio="xMidYMid meet" style={{ width: "100%", display: "block", minHeight: 320 }}>
+                    {[0, 0.25, 0.5, 0.75, 1].map(t => {
+                      const y = pad.t + t * cH;
+                      const v = (yMax - t * (yMax - yMin)).toFixed(1);
+
+                      return (
+                        <g key={t}>
+                          <line x1={pad.l} y1={y} x2={W - pad.r} y2={y} stroke="#334155" strokeWidth="1" />
+                          <text x={pad.l - 4} y={y + 4} textAnchor="end" fill="#94a3b8" fontSize="12">
+                            {v}
+                          </text>
+                        </g>
+                      );
+                    })}
+
+                    {chartData.filter((_, i) => i % 3 === 0).map((d) => {
+                      const i = chartData.indexOf(d);
+                      return (
+                        <text key={i} x={xS(i)} y={H - 8} textAnchor="middle" fill="#64748b" fontSize="10">
+                          {d.sem}
+                        </text>
+                      );
+                    })}
+
+                    <polyline points={points("objectif")} fill="none" stroke="#475569" strokeWidth="2" strokeDasharray="6,4" />
+                    <polyline points={points("mesure")} fill="none" stroke="#6366f1" strokeWidth="3" />
+
+                    {chartData.map((d, i) => d.mesure != null ? (
+                      <circle key={i} cx={xS(i)} cy={yS(d.mesure)} r="7" fill="#6366f1" stroke="#0f172a" strokeWidth="2" />
+                    ) : null)}
+                  </svg>
+                );
+              })()}
+            </div>
+
+            <div style={{
+              background: "#1e293b",
+              borderRadius: 14,
+              padding: "20px",
+              border: "1px solid #334155",
+            }}>
+              <div style={{
+                fontSize: 14,
+                color: "#f8fafc",
+                fontWeight: 600,
+                marginBottom: 16,
+              }}>
+                🏃 Sessions sport réalisées vs planifiées
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {PLAN.map(p => {
+                  const k = kpiSem(p.sem);
+                  if (k.planSessions === 0) return null;
+
+                  const pct = k.planSessions > 0 ? k.faitSessions / k.planSessions : 0;
+
+                  return (
+                    <div key={p.sem} style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                    }}>
+                      <div style={{ width: 30, fontSize: 11, color: "#64748b" }}>
+                        S{p.sem}
+                      </div>
+
+                      <div style={{
+                        flex: 1,
+                        background: "#0f172a",
+                        borderRadius: 4,
+                        height: 16,
+                        overflow: "hidden",
+                      }}>
+                        <div style={{
+                          height: "100%",
+                          borderRadius: 4,
+                          width: `${Math.min(pct * 100, 100)}%`,
+                          background: pct >= 1 ? "#10b981" : pct > 0.5 ? "#f59e0b" : "#ef4444",
+                          transition: "width 0.4s",
+                        }} />
+                      </div>
+
+                      <div style={{
+                        width: 40,
+                        fontSize: 11,
+                        color: "#94a3b8",
+                        textAlign: "right",
+                      }}>
+                        {k.faitSessions}/{k.planSessions}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <button onClick={resetAll} style={{
+              alignSelf: "flex-start",
+              padding: "7px 14px",
+              borderRadius: 8,
+              fontSize: 12,
+              cursor: "pointer",
+              border: "1px solid #450a0a",
+              background: "transparent",
+              color: "#ef4444",
+            }}>
+              🗑 Tout réinitialiser
+            </button>
+          </div>
+        )}
+
+        {copyMsg && (
+          <div style={{
+            position: "fixed",
+            bottom: 24,
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "#1e293b",
+            border: "1px solid #334155",
+            borderRadius: 12,
+            padding: "12px 20px",
+            fontSize: 13,
+            color: "#e2e8f0",
+            zIndex: 100,
+            display: "flex",
+            gap: 12,
+            alignItems: "center",
+            boxShadow: "0 8px 32px #0008",
+          }}>
+            {copyMsg}
+
+            <button onClick={() => setCopyMsg("")} style={{
+              background: "none",
+              border: "none",
+              color: "#64748b",
+              cursor: "pointer",
+              fontSize: 16,
+            }}>
+              ✕
+            </button>
+          </div>
+        )}
+
+        {showExport && (
+          <div style={{
+            position: "fixed",
+            inset: 0,
+            background: "#000a",
+            zIndex: 200,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 20,
+          }}>
+            <div style={{
+              background: "#1e293b",
+              borderRadius: 16,
+              padding: 24,
+              maxWidth: 500,
+              width: "100%",
+            }}>
+              <div style={{
+                fontSize: 15,
+                color: "#f8fafc",
+                fontWeight: 600,
+                marginBottom: 12,
+              }}>
+                💾 Sauvegarde manuelle
+              </div>
+
+              <p style={{
+                fontSize: 13,
+                color: "#94a3b8",
+                marginBottom: 12,
+              }}>
+                Copie ce texte et colle-le dans Notes ou un document :
+              </p>
+
+              <textarea
+                readOnly
+                value={JSON.stringify(data)}
+                rows={6}
+                onFocus={e => e.target.select()}
+                style={{
+                  width: "100%",
+                  padding: 10,
+                  borderRadius: 8,
+                  background: "#0f172a",
+                  border: "1px solid #334155",
+                  color: "#94a3b8",
+                  fontSize: 11,
+                  fontFamily: "monospace",
+                  resize: "none",
+                }}
+              />
+
+              <button onClick={() => setShowExport(false)} style={{
+                marginTop: 12,
+                padding: "8px 20px",
+                borderRadius: 8,
+                border: "none",
+                background: "#6366f1",
+                color: "white",
+                cursor: "pointer",
+              }}>
+                Fermer
+              </button>
+            </div>
+          </div>
+        )}
+
+        {showImport && (
+          <div style={{
+            position: "fixed",
+            inset: 0,
+            background: "#000a",
+            zIndex: 200,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 20,
+          }}>
+            <div style={{
+              background: "#1e293b",
+              borderRadius: 16,
+              padding: 24,
+              maxWidth: 500,
+              width: "100%",
+            }}>
+              <div style={{
+                fontSize: 15,
+                color: "#f8fafc",
+                fontWeight: 600,
+                marginBottom: 12,
+              }}>
+                📂 Charger mes données
+              </div>
+
+              <p style={{
+                fontSize: 13,
+                color: "#94a3b8",
+                marginBottom: 12,
+              }}>
+                Colle ici le texte sauvegardé précédemment :
+              </p>
+
+              <textarea
+                value={importText}
+                onChange={e => setImportText(e.target.value)}
+                rows={6}
+                placeholder="Colle ton JSON ici..."
+                style={{
+                  width: "100%",
+                  padding: 10,
+                  borderRadius: 8,
+                  background: "#0f172a",
+                  border: "1px solid #334155",
+                  color: "#e2e8f0",
+                  fontSize: 11,
+                  fontFamily: "monospace",
+                  resize: "none",
+                }}
+              />
+
+              <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+                <button onClick={doImportText} style={{
+                  flex: 1,
+                  padding: "8px 20px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: "#6366f1",
+                  color: "white",
+                  cursor: "pointer",
+                }}>
+                  Importer
+                </button>
+
+                <button onClick={() => setShowImport(false)} style={{
+                  padding: "8px 20px",
+                  borderRadius: 8,
+                  border: "1px solid #334155",
+                  background: "none",
+                  color: "#94a3b8",
+                  cursor: "pointer",
+                }}>
+                  Annuler
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  React.createElement(App)
+);
+</script>
+</body>
+</html>
