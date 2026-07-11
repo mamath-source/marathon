@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="Marathon Venise" />
   <meta name="theme-color" content="#0a0f1e" />
   
-manifest.json
+<link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="apple-touch-icon" href="icon.png">
 
@@ -760,6 +760,382 @@ function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJo
   );
 }
 
+
+const REWARDS = [
+  { id: 1, category: "⚖️ Poids", name: "It's a good start", condition: "Sous 68 kg", reward: "Bain moussant 🛁" },
+  { id: 2, category: "⚖️ Poids", name: "Goed Bezig!", condition: "Sous 67 kg", reward: "Merveilleux Pain Quotidien 🍰" },
+  { id: 3, category: "⚖️ Poids", name: "On lâche rien", condition: "Sous 66 kg", reward: "Jeu Switch 🎮" },
+  { id: 4, category: "⚖️ Poids", name: "Bye Bye Sixty-Five", condition: "Sous 65 kg", reward: "Robe Lady V 👗" },
+  { id: 5, category: "⚖️ Poids", name: "Mieux que prévu", condition: "Sous 64 kg", reward: "VR en amoureux 🥽" },
+  { id: 6, category: "⚖️ Poids", name: "You are amazing ❤️", condition: "Sous 63 kg", reward: "Robe Desigual 👗" },
+  { id: 7, category: "⚖️ Poids", name: "Volonté de fer", condition: "Vacances : écart S8-S5 ≤ 1 kg", reward: "Manucure 💅" },
+  { id: 8, category: "🏃 Bloc sport", name: "En route !", condition: "S1-S4 : ≥3 semaines vertes & ≥12 sorties", reward: "Bouquet de fleurs 💐" },
+  { id: 9, category: "🏃 Bloc sport", name: "On tient bon", condition: "S5-S8 : ≥3 semaines vertes & ≥12 sorties", reward: "Massage dos/nuque 💆" },
+  { id: 10, category: "🏃 Bloc sport", name: "Plus rien ne peut m'arrêter", condition: "S9-S12 : ≥3 semaines vertes & ≥12 sorties", reward: "Resto indien ou pizzeria 🍕" },
+  { id: 11, category: "🏃 Bloc sport", name: "La ligne droite", condition: "S13-S16 : ≥3 semaines vertes & ≥12 sorties", reward: "Bulle flottante ou expérience zen 🧘" },
+  { id: 12, category: "🎽 Sorties longues", name: "C'est long…", condition: "10 SL réalisées", reward: "Mitraillette 🥖" },
+  { id: 13, category: "🎽 Sorties longues", name: "C'est très long…", condition: "14 SL du plan réalisées", reward: "Massage complet 💆" },
+  { id: 14, category: "🔥 Semaines parfaites", name: "Bien partie", condition: "6 semaines parfaites", reward: "Manga Death Note 📚" },
+  { id: 15, category: "🔥 Semaines parfaites", name: "Régulière comme une horloge", condition: "9 semaines parfaites", reward: "Pédicure 💅" },
+  { id: 16, category: "🔥 Semaines parfaites", name: "Discipline de fer", condition: "13 semaines parfaites", reward: "Demi-journée off ☀️" },
+  { id: 17, category: "🔥 Semaines parfaites", name: "The best of the best", condition: "16 semaines parfaites", reward: "Cadeau de moi à moi à Venise 🎁" },
+  { id: 18, category: "🏁 Marathon", name: "Déjà mieux que Valence", condition: "Finisher", reward: "Shopping à Venise" },
+  { id: 19, category: "🏁 Marathon", name: "Tu cartonnes", condition: "Sous 3h50", reward: "Expérience spéciale à Venise 🇮🇹" },
+];
+
+const COURSE_CODES = ["EF", "SL", "VMA"];
+
+function getMarathonData(data) {
+  return data?._marathon || { finished: false, time: "" };
+}
+
+function parseMarathonTimeToSeconds(value) {
+  if (!value) return null;
+  const parts = String(value).trim().split(":").map(x => parseInt(x, 10));
+  if (parts.some(x => isNaN(x))) return null;
+  if (parts.length === 2) return parts[0] * 3600 + parts[1] * 60;
+  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  return null;
+}
+
+function countSessionsInWeeks(weeks, acceptedCodes) {
+  return weeks.reduce((acc, w) => {
+    return acc + (w.jours || []).reduce((dayAcc, j) => {
+      return dayAcc + (j.sessionsFaites || []).filter(s => acceptedCodes.includes(s)).length;
+    }, 0);
+  }, 0);
+}
+
+function getMinWeight(allWeeks) {
+  const weights = allWeeks
+    .map(w => parseFloat(w.poidsLundi))
+    .filter(w => !isNaN(w) && w > 0);
+  return weights.length ? Math.min(...weights) : null;
+}
+
+function buildRewardsStatus({ allWeeks, allKpis, data, marathonData }) {
+  const minWeight = getMinWeight(allWeeks);
+  const totalSL = countSessionsInWeeks(allWeeks, ["SL"]);
+  const perfectWeeks = allKpis.filter(k => k.poidsOk === true && k.deficitOk === true && k.sportOk === true).length;
+  const marathonSeconds = parseMarathonTimeToSeconds(marathonData.time);
+  const completedWeeks = PLAN.filter(p => hasWeekData(data[p.sem])).length;
+
+  const isGreenWeek = (sem) => {
+    const k = allKpis[sem - 1];
+    return hasWeekData(data[sem]) && k.poidsOk !== false && k.deficitOk !== false && k.sportOk !== false;
+  };
+
+  const blockStats = (start, end) => {
+    const weeks = allWeeks.slice(start - 1, end);
+    const greenWeeks = Array.from({ length: end - start + 1 }, (_, i) => start + i).filter(isGreenWeek).length;
+    const sorties = countSessionsInWeeks(weeks, COURSE_CODES);
+    return { greenWeeks, sorties };
+  };
+
+  const weightReward = (reward, threshold) => {
+    const unlocked = minWeight !== null && minWeight < threshold;
+    const progress = minWeight === null ? 0 : Math.max(0, Math.min(1, (70 - minWeight) / (70 - threshold)));
+    const detail = minWeight === null ? "Poids non saisi" : `Meilleur poids : ${minWeight.toFixed(1)} kg`;
+    const remaining = minWeight === null ? "Saisir un poids" : unlocked ? "Débloquée" : `Encore ${(minWeight - threshold + 0.1).toFixed(1)} kg environ`;
+    return { ...reward, unlocked, progress, detail, remaining };
+  };
+
+  const blockReward = (reward, start, end) => {
+    const stats = blockStats(start, end);
+    const unlocked = stats.greenWeeks >= 3 && stats.sorties >= 12;
+    const progress = Math.min(1, Math.min(stats.greenWeeks / 3, stats.sorties / 12));
+    const missingGreen = Math.max(0, 3 - stats.greenWeeks);
+    const missingRuns = Math.max(0, 12 - stats.sorties);
+    const missing = [];
+    if (missingGreen) missing.push(`${missingGreen} semaine${missingGreen > 1 ? "s" : ""} verte${missingGreen > 1 ? "s" : ""}`);
+    if (missingRuns) missing.push(`${missingRuns} sortie${missingRuns > 1 ? "s" : ""}`);
+    const detail = `${stats.greenWeeks}/3 semaines vertes · ${stats.sorties}/12 sorties`;
+    return { ...reward, unlocked, progress, detail, remaining: unlocked ? "Débloquée" : `Encore ${missing.join(" + ")}` };
+  };
+
+  const perfectReward = (reward, target) => ({
+    ...reward,
+    unlocked: perfectWeeks >= target,
+    progress: Math.min(1, perfectWeeks / target),
+    detail: `${perfectWeeks}/${target} semaines parfaites`,
+    remaining: perfectWeeks >= target ? "Débloquée" : `Encore ${target - perfectWeeks} semaine${target - perfectWeeks > 1 ? "s" : ""} parfaite${target - perfectWeeks > 1 ? "s" : ""}`,
+  });
+
+  const baseRewards = REWARDS.map(reward => {
+    if (reward.id === 1) return weightReward(reward, 68);
+    if (reward.id === 2) return weightReward(reward, 67);
+    if (reward.id === 3) return weightReward(reward, 66);
+    if (reward.id === 4) return weightReward(reward, 65);
+    if (reward.id === 5) return weightReward(reward, 64);
+    if (reward.id === 6) return weightReward(reward, 63);
+    if (reward.id === 7) {
+      const p5 = parseFloat(allWeeks[4]?.poidsLundi);
+      const p8 = parseFloat(allWeeks[7]?.poidsLundi);
+      const hasBoth = !isNaN(p5) && !isNaN(p8);
+      const diff = hasBoth ? Math.abs(p8 - p5) : null;
+      const unlocked = hasBoth && diff <= 1;
+      return {
+        ...reward,
+        unlocked,
+        progress: !hasBoth ? 0 : Math.max(0, Math.min(1, 1 - Math.max(0, diff - 1) / 2)),
+        detail: hasBoth ? `Écart S8-S5 : ${diff.toFixed(1)} kg` : "Poids S5 et S8 requis",
+        remaining: !hasBoth ? "Saisir les poids S5 et S8" : unlocked ? "Débloquée" : `Réduire l'écart de ${(diff - 1).toFixed(1)} kg`,
+      };
+    }
+    if (reward.id === 8) return blockReward(reward, 1, 4);
+    if (reward.id === 9) return blockReward(reward, 5, 8);
+    if (reward.id === 10) return blockReward(reward, 9, 12);
+    if (reward.id === 11) return blockReward(reward, 13, 16);
+    if (reward.id === 12) return { ...reward, unlocked: totalSL >= 10, progress: Math.min(1, totalSL / 10), detail: `${totalSL}/10 SL réalisées`, remaining: totalSL >= 10 ? "Débloquée" : `Encore ${10 - totalSL} SL` };
+    if (reward.id === 13) return { ...reward, unlocked: totalSL >= 14, progress: Math.min(1, totalSL / 14), detail: `${totalSL}/14 SL réalisées`, remaining: totalSL >= 14 ? "Débloquée" : `Encore ${14 - totalSL} SL` };
+    if (reward.id === 14) return perfectReward(reward, 6);
+    if (reward.id === 15) return perfectReward(reward, 9);
+    if (reward.id === 16) return perfectReward(reward, 13);
+    if (reward.id === 17) return perfectReward(reward, 16);
+    if (reward.id === 18) return { ...reward, unlocked: !!marathonData.finished, progress: marathonData.finished ? 1 : 0, detail: marathonData.finished ? "Marathon terminé" : "À valider après la course", remaining: marathonData.finished ? "Débloquée" : "Cocher Finisher" };
+    if (reward.id === 19) {
+      const target = 3 * 3600 + 50 * 60;
+      const unlocked = marathonSeconds !== null && marathonSeconds < target;
+      return { ...reward, unlocked, progress: unlocked ? 1 : 0, detail: marathonData.time ? `Temps saisi : ${marathonData.time}` : "Temps à saisir après la course", remaining: unlocked ? "Débloquée" : "Saisir un temps < 3h50" };
+    }
+    return { ...reward, unlocked: false, progress: 0, detail: "", remaining: "" };
+  });
+
+  if (completedWeeks >= 16) {
+    baseRewards.push({
+      id: "secret-never-gave-up",
+      category: "❤️ Secret",
+      name: "You Never Gave Up",
+      condition: "16 semaines terminées",
+      reward: "Récompense secrète débloquée ❤️",
+      unlocked: true,
+      progress: 1,
+      detail: "Tu as tenu les 16 semaines.",
+      remaining: "Débloquée",
+      secret: true,
+    });
+  }
+
+  return baseRewards;
+}
+
+function RewardsTab({ rewardsStatus, marathonData, updateMarathonField }) {
+  const unlockedCount = rewardsStatus.filter(r => r.unlocked).length;
+  const total = rewardsStatus.length;
+  const globalProgress = total ? unlockedCount / total : 0;
+  const lockedRewards = rewardsStatus.filter(r => !r.unlocked);
+  const nextReward = lockedRewards.length
+    ? [...lockedRewards].sort((a, b) => (b.progress || 0) - (a.progress || 0))[0]
+    : null;
+
+  const startDate = new Date(2026, 6, 6);
+  const raceDate = new Date(2026, 9, 25);
+  const today = new Date();
+  const totalMs = raceDate - startDate;
+  const elapsedMs = Math.max(0, Math.min(today - startDate, totalMs));
+  const dateProgress = totalMs > 0 ? elapsedMs / totalMs : 0;
+  const roadProgress = Math.min(1, (dateProgress * 0.55) + (globalProgress * 0.45));
+  const daysLeft = Math.max(0, Math.ceil((raceDate - today) / (1000 * 60 * 60 * 24)));
+
+  const categories = rewardsStatus.reduce((acc, r) => {
+    if (!acc[r.category]) acc[r.category] = [];
+    acc[r.category].push(r);
+    return acc;
+  }, {});
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+      <div style={{
+        background: "linear-gradient(135deg, #0f766e 0%, #0f172a 72%)",
+        borderRadius: 16,
+        padding: 20,
+        border: "1px solid #134e4a",
+      }}>
+        <div style={{ fontSize: 12, color: "#99f6e4", textTransform: "uppercase", letterSpacing: 1, fontWeight: 700, marginBottom: 8 }}>
+          🇮🇹 Road to Venice
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "flex-end" }}>
+          <div>
+            <div style={{ fontSize: 22, color: "#f8fafc", fontWeight: 800 }}>
+              Marathon de Venise
+            </div>
+            <div style={{ fontSize: 13, color: "#cbd5e1", marginTop: 4 }}>
+              {daysLeft} jour{daysLeft > 1 ? "s" : ""} restant{daysLeft > 1 ? "s" : ""} · {unlockedCount}/{total} récompenses
+            </div>
+          </div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#5eead4" }}>
+            {Math.round(roadProgress * 100)}%
+          </div>
+        </div>
+        <div style={{ height: 9, background: "#0f172a", borderRadius: 99, overflow: "hidden", marginTop: 14 }}>
+          <div style={{
+            height: "100%",
+            width: `${Math.round(roadProgress * 100)}%`,
+            borderRadius: 99,
+            background: "linear-gradient(90deg, #2dd4bf, #f59e0b)",
+          }} />
+        </div>
+      </div>
+
+      <div style={{
+        background: "linear-gradient(135deg, #312e81 0%, #0f172a 100%)",
+        borderRadius: 16,
+        padding: 20,
+        border: "1px solid #334155",
+      }}>
+        <div style={{ fontSize: 30, marginBottom: 8 }}>🏆</div>
+        <div style={{ fontSize: 20, color: "#f8fafc", fontWeight: 700, marginBottom: 4 }}>
+          Récompenses
+        </div>
+        <div style={{ fontSize: 13, color: "#cbd5e1", marginBottom: 12 }}>
+          {unlockedCount}/{total} récompenses débloquées
+        </div>
+        <div style={{ height: 8, background: "#0f172a", borderRadius: 99, overflow: "hidden" }}>
+          <div style={{
+            height: "100%",
+            width: `${Math.round(globalProgress * 100)}%`,
+            borderRadius: 99,
+            background: "linear-gradient(90deg, #f59e0b, #10b981)",
+          }} />
+        </div>
+      </div>
+
+      {nextReward && (
+        <div style={{
+          background: "#1e293b",
+          borderRadius: 14,
+          padding: 16,
+          border: "1px solid #334155",
+        }}>
+          <div style={{ fontSize: 12, color: "#f59e0b", textTransform: "uppercase", letterSpacing: 1, fontWeight: 700, marginBottom: 8 }}>
+            🎯 Prochaine récompense
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+            <div>
+              <div style={{ fontSize: 17, color: "#f8fafc", fontWeight: 800 }}>{nextReward.name}</div>
+              <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>{nextReward.condition}</div>
+              <div style={{ fontSize: 12, color: "#fef3c7", marginTop: 6 }}>🎁 {nextReward.reward}</div>
+              <div style={{ fontSize: 12, color: "#cbd5e1", marginTop: 6 }}>{nextReward.remaining || nextReward.detail}</div>
+            </div>
+            <div style={{ minWidth: 84, textAlign: "right", color: "#f59e0b", fontSize: 22, fontWeight: 800 }}>
+              {Math.round((nextReward.progress || 0) * 100)}%
+            </div>
+          </div>
+          <div style={{ marginTop: 10, height: 7, background: "#0f172a", borderRadius: 99, overflow: "hidden" }}>
+            <div style={{
+              height: "100%",
+              width: `${Math.round((nextReward.progress || 0) * 100)}%`,
+              background: "linear-gradient(90deg, #f59e0b, #10b981)",
+              borderRadius: 99,
+            }} />
+          </div>
+        </div>
+      )}
+
+      <div style={{
+        background: "#1e293b",
+        borderRadius: 14,
+        padding: 16,
+        border: "1px solid #334155",
+      }}>
+        <div style={{ fontSize: 13, color: "#f8fafc", fontWeight: 700, marginBottom: 10 }}>
+          🏁 Résultat marathon
+        </div>
+        <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, color: "#cbd5e1", fontSize: 13 }}>
+            <input
+              type="checkbox"
+              checked={!!marathonData.finished}
+              onChange={e => updateMarathonField("finished", e.target.checked)}
+            />
+            Finisher
+          </label>
+          <input
+            type="text"
+            value={marathonData.time || ""}
+            onChange={e => updateMarathonField("time", e.target.value)}
+            placeholder="ex: 03:49:30"
+            style={{
+              width: 110,
+              padding: "6px 8px",
+              borderRadius: 8,
+              border: "1.5px solid #334155",
+              background: "#0f172a",
+              color: "#f8fafc",
+              fontSize: 13,
+              textAlign: "center",
+            }}
+          />
+          <span style={{ fontSize: 12, color: "#64748b" }}>Format : HH:MM ou HH:MM:SS</span>
+        </div>
+      </div>
+
+      {Object.entries(categories).map(([category, rewards]) => {
+        const catUnlocked = rewards.filter(r => r.unlocked).length;
+        return (
+          <div key={category}>
+            <div style={{
+              fontSize: 12,
+              color: "#94a3b8",
+              textTransform: "uppercase",
+              letterSpacing: 1,
+              fontWeight: 700,
+              marginBottom: 10,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}>
+              <span>{category}</span>
+              <span>{catUnlocked}/{rewards.length}</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 12 }}>
+              {rewards.map(r => {
+                const pct = Math.round((r.progress || 0) * 100);
+                return (
+                  <div key={r.id} style={{
+                    background: r.unlocked ? "#064e3b" : "#1e293b",
+                    border: `1px solid ${r.unlocked ? "#10b981" : "#334155"}`,
+                    borderRadius: 14,
+                    padding: 14,
+                    opacity: r.unlocked ? 1 : 0.58,
+                    filter: r.unlocked ? "none" : "grayscale(0.8)",
+                    position: "relative",
+                    overflow: "hidden",
+                  }}>
+                    <div style={{ position: "absolute", top: 10, right: 12, fontSize: 16 }}>
+                      {r.unlocked ? "✅" : "🔒"}
+                    </div>
+                    <div style={{ fontSize: 15, color: r.unlocked ? "#d1fae5" : "#e2e8f0", fontWeight: 700, paddingRight: 24 }}>
+                      {r.name}
+                    </div>
+                    <div style={{ fontSize: 12, color: r.unlocked ? "#bbf7d0" : "#94a3b8", marginTop: 6, lineHeight: 1.35 }}>
+                      {r.condition}
+                    </div>
+                    <div style={{ fontSize: 12, color: r.unlocked ? "#fef3c7" : "#cbd5e1", marginTop: 8, fontWeight: 600 }}>
+                      🎁 {r.reward}
+                    </div>
+                    <div style={{ fontSize: 11, color: r.unlocked ? "#a7f3d0" : "#64748b", marginTop: 8 }}>
+                      {r.detail}
+                    </div>
+                    <div style={{ marginTop: 8, height: 5, background: "#0f172a", borderRadius: 99, overflow: "hidden" }}>
+                      <div style={{
+                        height: "100%",
+                        width: `${pct}%`,
+                        background: r.unlocked ? "#10b981" : "#64748b",
+                        borderRadius: 99,
+                      }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function getCurrentPlanningPosition() {
   const start = new Date(2026, 6, 6); // 6 juillet 2026
   const today = new Date();
@@ -798,6 +1174,7 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
   const [showImport, setShowImport] = useState(false);
   const [importText, setImportText] = useState("");
   const [copyMsg, setCopyMsg] = useState("");
+  const [rewardToast, setRewardToast] = useState(null);
 
   useEffect(() => {
     try {
@@ -898,6 +1275,18 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
     } catch(e) {
       setCopyMsg("❌ Texte invalide, réessaie.");
     }
+  };
+
+  const marathonData = getMarathonData(data);
+
+  const updateMarathonField = (field, val) => {
+    save({
+      ...data,
+      _marathon: {
+        ...marathonData,
+        [field]: val,
+      }
+    });
   };
 
   const kpiSem = (s) => {
@@ -1012,6 +1401,37 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
     };
   };
 
+  useEffect(() => {
+    if (!loaded) return;
+    const marathonDataForCheck = getMarathonData(data);
+    const allKpisForCheck = PLAN.map(p => kpiSem(p.sem));
+    const allWeeksForCheck = PLAN.map(p => getWeek(p.sem));
+    const statusForCheck = buildRewardsStatus({
+      allWeeks: allWeeksForCheck,
+      allKpis: allKpisForCheck,
+      data,
+      marathonData: marathonDataForCheck,
+    });
+    const unlockedIds = statusForCheck.filter(r => r.unlocked).map(r => String(r.id));
+    let previousIds = [];
+    try {
+      previousIds = JSON.parse(localStorage.getItem("suivi-marathon-unlocked-rewards-v1") || "[]");
+    } catch(e) {
+      previousIds = [];
+    }
+    const newlyUnlockedIds = unlockedIds.filter(id => !previousIds.includes(id));
+    if (newlyUnlockedIds.length > 0) {
+      const newest = statusForCheck.find(r => String(r.id) === newlyUnlockedIds[newlyUnlockedIds.length - 1]);
+      if (newest) {
+        setRewardToast(newest);
+        window.setTimeout(() => setRewardToast(null), 4200);
+      }
+    }
+    try {
+      localStorage.setItem("suivi-marathon-unlocked-rewards-v1", JSON.stringify(Array.from(new Set([...previousIds, ...unlockedIds]))));
+    } catch(e) {}
+  }, [data, loaded]);
+
   if (!loaded) {
     return (
       <div style={{
@@ -1043,6 +1463,9 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
   const circ = 2 * Math.PI * r;
   const dash = progression * circ;
   const col = progression < 0.33 ? "#6366f1" : progression < 0.66 ? "#f59e0b" : "#10b981";
+  const allKpis = PLAN.map(p => kpiSem(p.sem));
+  const allWeeks = PLAN.map(p => getWeek(p.sem));
+  const rewardsStatus = buildRewardsStatus({ allWeeks, allKpis, data, marathonData });
 
   return (
     <div style={{
@@ -1083,7 +1506,7 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
             </div>
 
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {["saisie", "tableau", "graphiques"].map(t => (
+              {["saisie", "tableau", "graphiques", "recompenses"].map(t => (
                 <button key={t} onClick={() => setActiveTab(t)} style={{
                   padding: "7px 16px",
                   borderRadius: 8,
@@ -1093,7 +1516,7 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
                   background: activeTab === t ? "#6366f1" : "#1e293b",
                   color: activeTab === t ? "white" : "#94a3b8",
                 }}>
-                  {t === "saisie" ? "📝 Saisie" : t === "tableau" ? "📅 Tableau" : "📈 Graphiques"}
+                  {t === "saisie" ? "📝 Saisie" : t === "tableau" ? "📅 Tableau" : t === "graphiques" ? "📈 Graphiques" : "🏆 Récompenses"}
                 </button>
               ))}
 
@@ -1743,6 +2166,42 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
             }}>
               🗑 Tout réinitialiser
             </button>
+          </div>
+        )}
+
+        {activeTab === "recompenses" && (
+          <RewardsTab
+            rewardsStatus={rewardsStatus}
+            marathonData={marathonData}
+            updateMarathonField={updateMarathonField}
+          />
+        )}
+
+        {rewardToast && (
+          <div style={{
+            position: "fixed",
+            top: 18,
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "linear-gradient(135deg, #064e3b, #0f172a)",
+            border: "1px solid #10b981",
+            borderRadius: 16,
+            padding: "14px 18px",
+            color: "#ecfdf5",
+            zIndex: 300,
+            boxShadow: "0 12px 40px #000a",
+            maxWidth: 340,
+            width: "calc(100% - 32px)",
+          }}>
+            <div style={{ fontSize: 12, color: "#a7f3d0", textTransform: "uppercase", letterSpacing: 1, fontWeight: 800 }}>
+              🎉 Récompense débloquée
+            </div>
+            <div style={{ fontSize: 17, fontWeight: 800, marginTop: 6 }}>
+              {rewardToast.name}
+            </div>
+            <div style={{ fontSize: 13, color: "#fef3c7", marginTop: 4 }}>
+              🎁 {rewardToast.reward}
+            </div>
           </div>
         )}
 
