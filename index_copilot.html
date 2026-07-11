@@ -9,11 +9,10 @@
   <meta name="theme-color" content="#0a0f1e" />
   
 
-icon.png
-icon.png
+  <link rel="icon" type="image/png" href="icon.png" />
+  <link rel="apple-touch-icon" href="icon.png" />
 
-  
-  <title>Suivi Marathon Venise </title>
+  <title>Marathon Venise</title>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -290,7 +289,7 @@ function WeekSummary({ weekSport, joursData }) {
     const planned = isPlanned(b.code, b.idx);
     const done = isDone(b.code, b.idx);
     const colorPlan = "#f59e0b";
-    const colorDone = b.cat === "course" ? "#10b981" : "#8b5cf6";
+    const colorDone = b.cat === "course" ? "#10b981" : "#059669";
 
     return (
       <div key={i} style={{
@@ -698,13 +697,14 @@ function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJo
           onChange={e => updateJour(activeSem, activeJour, "kCalTotales", e.target.value)}
           placeholder="ex: 1650"
           style={{
-            width: 120,
-            padding: "10px 14px",
+            width: 90,
+            padding: "6px 8px",
             borderRadius: 8,
             border: `1.5px solid ${jour.kCalTotales ? "#10b981" : "#334155"}`,
             background: "#0f172a",
             color: "#f8fafc",
-            fontSize: 15,
+            fontSize: 13,
+            textAlign: "center",
           }}
         />
 
@@ -731,13 +731,14 @@ function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJo
           onChange={e => updateJour(activeSem, activeJour, "garminKcal", e.target.value)}
           placeholder="ex: 2150"
           style={{
-            width: 120,
-            padding: "8px 12px",
+            width: 90,
+            padding: "6px 8px",
             borderRadius: 8,
             border: `1.5px solid ${jour.garminKcal ? "#10b981" : "#334155"}`,
             background: "#0f172a",
             color: "#f8fafc",
             fontSize: 13,
+            textAlign: "center",
           }}
         />
 
@@ -790,15 +791,15 @@ function App() {
   const updateJour = (sem, jour, field, val) => {
     const w = normalizeWeek(data[sem]);
     w.jours = w.jours.map((j, i) =>
-      i === jour ? { ...j, val } : j
+      i === jour ? { ...j, [field]: val } : j
     );
-    save({ ...data, w });
+    save({ ...data, [sem]: w });
   };
 
   const updateWeek = (sem, field, val) => {
     const w = normalizeWeek(data[sem]);
     w[field] = val;
-    save({ ...data, w });
+    save({ ...data, [sem]: w });
   };
 
   const updateWeekSport = (sem, sportData) => {
@@ -810,7 +811,7 @@ function App() {
         sportData?.planningJours?.[i] || []
       ),
     };
-    save({ ...data, w });
+    save({ ...data, [sem]: w });
   };
 
   const resetWeek = (sem) => {
