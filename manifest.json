@@ -8,18 +8,11 @@
   "theme_color": "#0a0f1e",
   "orientation": "portrait",
 "icons": [
-2
 {
-3
 "src": "icon.png",
-4
 "sizes": "512x512",
-5
 "type": "image/png",
-6
 "purpose": "any maskable"
-7
 }
-8
 ]
 }
