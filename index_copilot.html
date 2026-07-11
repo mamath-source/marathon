@@ -760,11 +760,39 @@ function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJo
   );
 }
 
+function getCurrentPlanningPosition() {
+  const start = new Date(2026, 6, 6); // 6 juillet 2026
+  const today = new Date();
+
+  const diffDays = Math.floor(
+    (today - start) / (1000 * 60 * 60 * 24)
+  );
+
+  if (diffDays < 0) {
+    return { sem: 1, jour: 0 };
+  }
+
+  const sem = Math.min(
+    Math.floor(diffDays / 7) + 1,
+    16
+  );
+
+  const jour = Math.min(
+    Math.max(diffDays % 7, 0),
+    6
+  );
+
+  return { sem, jour };
+}
+
+  
 function App() {
   const [data, setData] = useState({});
-  const [activeSem, setActiveSem] = useState(1);
-  const [activeTab, setActiveTab] = useState("saisie");
-  const [activeJour, setActiveJour] = useState(0);
+ const initialPos = getCurrentPlanningPosition();
+
+const [activeSem, setActiveSem] = useState(initialPos.sem);
+const [activeTab, setActiveTab] = useState("saisie");
+const [activeJour, setActiveJour] = useState(initialPos.jour);
   const [loaded, setLoaded] = useState(false);
   const [showExport, setShowExport] = useState(false);
   const [showImport, setShowImport] = useState(false);
