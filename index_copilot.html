@@ -380,7 +380,7 @@ function WeekSummary({ weekSport, joursData }) {
 }
 
 function CollapsibleSportPanel({ jour, jourIdx, weekSport, activeSem, updateJour, updateWeekSport }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   const faites = jour.sessionsFaites || [];
   const planningJours = weekSport?.planningJours || Array.from({ length: 7 }, () => []);
