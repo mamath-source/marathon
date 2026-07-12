@@ -1136,6 +1136,480 @@ function RewardsTab({ rewardsStatus, marathonData, updateMarathonField }) {
   );
 }
 
+const RUNNING_PLAN = [
+  {
+    "week": 1,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45'"
+      },
+      {
+        "title": "VMA 100",
+        "details": "2x (8 x 30\"30\") - R3'"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 50'"
+      },
+      {
+        "title": "SL - 1h10",
+        "details": "EF 75%"
+      }
+    ]
+  },
+  {
+    "week": 2,
+    "sessions": [
+      {
+        "title": "PPG",
+        "details": "20 min + 2x6' PPG"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "VMA 105",
+        "details": "2x (8x200m-30\") - R3'"
+      },
+      {
+        "title": "SL - 1h30",
+        "details": "2x8' AS21"
+      }
+    ]
+  },
+  {
+    "week": 3,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45' à 1h"
+      },
+      {
+        "title": "PPG",
+        "details": "20 min + 2x8' PPG"
+      },
+      {
+        "title": "VMA 95",
+        "details": "2x (5x 400m - 1') - R3'"
+      },
+      {
+        "title": "SL - 1h30",
+        "details": "2x12' AS42"
+      }
+    ]
+  },
+  {
+    "week": 4,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45'"
+      },
+      {
+        "title": "VMA 105",
+        "details": "2x (8x 30\"-30\") - R3'"
+      },
+      {
+        "title": "SL - 1h20",
+        "details": "75%FCM"
+      },
+      {
+        "title": "/",
+        "details": "",
+        "empty": true
+      }
+    ]
+  },
+  {
+    "week": 5,
+    "sessions": [
+      {
+        "title": "VMA 100",
+        "details": "12x300m - 50\""
+      },
+      {
+        "title": "EF",
+        "details": "Footing 45' à 1h"
+      },
+      {
+        "title": "VMA 95",
+        "details": "2x (5x 400m - 1') - R3'"
+      },
+      {
+        "title": "SL - 1h30",
+        "details": "3x8' AS21"
+      }
+    ]
+  },
+  {
+    "week": 6,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45'"
+      },
+      {
+        "title": "PPG",
+        "details": "20 min + 2x10' PPG"
+      },
+      {
+        "title": "VMA 100",
+        "details": "2x (6x 300m - 45\") - R3'"
+      },
+      {
+        "title": "SL - 1h30",
+        "details": "3x12' AS42"
+      }
+    ]
+  },
+  {
+    "week": 7,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45' à 1h"
+      },
+      {
+        "title": "VMA 95",
+        "details": "2x (4x 500m - 1') - R3'"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "SL - 1h30",
+        "details": "3x10' AS21"
+      }
+    ]
+  },
+  {
+    "week": 8,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45'"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 45'"
+      },
+      {
+        "title": "SL - 1h20",
+        "details": "75%FCM"
+      },
+      {
+        "title": "/",
+        "details": "",
+        "empty": true
+      }
+    ]
+  },
+  {
+    "week": 9,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45' à 1h"
+      },
+      {
+        "title": "VMA 100",
+        "details": "10x 300m - 50\""
+      },
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "SL - 1h40",
+        "details": "3x 3km AS42"
+      }
+    ]
+  },
+  {
+    "week": 10,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45' à 1h"
+      },
+      {
+        "title": "AS21",
+        "details": "10' + 8' + 6' AS21 - R2'"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "SL - 1h50",
+        "details": "2x (4km + 3km) AS42"
+      }
+    ]
+  },
+  {
+    "week": 11,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45' à 1h"
+      },
+      {
+        "title": "VMA 105",
+        "details": "2x(10x200m-30\") - R2'"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "SL - 2h",
+        "details": "3x4km AS42"
+      }
+    ]
+  },
+  {
+    "week": 12,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 50'"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 40'"
+      },
+      {
+        "title": "SL - AS42",
+        "details": "Semi à AS42"
+      }
+    ]
+  },
+  {
+    "week": 13,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45'"
+      },
+      {
+        "title": "AS21",
+        "details": "2x 10' à 85-90% - R2'"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 50'"
+      },
+      {
+        "title": "SL - 2h15",
+        "details": "5km + 4km + 3km AS42"
+      }
+    ]
+  },
+  {
+    "week": 14,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45'"
+      },
+      {
+        "title": "VMA 100",
+        "details": "2x (12 x 30\"30\") - R3'"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "SL - 1h50",
+        "details": "2x5km AS42"
+      }
+    ]
+  },
+  {
+    "week": 15,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45' à 1h"
+      },
+      {
+        "title": "AS42",
+        "details": "30' EF + 30' AS42"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "SL - 1h20",
+        "details": "2x20' AS42"
+      }
+    ]
+  },
+  {
+    "week": 16,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 50'"
+      },
+      {
+        "title": "/",
+        "details": "",
+        "empty": true
+      },
+      {
+        "title": "MARATHON",
+        "details": ""
+      }
+    ]
+  }
+];
+
+
+function RunningPlanTab({ runningChecks, updateRunningPlanCheck, currentSem }) {
+  const [showPastWeeks, setShowPastWeeks] = useState(false);
+  const pastWeeks = RUNNING_PLAN.filter(w => w.week < currentSem);
+  const visibleWeeks = RUNNING_PLAN.filter(w => w.week >= currentSem);
+
+  const renderWeekRow = (weekData) => {
+    const realSessions = weekData.sessions.filter(s => !s.empty);
+    const doneCount = realSessions.filter((_, idx) => runningChecks[`S${weekData.week}-${idx}`]).length;
+    const totalCount = realSessions.length;
+    const pct = totalCount ? doneCount / totalCount : 0;
+
+    return (
+      <div key={weekData.week} style={{
+        display: "grid",
+        gridTemplateColumns: "52px repeat(4, minmax(120px, 1fr))",
+        gap: 6,
+        alignItems: "stretch",
+        marginBottom: 8,
+      }}>
+        <div style={{
+          background: "#0f172a",
+          border: "1px solid #334155",
+          borderRadius: 10,
+          minHeight: 74,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#f8fafc",
+          fontWeight: 800,
+          fontSize: 16,
+        }}>
+          <div>S{weekData.week}</div>
+          <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 4 }}>{doneCount}/{totalCount}</div>
+          <div style={{ width: 34, height: 4, borderRadius: 99, background: "#1e293b", overflow: "hidden", marginTop: 5 }}>
+            <div style={{ width: `${Math.round(pct * 100)}%`, height: "100%", background: "#10b981" }} />
+          </div>
+        </div>
+
+        {weekData.sessions.map((session, idx) => {
+          const key = `S${weekData.week}-${idx}`;
+          const done = !!runningChecks[key];
+          if (session.empty) {
+            return (
+              <div key={idx} style={{
+                background: "#0f172a",
+                border: "1px dashed #334155",
+                borderRadius: 10,
+                minHeight: 74,
+                color: "#334155",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 18,
+                fontWeight: 800,
+              }}>/</div>
+            );
+          }
+          return (
+            <button key={idx} onClick={() => updateRunningPlanCheck(key, !done)} style={{
+              background: done ? "#064e3b" : "#1e293b",
+              border: `1.5px solid ${done ? "#10b981" : "#334155"}`,
+              borderRadius: 10,
+              minHeight: 74,
+              padding: "10px 8px",
+              color: done ? "#d1fae5" : "#cbd5e1",
+              cursor: "pointer",
+              textAlign: "center",
+              fontFamily: "inherit",
+              boxShadow: done ? "0 0 0 1px #10b98133 inset" : "none",
+            }}>
+              <div style={{ fontSize: 12, fontWeight: 800, color: done ? "#86efac" : "#e2e8f0", marginBottom: 4 }}>
+                {done ? "✓ " : ""}{session.title}
+              </div>
+              {session.details && (
+                <div style={{ fontSize: 11, lineHeight: 1.25, color: done ? "#bbf7d0" : "#94a3b8", whiteSpace: "pre-line" }}>
+                  {session.details}
+                </div>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <div style={{
+        background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+        borderRadius: 16,
+        padding: 18,
+        border: "1px solid #334155",
+      }}>
+        <div style={{ fontSize: 20, color: "#f8fafc", fontWeight: 800 }}>🏃 Plan running</div>
+        <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
+          Vue tableau comme ton Excel · clic sur une case pour la valider
+        </div>
+      </div>
+
+      {pastWeeks.length > 0 && (
+        <div>
+          <button onClick={() => setShowPastWeeks(!showPastWeeks)} style={{
+            width: "100%",
+            background: "#1e293b",
+            border: "1px solid #334155",
+            color: "#cbd5e1",
+            borderRadius: 10,
+            padding: "10px 12px",
+            fontFamily: "inherit",
+            fontSize: 13,
+            fontWeight: 700,
+            cursor: "pointer",
+            textAlign: "left",
+            marginBottom: showPastWeeks ? 10 : 0,
+          }}>
+            {showPastWeeks ? "▼" : "▶"} Semaines passées ({pastWeeks[0].week} à {pastWeeks[pastWeeks.length - 1].week})
+          </button>
+          {showPastWeeks && <div>{pastWeeks.map(renderWeekRow)}</div>}
+        </div>
+      )}
+
+      <div style={{ overflowX: "auto", paddingBottom: 4 }}>
+        <div style={{ minWidth: 650 }}>
+          {visibleWeeks.map(renderWeekRow)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function getCurrentPlanningPosition() {
   const start = new Date(2026, 6, 6); // 6 juillet 2026
   const today = new Date();
@@ -1278,6 +1752,17 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
   };
 
   const marathonData = getMarathonData(data);
+  const runningChecks = data._runningPlanChecks || {};
+
+  const updateRunningPlanCheck = (key, val) => {
+    save({
+      ...data,
+      _runningPlanChecks: {
+        ...runningChecks,
+        [key]: val,
+      }
+    });
+  };
 
   const updateMarathonField = (field, val) => {
     save({
@@ -1466,6 +1951,7 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
   const allKpis = PLAN.map(p => kpiSem(p.sem));
   const allWeeks = PLAN.map(p => getWeek(p.sem));
   const rewardsStatus = buildRewardsStatus({ allWeeks, allKpis, data, marathonData });
+  const currentPlanningPositionForTab = getCurrentPlanningPosition();
 
   return (
     <div style={{
@@ -1506,7 +1992,7 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
             </div>
 
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {["saisie", "tableau", "graphiques", "recompenses"].map(t => (
+              {["saisie", "tableau", "graphiques", "recompenses", "planRunning"].map(t => (
                 <button key={t} onClick={() => setActiveTab(t)} style={{
                   padding: "7px 16px",
                   borderRadius: 8,
@@ -1516,7 +2002,7 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
                   background: activeTab === t ? "#6366f1" : "#1e293b",
                   color: activeTab === t ? "white" : "#94a3b8",
                 }}>
-                  {t === "saisie" ? "📝 Saisie" : t === "tableau" ? "📅 Tableau" : t === "graphiques" ? "📈 Graphiques" : "🏆 Récompenses"}
+                  {t === "saisie" ? "📝 Saisie" : t === "tableau" ? "📅 Tableau" : t === "graphiques" ? "📈 Graphiques" : t === "recompenses" ? "🏆 Récompenses" : "🏃 Plan Running"}
                 </button>
               ))}
 
@@ -2174,6 +2660,14 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
             rewardsStatus={rewardsStatus}
             marathonData={marathonData}
             updateMarathonField={updateMarathonField}
+          />
+        )}
+
+        {activeTab === "planRunning" && (
+          <RunningPlanTab
+            runningChecks={runningChecks}
+            updateRunningPlanCheck={updateRunningPlanCheck}
+            currentSem={currentPlanningPositionForTab.sem}
           />
         )}
 
