@@ -766,8 +766,7 @@ const REWARDS = [
   { id: 2, category: "⚖️ Poids", name: "Goed Bezig!", condition: "Sous 67 kg", reward: "Merveilleux Pain Quotidien 🍰" },
   { id: 3, category: "⚖️ Poids", name: "On lâche rien", condition: "Sous 66 kg", reward: "Jeu Switch 🎮" },
   { id: 4, category: "⚖️ Poids", name: "Bye Bye Sixty-Five", condition: "Sous 65 kg", reward: "Robe Lady V 👗" },
-  { id: 5, category: "⚖️ Poids", name: "Mieux que prévu", condition: "Sous 64 kg", reward: "VR en amoureux 🥽" },
-  { id: 6, category: "⚖️ Poids", name: "You are amazing ❤️", condition: "Sous 63 kg", reward: "Robe Desigual 👗" },
+  { id: 5, category: "⚖️ Poids", name: "Mieux que prévu", condition: "Sous 64 kg", reward: "Robe Desigual 👗" },
   { id: 7, category: "⚖️ Poids", name: "Volonté de fer", condition: "Vacances : écart S8-S5 ≤ 1 kg", reward: "Manucure 💅" },
   { id: 8, category: "🏃 Bloc sport", name: "En route !", condition: "S1-S4 : ≥3 semaines vertes & ≥12 sorties", reward: "Bouquet de fleurs 💐" },
   { id: 9, category: "🏃 Bloc sport", name: "On tient bon", condition: "S5-S8 : ≥3 semaines vertes & ≥12 sorties", reward: "Massage dos/nuque 💆" },
@@ -781,6 +780,8 @@ const REWARDS = [
   { id: 17, category: "🔥 Semaines parfaites", name: "The best of the best", condition: "16 semaines parfaites", reward: "Cadeau de moi à moi à Venise 🎁" },
   { id: 18, category: "🏁 Marathon", name: "Déjà mieux que Valence", condition: "Finisher", reward: "Shopping à Venise" },
   { id: 19, category: "🏁 Marathon", name: "Tu cartonnes", condition: "Sous 3h50", reward: "Expérience spéciale à Venise 🇮🇹" },
+  { id: 20, category: "⭐ Régularité", name: "Un jour à la fois", condition: "30 jours complétés", reward: "Nouveau roman 📚" },
+  { id: 21, category: "⭐ Régularité", name: "Trust the plan", condition: "55 séances du plan running cochées", reward: "Séance VR en amoureux 🥽" },
 ];
 
 const COURSE_CODES = ["EF", "SL", "VMA"];
@@ -819,6 +820,14 @@ function buildRewardsStatus({ allWeeks, allKpis, data, marathonData }) {
   const perfectWeeks = allKpis.filter(k => k.poidsOk === true && k.deficitOk === true && k.sportOk === true).length;
   const marathonSeconds = parseMarathonTimeToSeconds(marathonData.time);
   const completedWeeks = PLAN.filter(p => hasWeekData(data[p.sem])).length;
+  const completedDays = allWeeks.reduce((acc, w) => {
+    return acc + (w.jours || []).filter(j =>
+      j.kCalTotales ||
+      j.garminKcal ||
+      (j.sessionsFaites && j.sessionsFaites.length > 0)
+    ).length;
+  }, 0);
+  const runningPlanDone = Object.values(data?._runningPlanChecks || {}).filter(Boolean).length;
 
   const isGreenWeek = (sem) => {
     const k = allKpis[sem - 1];
@@ -867,7 +876,6 @@ function buildRewardsStatus({ allWeeks, allKpis, data, marathonData }) {
     if (reward.id === 3) return weightReward(reward, 66);
     if (reward.id === 4) return weightReward(reward, 65);
     if (reward.id === 5) return weightReward(reward, 64);
-    if (reward.id === 6) return weightReward(reward, 63);
     if (reward.id === 7) {
       const p5 = parseFloat(allWeeks[4]?.poidsLundi);
       const p8 = parseFloat(allWeeks[7]?.poidsLundi);
@@ -897,6 +905,24 @@ function buildRewardsStatus({ allWeeks, allKpis, data, marathonData }) {
       const target = 3 * 3600 + 50 * 60;
       const unlocked = marathonSeconds !== null && marathonSeconds < target;
       return { ...reward, unlocked, progress: unlocked ? 1 : 0, detail: marathonData.time ? `Temps saisi : ${marathonData.time}` : "Temps à saisir après la course", remaining: unlocked ? "Débloquée" : "Saisir un temps < 3h50" };
+    }
+    if (reward.id === 20) {
+      return {
+        ...reward,
+        unlocked: completedDays >= 30,
+        progress: Math.min(1, completedDays / 30),
+        detail: `${completedDays}/30 jours complétés`,
+        remaining: completedDays >= 30 ? "Débloquée" : `Encore ${30 - completedDays} jour${30 - completedDays > 1 ? "s" : ""}`,
+      };
+    }
+    if (reward.id === 21) {
+      return {
+        ...reward,
+        unlocked: runningPlanDone >= 55,
+        progress: Math.min(1, runningPlanDone / 55),
+        detail: `${runningPlanDone}/55 séances cochées`,
+        remaining: runningPlanDone >= 55 ? "Débloquée" : `Encore ${55 - runningPlanDone} séance${55 - runningPlanDone > 1 ? "s" : ""}`,
+      };
     }
     return { ...reward, unlocked: false, progress: 0, detail: "", remaining: "" };
   });
