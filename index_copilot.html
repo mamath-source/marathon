@@ -1510,6 +1510,52 @@ function RunningPlanTab({ runningChecks, updateRunningPlanCheck, currentSem }) {
   const pastWeeks = RUNNING_PLAN.filter(w => w.week < currentSem);
   const visibleWeeks = RUNNING_PLAN.filter(w => w.week >= currentSem);
 
+  const renderSessionCell = (weekData, session, idx) => {
+    const key = `S${weekData.week}-${idx}`;
+    const done = !!runningChecks[key];
+
+    if (session.empty) {
+      return (
+        <div key={idx} style={{
+          background: "#0f172a",
+          border: "1px dashed #334155",
+          borderRadius: 10,
+          minHeight: 74,
+          color: "#334155",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 18,
+          fontWeight: 800,
+        }}>/</div>
+      );
+    }
+
+    return (
+      <button key={idx} onClick={() => updateRunningPlanCheck(key, !done)} style={{
+        background: done ? "#064e3b" : "#1e293b",
+        border: `1.5px solid ${done ? "#10b981" : "#334155"}`,
+        borderRadius: 10,
+        minHeight: 74,
+        padding: "10px 8px",
+        color: done ? "#d1fae5" : "#cbd5e1",
+        cursor: "pointer",
+        textAlign: "center",
+        fontFamily: "inherit",
+        boxShadow: done ? "0 0 0 1px #10b98133 inset" : "none",
+      }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: done ? "#86efac" : "#e2e8f0", marginBottom: 4 }}>
+          {done ? "✓ " : ""}{session.title}
+        </div>
+        {session.details && (
+          <div style={{ fontSize: 11, lineHeight: 1.25, color: done ? "#bbf7d0" : "#94a3b8", whiteSpace: "pre-line" }}>
+            {session.details}
+          </div>
+        )}
+      </button>
+    );
+  };
+
   const renderWeekRow = (weekData) => {
     const realSessions = weekData.sessions.filter(s => !s.empty);
     const doneCount = realSessions.filter((_, idx) => runningChecks[`S${weekData.week}-${idx}`]).length;
@@ -1519,16 +1565,18 @@ function RunningPlanTab({ runningChecks, updateRunningPlanCheck, currentSem }) {
     return (
       <div key={weekData.week} style={{
         display: "grid",
-        gridTemplateColumns: "52px repeat(4, minmax(120px, 1fr))",
+        gridTemplateColumns: "54px 1fr 1fr",
+        gridTemplateRows: "auto auto",
         gap: 6,
         alignItems: "stretch",
-        marginBottom: 8,
+        marginBottom: 10,
       }}>
         <div style={{
+          gridRow: "1 / span 2",
           background: "#0f172a",
           border: "1px solid #334155",
           borderRadius: 10,
-          minHeight: 74,
+          minHeight: 154,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -1544,49 +1592,7 @@ function RunningPlanTab({ runningChecks, updateRunningPlanCheck, currentSem }) {
           </div>
         </div>
 
-        {weekData.sessions.map((session, idx) => {
-          const key = `S${weekData.week}-${idx}`;
-          const done = !!runningChecks[key];
-          if (session.empty) {
-            return (
-              <div key={idx} style={{
-                background: "#0f172a",
-                border: "1px dashed #334155",
-                borderRadius: 10,
-                minHeight: 74,
-                color: "#334155",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 18,
-                fontWeight: 800,
-              }}>/</div>
-            );
-          }
-          return (
-            <button key={idx} onClick={() => updateRunningPlanCheck(key, !done)} style={{
-              background: done ? "#064e3b" : "#1e293b",
-              border: `1.5px solid ${done ? "#10b981" : "#334155"}`,
-              borderRadius: 10,
-              minHeight: 74,
-              padding: "10px 8px",
-              color: done ? "#d1fae5" : "#cbd5e1",
-              cursor: "pointer",
-              textAlign: "center",
-              fontFamily: "inherit",
-              boxShadow: done ? "0 0 0 1px #10b98133 inset" : "none",
-            }}>
-              <div style={{ fontSize: 12, fontWeight: 800, color: done ? "#86efac" : "#e2e8f0", marginBottom: 4 }}>
-                {done ? "✓ " : ""}{session.title}
-              </div>
-              {session.details && (
-                <div style={{ fontSize: 11, lineHeight: 1.25, color: done ? "#bbf7d0" : "#94a3b8", whiteSpace: "pre-line" }}>
-                  {session.details}
-                </div>
-              )}
-            </button>
-          );
-        })}
+        {weekData.sessions.map((session, idx) => renderSessionCell(weekData, session, idx))}
       </div>
     );
   };
@@ -1601,7 +1607,7 @@ function RunningPlanTab({ runningChecks, updateRunningPlanCheck, currentSem }) {
       }}>
         <div style={{ fontSize: 20, color: "#f8fafc", fontWeight: 800 }}>🏃 Plan running</div>
         <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
-          Vue tableau comme ton Excel · clic sur une case pour la valider
+          Vue 2×2 sans scroll horizontal · clic sur une case pour la valider
         </div>
       </div>
 
@@ -1627,10 +1633,8 @@ function RunningPlanTab({ runningChecks, updateRunningPlanCheck, currentSem }) {
         </div>
       )}
 
-      <div style={{ overflowX: "auto", paddingBottom: 4 }}>
-        <div style={{ minWidth: 650 }}>
-          {visibleWeeks.map(renderWeekRow)}
-        </div>
+      <div>
+        {visibleWeeks.map(renderWeekRow)}
       </div>
     </div>
   );
