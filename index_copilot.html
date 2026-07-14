@@ -766,7 +766,8 @@ const REWARDS = [
   { id: 2, category: "⚖️ Poids", name: "Goed Bezig!", condition: "Sous 67 kg", reward: "Merveilleux Pain Quotidien 🍰" },
   { id: 3, category: "⚖️ Poids", name: "On lâche rien", condition: "Sous 66 kg", reward: "Jeu Switch 🎮" },
   { id: 4, category: "⚖️ Poids", name: "Bye Bye Sixty-Five", condition: "Sous 65 kg", reward: "Robe Lady V 👗" },
-  { id: 5, category: "⚖️ Poids", name: "Mieux que prévu", condition: "Sous 64 kg", reward: "Robe Desigual 👗" },
+  { id: 5, category: "⚖️ Poids", name: "Mieux que prévu", condition: "Sous 64 kg", reward: "VR en amoureux 🥽" },
+  { id: 6, category: "⚖️ Poids", name: "You are amazing ❤️", condition: "Sous 63 kg", reward: "Robe Desigual 👗" },
   { id: 7, category: "⚖️ Poids", name: "Volonté de fer", condition: "Vacances : écart S8-S5 ≤ 1 kg", reward: "Manucure 💅" },
   { id: 8, category: "🏃 Bloc sport", name: "En route !", condition: "S1-S4 : ≥3 semaines vertes & ≥12 sorties", reward: "Bouquet de fleurs 💐" },
   { id: 9, category: "🏃 Bloc sport", name: "On tient bon", condition: "S5-S8 : ≥3 semaines vertes & ≥12 sorties", reward: "Massage dos/nuque 💆" },
@@ -778,10 +779,8 @@ const REWARDS = [
   { id: 15, category: "🔥 Semaines parfaites", name: "Régulière comme une horloge", condition: "9 semaines parfaites", reward: "Pédicure 💅" },
   { id: 16, category: "🔥 Semaines parfaites", name: "Discipline de fer", condition: "13 semaines parfaites", reward: "Demi-journée off ☀️" },
   { id: 17, category: "🔥 Semaines parfaites", name: "The best of the best", condition: "16 semaines parfaites", reward: "Cadeau de moi à moi à Venise 🎁" },
-  { id: 18, category: "🏁 Marathon", name: "Déjà mieux que Valence", condition: "Finisher", reward: "Shopping à Venise" },
+  { id: 18, category: "🏁 Marathon", name: "Déjà mieux que Valence", condition: "Finisher", reward: "Un parfum" },
   { id: 19, category: "🏁 Marathon", name: "Tu cartonnes", condition: "Sous 3h50", reward: "Expérience spéciale à Venise 🇮🇹" },
-  { id: 20, category: "⭐ Régularité", name: "Un jour à la fois", condition: "30 jours complétés", reward: "Nouveau roman 📚" },
-  { id: 21, category: "⭐ Régularité", name: "Trust the plan", condition: "55 séances du plan running cochées", reward: "Séance VR en amoureux 🥽" },
 ];
 
 const COURSE_CODES = ["EF", "SL", "VMA"];
@@ -820,14 +819,6 @@ function buildRewardsStatus({ allWeeks, allKpis, data, marathonData }) {
   const perfectWeeks = allKpis.filter(k => k.poidsOk === true && k.deficitOk === true && k.sportOk === true).length;
   const marathonSeconds = parseMarathonTimeToSeconds(marathonData.time);
   const completedWeeks = PLAN.filter(p => hasWeekData(data[p.sem])).length;
-  const completedDays = allWeeks.reduce((acc, w) => {
-    return acc + (w.jours || []).filter(j =>
-      j.kCalTotales ||
-      j.garminKcal ||
-      (j.sessionsFaites && j.sessionsFaites.length > 0)
-    ).length;
-  }, 0);
-  const runningPlanDone = Object.values(data?._runningPlanChecks || {}).filter(Boolean).length;
 
   const isGreenWeek = (sem) => {
     const k = allKpis[sem - 1];
@@ -876,6 +867,7 @@ function buildRewardsStatus({ allWeeks, allKpis, data, marathonData }) {
     if (reward.id === 3) return weightReward(reward, 66);
     if (reward.id === 4) return weightReward(reward, 65);
     if (reward.id === 5) return weightReward(reward, 64);
+    if (reward.id === 6) return weightReward(reward, 63);
     if (reward.id === 7) {
       const p5 = parseFloat(allWeeks[4]?.poidsLundi);
       const p8 = parseFloat(allWeeks[7]?.poidsLundi);
@@ -905,24 +897,6 @@ function buildRewardsStatus({ allWeeks, allKpis, data, marathonData }) {
       const target = 3 * 3600 + 50 * 60;
       const unlocked = marathonSeconds !== null && marathonSeconds < target;
       return { ...reward, unlocked, progress: unlocked ? 1 : 0, detail: marathonData.time ? `Temps saisi : ${marathonData.time}` : "Temps à saisir après la course", remaining: unlocked ? "Débloquée" : "Saisir un temps < 3h50" };
-    }
-    if (reward.id === 20) {
-      return {
-        ...reward,
-        unlocked: completedDays >= 30,
-        progress: Math.min(1, completedDays / 30),
-        detail: `${completedDays}/30 jours complétés`,
-        remaining: completedDays >= 30 ? "Débloquée" : `Encore ${30 - completedDays} jour${30 - completedDays > 1 ? "s" : ""}`,
-      };
-    }
-    if (reward.id === 21) {
-      return {
-        ...reward,
-        unlocked: runningPlanDone >= 55,
-        progress: Math.min(1, runningPlanDone / 55),
-        detail: `${runningPlanDone}/55 séances cochées`,
-        remaining: runningPlanDone >= 55 ? "Débloquée" : `Encore ${55 - runningPlanDone} séance${55 - runningPlanDone > 1 ? "s" : ""}`,
-      };
     }
     return { ...reward, unlocked: false, progress: 0, detail: "", remaining: "" };
   });
@@ -1510,52 +1484,6 @@ function RunningPlanTab({ runningChecks, updateRunningPlanCheck, currentSem }) {
   const pastWeeks = RUNNING_PLAN.filter(w => w.week < currentSem);
   const visibleWeeks = RUNNING_PLAN.filter(w => w.week >= currentSem);
 
-  const renderSessionCell = (weekData, session, idx) => {
-    const key = `S${weekData.week}-${idx}`;
-    const done = !!runningChecks[key];
-
-    if (session.empty) {
-      return (
-        <div key={idx} style={{
-          background: "#0f172a",
-          border: "1px dashed #334155",
-          borderRadius: 10,
-          minHeight: 74,
-          color: "#334155",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 18,
-          fontWeight: 800,
-        }}>/</div>
-      );
-    }
-
-    return (
-      <button key={idx} onClick={() => updateRunningPlanCheck(key, !done)} style={{
-        background: done ? "#064e3b" : "#1e293b",
-        border: `1.5px solid ${done ? "#10b981" : "#334155"}`,
-        borderRadius: 10,
-        minHeight: 74,
-        padding: "10px 8px",
-        color: done ? "#d1fae5" : "#cbd5e1",
-        cursor: "pointer",
-        textAlign: "center",
-        fontFamily: "inherit",
-        boxShadow: done ? "0 0 0 1px #10b98133 inset" : "none",
-      }}>
-        <div style={{ fontSize: 12, fontWeight: 800, color: done ? "#86efac" : "#e2e8f0", marginBottom: 4 }}>
-          {done ? "✓ " : ""}{session.title}
-        </div>
-        {session.details && (
-          <div style={{ fontSize: 11, lineHeight: 1.25, color: done ? "#bbf7d0" : "#94a3b8", whiteSpace: "pre-line" }}>
-            {session.details}
-          </div>
-        )}
-      </button>
-    );
-  };
-
   const renderWeekRow = (weekData) => {
     const realSessions = weekData.sessions.filter(s => !s.empty);
     const doneCount = realSessions.filter((_, idx) => runningChecks[`S${weekData.week}-${idx}`]).length;
@@ -1565,18 +1493,16 @@ function RunningPlanTab({ runningChecks, updateRunningPlanCheck, currentSem }) {
     return (
       <div key={weekData.week} style={{
         display: "grid",
-        gridTemplateColumns: "54px 1fr 1fr",
-        gridTemplateRows: "auto auto",
+        gridTemplateColumns: "52px repeat(4, minmax(120px, 1fr))",
         gap: 6,
         alignItems: "stretch",
-        marginBottom: 10,
+        marginBottom: 8,
       }}>
         <div style={{
-          gridRow: "1 / span 2",
           background: "#0f172a",
           border: "1px solid #334155",
           borderRadius: 10,
-          minHeight: 154,
+          minHeight: 74,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -1592,7 +1518,49 @@ function RunningPlanTab({ runningChecks, updateRunningPlanCheck, currentSem }) {
           </div>
         </div>
 
-        {weekData.sessions.map((session, idx) => renderSessionCell(weekData, session, idx))}
+        {weekData.sessions.map((session, idx) => {
+          const key = `S${weekData.week}-${idx}`;
+          const done = !!runningChecks[key];
+          if (session.empty) {
+            return (
+              <div key={idx} style={{
+                background: "#0f172a",
+                border: "1px dashed #334155",
+                borderRadius: 10,
+                minHeight: 74,
+                color: "#334155",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 18,
+                fontWeight: 800,
+              }}>/</div>
+            );
+          }
+          return (
+            <button key={idx} onClick={() => updateRunningPlanCheck(key, !done)} style={{
+              background: done ? "#064e3b" : "#1e293b",
+              border: `1.5px solid ${done ? "#10b981" : "#334155"}`,
+              borderRadius: 10,
+              minHeight: 74,
+              padding: "10px 8px",
+              color: done ? "#d1fae5" : "#cbd5e1",
+              cursor: "pointer",
+              textAlign: "center",
+              fontFamily: "inherit",
+              boxShadow: done ? "0 0 0 1px #10b98133 inset" : "none",
+            }}>
+              <div style={{ fontSize: 12, fontWeight: 800, color: done ? "#86efac" : "#e2e8f0", marginBottom: 4 }}>
+                {done ? "✓ " : ""}{session.title}
+              </div>
+              {session.details && (
+                <div style={{ fontSize: 11, lineHeight: 1.25, color: done ? "#bbf7d0" : "#94a3b8", whiteSpace: "pre-line" }}>
+                  {session.details}
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
     );
   };
@@ -1607,7 +1575,7 @@ function RunningPlanTab({ runningChecks, updateRunningPlanCheck, currentSem }) {
       }}>
         <div style={{ fontSize: 20, color: "#f8fafc", fontWeight: 800 }}>🏃 Plan running</div>
         <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
-          Vue 2×2 sans scroll horizontal · clic sur une case pour la valider
+          Vue tableau comme ton Excel · clic sur une case pour la valider
         </div>
       </div>
 
@@ -1633,8 +1601,10 @@ function RunningPlanTab({ runningChecks, updateRunningPlanCheck, currentSem }) {
         </div>
       )}
 
-      <div>
-        {visibleWeeks.map(renderWeekRow)}
+      <div style={{ overflowX: "auto", paddingBottom: 4 }}>
+        <div style={{ minWidth: 650 }}>
+          {visibleWeeks.map(renderWeekRow)}
+        </div>
       </div>
     </div>
   );
