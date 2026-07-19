@@ -762,32 +762,44 @@ function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJo
 
 
 const REWARDS = [
-  { id: 1, category: "⚖️ Poids", name: "It's a good start", condition: "Sous 68 kg", reward: "Bain moussant 🛁" },
-  { id: 2, category: "⚖️ Poids", name: "Goed Bezig!", condition: "Sous 67 kg", reward: "Merveilleux Pain Quotidien 🍰" },
-  { id: 3, category: "⚖️ Poids", name: "On lâche rien", condition: "Sous 66 kg", reward: "Jeu Switch 🎮" },
-  { id: 4, category: "⚖️ Poids", name: "Bye Bye Sixty-Five", condition: "Sous 65 kg", reward: "Robe Lady V 👗" },
-  { id: 5, category: "⚖️ Poids", name: "Mieux que prévu", condition: "Sous 64 kg", reward: "Robe Desigual 👗" },
-  { id: 7, category: "⚖️ Poids", name: "Volonté de fer", condition: "Vacances : écart S8-S5 ≤ 1 kg", reward: "Manucure 💅" },
-  { id: 8, category: "🏃 Bloc sport", name: "En route !", condition: "S1-S4 : ≥3 semaines vertes & ≥12 sorties", reward: "Bouquet de fleurs 💐" },
+  { id: 1, category: "⚖️ Poids & composition corporelle", name: "It's a good start", condition: "Sous 68 kg", reward: "Bouquet de fleurs 💐" },
+  { id: 2, category: "⚖️ Poids & composition corporelle", name: "Goed Bezig!", condition: "Sous 67 kg", reward: "Merveilleux Pain Quotidien 🍰" },
+  { id: 3, category: "⚖️ Poids & composition corporelle", name: "On lâche rien", condition: "Sous 66 kg", reward: "Jeu Switch 🎮" },
+  { id: 4, category: "⚖️ Poids & composition corporelle", name: "Bye Bye Sixty-Five", condition: "Sous 65 kg", reward: "Robe Lady V 👗" },
+  { id: 5, category: "⚖️ Poids & composition corporelle", name: "Mieux que prévu", condition: "Sous 64 kg", reward: "Robe Desigual 👗" },
+  { id: 7, category: "⚖️ Poids & composition corporelle", name: "Volonté de fer", condition: "Vacances : écart S8-S5 ≤ 1 kg", reward: "Manucure 💅" },
+  { id: 8, category: "🏃 Bloc sport", name: "En route !", condition: "S1-S4 : ≥3 semaines vertes & ≥12 sorties", reward: "Nouveau roman 📚" },
   { id: 9, category: "🏃 Bloc sport", name: "On tient bon", condition: "S5-S8 : ≥3 semaines vertes & ≥12 sorties", reward: "Massage dos/nuque 💆" },
   { id: 10, category: "🏃 Bloc sport", name: "Plus rien ne peut m'arrêter", condition: "S9-S12 : ≥3 semaines vertes & ≥12 sorties", reward: "Resto indien ou pizzeria 🍕" },
   { id: 11, category: "🏃 Bloc sport", name: "La ligne droite", condition: "S13-S16 : ≥3 semaines vertes & ≥12 sorties", reward: "Bulle flottante ou expérience zen 🧘" },
   { id: 12, category: "🎽 Sorties longues", name: "C'est long…", condition: "10 SL réalisées", reward: "Mitraillette 🥖" },
   { id: 13, category: "🎽 Sorties longues", name: "C'est très long…", condition: "14 SL du plan réalisées", reward: "Massage complet 💆" },
-  { id: 14, category: "🔥 Semaines parfaites", name: "Bien partie", condition: "6 semaines parfaites", reward: "Manga Death Note 📚" },
-  { id: 15, category: "🔥 Semaines parfaites", name: "Régulière comme une horloge", condition: "9 semaines parfaites", reward: "Pédicure 💅" },
-  { id: 16, category: "🔥 Semaines parfaites", name: "Discipline de fer", condition: "13 semaines parfaites", reward: "Demi-journée off ☀️" },
+  { id: 14, category: "🔥 Semaines parfaites", name: "Bien partie", condition: "6 semaines parfaites", reward: "Demi-journée off ☀️" },
+  { id: 15, category: "🔥 Semaines parfaites", name: "Régulière comme une horloge", condition: "9 semaines parfaites", reward: "BD ou manga 📚" },
+  { id: 16, category: "🔥 Semaines parfaites", name: "Discipline de fer", condition: "13 semaines parfaites", reward: "Pédicure 💅" },
   { id: 17, category: "🔥 Semaines parfaites", name: "The best of the best", condition: "16 semaines parfaites", reward: "Cadeau de moi à moi à Venise 🎁" },
   { id: 18, category: "🏁 Marathon", name: "Déjà mieux que Valence", condition: "Finisher", reward: "Un parfum" },
   { id: 19, category: "🏁 Marathon", name: "Tu cartonnes", condition: "Sous 3h50", reward: "Expérience spéciale à Venise 🇮🇹" },
-  { id: 20, category: "⭐ Régularité", name: "Un jour à la fois", condition: "30 jours complétés", reward: "Nouveau roman 📚" },
-  { id: 21, category: "⭐ Régularité", name: "Trust the plan", condition: "55 séances du plan running cochées", reward: "Séance VR en amoureux 🥽" },
+  { id: 20, category: "⚖️ Poids & composition corporelle", name: "Athlète 2.0", condition: "Gras < 27 % et muscle > 31 %", reward: "Bijou ✨" },
+  { id: 21, category: "🏁 Marathon", name: "Trust the plan", condition: "55 séances du plan running cochées", reward: "Séance VR en amoureux 🥽" },
 ];
 
 const COURSE_CODES = ["EF", "SL", "VMA"];
 
 function getMarathonData(data) {
   return data?._marathon || { finished: false, time: "" };
+}
+
+function getBodyCompositionData(data) {
+  return data?._bodyComposition || { fatUnder27: false, muscleOver31: false };
+}
+
+function revealSecretText(encoded) {
+  try {
+    return decodeURIComponent(escape(atob(encoded)));
+  } catch(e) {
+    return "Récompense secrète";
+  }
 }
 
 function parseMarathonTimeToSeconds(value) {
@@ -814,10 +826,10 @@ function getMinWeight(allWeeks) {
   return weights.length ? Math.min(...weights) : null;
 }
 
-function buildRewardsStatus({ allWeeks, allKpis, data, marathonData }) {
+function buildRewardsStatus({ allWeeks, allKpis, data, marathonData, bodyCompositionData }) {
   const minWeight = getMinWeight(allWeeks);
   const totalSL = countSessionsInWeeks(allWeeks, ["SL"]);
-  const perfectWeeks = allKpis.filter(k => k.poidsOk === true && k.deficitOk === true && k.sportOk === true).length;
+  const perfectWeeks = allKpis.filter(k => k.poidsOk === true && k.sportOk === true).length;
   const marathonSeconds = parseMarathonTimeToSeconds(marathonData.time);
   const completedWeeks = PLAN.filter(p => hasWeekData(data[p.sem])).length;
   const completedDays = allWeeks.reduce((acc, w) => {
@@ -907,12 +919,19 @@ function buildRewardsStatus({ allWeeks, allKpis, data, marathonData }) {
       return { ...reward, unlocked, progress: unlocked ? 1 : 0, detail: marathonData.time ? `Temps saisi : ${marathonData.time}` : "Temps à saisir après la course", remaining: unlocked ? "Débloquée" : "Saisir un temps < 3h50" };
     }
     if (reward.id === 20) {
+      const fatOk = !!bodyCompositionData.fatUnder27;
+      const muscleOk = !!bodyCompositionData.muscleOver31;
+      const unlocked = fatOk && muscleOk;
+      const progress = (fatOk ? 0.5 : 0) + (muscleOk ? 0.5 : 0);
+      const missing = [];
+      if (!fatOk) missing.push("gras < 27 %");
+      if (!muscleOk) missing.push("muscle > 31 %");
       return {
         ...reward,
-        unlocked: completedDays >= 30,
-        progress: Math.min(1, completedDays / 30),
-        detail: `${completedDays}/30 jours complétés`,
-        remaining: completedDays >= 30 ? "Débloquée" : `Encore ${30 - completedDays} jour${30 - completedDays > 1 ? "s" : ""}`,
+        unlocked,
+        progress,
+        detail: `${fatOk ? "✓" : "☐"} Gras < 27 % · ${muscleOk ? "✓" : "☐"} Muscle > 31 %`,
+        remaining: unlocked ? "Débloquée" : `Encore : ${missing.join(" + ")}`,
       };
     }
     if (reward.id === 21) {
@@ -927,29 +946,37 @@ function buildRewardsStatus({ allWeeks, allKpis, data, marathonData }) {
     return { ...reward, unlocked: false, progress: 0, detail: "", remaining: "" };
   });
 
-  if (completedWeeks >= 16) {
-    baseRewards.push({
-      id: "secret-never-gave-up",
-      category: "❤️ Secret",
-      name: "You Never Gave Up",
-      condition: "16 semaines terminées",
-      reward: "Récompense secrète débloquée ❤️",
-      unlocked: true,
-      progress: 1,
-      detail: "Tu as tenu les 16 semaines.",
-      remaining: "Débloquée",
-      secret: true,
-    });
-  }
+  const secretStartDate = new Date(2026, 9, 25);
+  const secretToday = new Date();
+  const secretA = parseFloat(revealSecretText("NjUuNQ=="));
+  const secretB = parseInt(revealSecretText("NTU="), 10);
+  const secretUnlocked = secretToday >= secretStartDate && !!marathonData.finished && minWeight !== null && minWeight <= secretA && runningPlanDone >= secretB;
+  const secretRewardText = revealSecretText("VW4gY2FybmV0IEFyb3VuZCB0aGUgd29ybGQgZXQgMSBzdHlsbyBkb3LDqSBwb3VyIGxhIHByw6lwYXJhdGlvbiBTw6l2aWxsZSDinKg=");
+
+  baseRewards.push({
+    id: "secret-locked-chest",
+    category: "🔐 Secret",
+    name: secretUnlocked ? "Coffre secret ouvert" : "Coffre verrouillé",
+    condition: secretUnlocked ? "Objectif secret validé" : "Cette récompense ne peut être débloquée qu'en fin de préparation. Les conditions seront révélées au moment opportun.",
+    reward: secretUnlocked ? secretRewardText : "Mystère 🔐",
+    unlocked: secretUnlocked,
+    progress: secretUnlocked ? 1 : 0,
+    detail: secretUnlocked ? "Tu as débloqué la récompense surprise." : "Coffre verrouillé",
+    remaining: secretUnlocked ? "Débloquée" : "Conditions secrètes",
+    secret: true,
+    bonus: true,
+  });
 
   return baseRewards;
 }
 
-function RewardsTab({ rewardsStatus, marathonData, updateMarathonField }) {
-  const unlockedCount = rewardsStatus.filter(r => r.unlocked).length;
-  const total = rewardsStatus.length;
+function RewardsTab({ rewardsStatus, marathonData, updateMarathonField, bodyCompositionData, updateBodyCompositionField }) {
+  const visibleRewards = rewardsStatus.filter(r => !r.bonus);
+  const secretReward = rewardsStatus.find(r => r.secret);
+  const unlockedCount = visibleRewards.filter(r => r.unlocked).length;
+  const total = visibleRewards.length;
   const globalProgress = total ? unlockedCount / total : 0;
-  const lockedRewards = rewardsStatus.filter(r => !r.unlocked);
+  const lockedRewards = visibleRewards.filter(r => !r.unlocked);
   const nextReward = lockedRewards.length
     ? [...lockedRewards].sort((a, b) => (b.progress || 0) - (a.progress || 0))[0]
     : null;
@@ -963,7 +990,7 @@ function RewardsTab({ rewardsStatus, marathonData, updateMarathonField }) {
   const roadProgress = Math.min(1, (dateProgress * 0.55) + (globalProgress * 0.45));
   const daysLeft = Math.max(0, Math.ceil((raceDate - today) / (1000 * 60 * 60 * 24)));
 
-  const categories = rewardsStatus.reduce((acc, r) => {
+  const categories = visibleRewards.reduce((acc, r) => {
     if (!acc[r.category]) acc[r.category] = [];
     acc[r.category].push(r);
     return acc;
@@ -1095,6 +1122,62 @@ function RewardsTab({ rewardsStatus, marathonData, updateMarathonField }) {
           <span style={{ fontSize: 12, color: "#64748b" }}>Format : HH:MM ou HH:MM:SS</span>
         </div>
       </div>
+
+
+      <div style={{
+        background: "#1e293b",
+        borderRadius: 14,
+        padding: 16,
+        border: "1px solid #334155",
+      }}>
+        <div style={{ fontSize: 13, color: "#f8fafc", fontWeight: 700, marginBottom: 10 }}>
+          ⚖️ Composition corporelle
+        </div>
+        <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, color: "#cbd5e1", fontSize: 13 }}>
+            <input
+              type="checkbox"
+              checked={!!bodyCompositionData.fatUnder27}
+              onChange={e => updateBodyCompositionField("fatUnder27", e.target.checked)}
+            />
+            Gras &lt; 27 %
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, color: "#cbd5e1", fontSize: 13 }}>
+            <input
+              type="checkbox"
+              checked={!!bodyCompositionData.muscleOver31}
+              onChange={e => updateBodyCompositionField("muscleOver31", e.target.checked)}
+            />
+            Muscle &gt; 31 %
+          </label>
+          <span style={{ fontSize: 12, color: "#64748b" }}>
+            Les deux cases débloquent Athlète 2.0.
+          </span>
+        </div>
+      </div>
+
+      {secretReward && (
+        <div style={{
+          background: secretReward.unlocked ? "linear-gradient(135deg, #4c1d95, #0f172a)" : "#111827",
+          borderRadius: 16,
+          padding: 16,
+          border: `1px solid ${secretReward.unlocked ? "#a78bfa" : "#334155"}`,
+          boxShadow: secretReward.unlocked ? "0 0 0 1px #a78bfa33 inset" : "none",
+        }}>
+          <div style={{ fontSize: 12, color: secretReward.unlocked ? "#ddd6fe" : "#94a3b8", textTransform: "uppercase", letterSpacing: 1, fontWeight: 800, marginBottom: 8 }}>
+            {secretReward.unlocked ? "🎁 Secret débloqué" : "🔐 Coffre verrouillé"}
+          </div>
+          <div style={{ fontSize: 17, color: "#f8fafc", fontWeight: 800 }}>
+            {secretReward.name}
+          </div>
+          <div style={{ fontSize: 12, color: secretReward.unlocked ? "#fef3c7" : "#94a3b8", marginTop: 6, lineHeight: 1.4 }}>
+            {secretReward.condition}
+          </div>
+          <div style={{ fontSize: 12, color: secretReward.unlocked ? "#fef3c7" : "#64748b", marginTop: 8, fontWeight: 700 }}>
+            🎁 {secretReward.reward}
+          </div>
+        </div>
+      )}
 
       {Object.entries(categories).map(([category, rewards]) => {
         const catUnlocked = rewards.filter(r => r.unlocked).length;
@@ -1811,6 +1894,7 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
 
   const marathonData = getMarathonData(data);
   const runningChecks = data._runningPlanChecks || {};
+  const bodyCompositionData = getBodyCompositionData(data);
 
   const updateRunningPlanCheck = (key, val) => {
     save({
@@ -1827,6 +1911,16 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
       ...data,
       _marathon: {
         ...marathonData,
+        [field]: val,
+      }
+    });
+  };
+
+  const updateBodyCompositionField = (field, val) => {
+    save({
+      ...data,
+      _bodyComposition: {
+        ...bodyCompositionData,
         [field]: val,
       }
     });
@@ -1947,6 +2041,7 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
   useEffect(() => {
     if (!loaded) return;
     const marathonDataForCheck = getMarathonData(data);
+    const bodyCompositionDataForCheck = getBodyCompositionData(data);
     const allKpisForCheck = PLAN.map(p => kpiSem(p.sem));
     const allWeeksForCheck = PLAN.map(p => getWeek(p.sem));
     const statusForCheck = buildRewardsStatus({
@@ -1954,6 +2049,7 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
       allKpis: allKpisForCheck,
       data,
       marathonData: marathonDataForCheck,
+      bodyCompositionData: bodyCompositionDataForCheck,
     });
     const unlockedIds = statusForCheck.filter(r => r.unlocked).map(r => String(r.id));
     let previousIds = [];
@@ -2008,7 +2104,7 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
   const col = progression < 0.33 ? "#6366f1" : progression < 0.66 ? "#f59e0b" : "#10b981";
   const allKpis = PLAN.map(p => kpiSem(p.sem));
   const allWeeks = PLAN.map(p => getWeek(p.sem));
-  const rewardsStatus = buildRewardsStatus({ allWeeks, allKpis, data, marathonData });
+  const rewardsStatus = buildRewardsStatus({ allWeeks, allKpis, data, marathonData, bodyCompositionData });
   const currentPlanningPositionForTab = getCurrentPlanningPosition();
 
   return (
@@ -2718,6 +2814,8 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
             rewardsStatus={rewardsStatus}
             marathonData={marathonData}
             updateMarathonField={updateMarathonField}
+            bodyCompositionData={bodyCompositionData}
+            updateBodyCompositionField={updateBodyCompositionField}
           />
         )}
 
