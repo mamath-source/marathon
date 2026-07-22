@@ -555,14 +555,9 @@ function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJo
 
   const hasKcal = kcal > 0;
   const hasGarmin = garmin > 0;
-
-  const budgetMax = hasGarmin
-    ? Math.round(garmin - deficitCibleJour)
-    : cibleKcal;
-
-  const restant = budgetMax - kcal;
-
-  const kcalOk = hasKcal && kcal <= budgetMax + 80;
+  const hasDeficit = hasKcal && hasGarmin;
+  const deficit = hasDeficit ? Math.round(garmin - kcal) : null;
+  const deficitOk = hasDeficit ? deficit >= deficitCibleJour - 50 : null;
 
   return (
     <div style={{
@@ -584,7 +579,7 @@ function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJo
           🍽️ Nutrition
         </div>
 
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <span style={{
             padding: "2px 8px",
             borderRadius: 6,
@@ -595,89 +590,20 @@ function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJo
             🎯 Déficit visé : {deficitCibleJour} kcal
           </span>
 
-          {hasGarmin ? (
-            <>
-              <span style={{
-                padding: "2px 8px",
-                borderRadius: 6,
-                fontSize: 11,
-                background: "#10b98122",
-                color: "#10b981",
-              }}>
-                ⌚ Brûlé : {garmin} kcal
-              </span>
-
-              <span style={{
-                padding: "2px 8px",
-                borderRadius: 6,
-                fontSize: 11,
-                fontWeight: 700,
-                background: "#6366f122",
-                color: "#6366f1",
-              }}>
-                💡 Budget : {budgetMax} kcal
-              </span>
-            </>
-          ) : (
+          {hasDeficit && (
             <span style={{
               padding: "2px 8px",
               borderRadius: 6,
               fontSize: 11,
-              background: "#6366f122",
-              color: "#6366f1",
-            }}>
-              🎯 Objectif calories : {cibleKcal} kcal
-            </span>
-          )}
-
-          {hasKcal && (
-            <span style={{
-              padding: "2px 8px",
-              borderRadius: 99,
-              fontSize: 11,
               fontWeight: 700,
-              background: kcalOk ? "#064e3b" : "#450a0a",
-              color: kcalOk ? "#6ee7b7" : "#fca5a5",
+              background: deficitOk ? "#064e3b" : "#450a0a",
+              color: deficitOk ? "#6ee7b7" : "#fca5a5",
             }}>
-              {kcal} kcal {kcalOk ? "✓" : "✗"}
+              {deficitOk ? "✅" : "❌"} Déficit : {deficit} kcal
             </span>
           )}
         </div>
       </div>
-
-      {hasKcal && (
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          marginBottom: 14,
-        }}>
-          <div style={{
-            flex: 1,
-            background: "#0f172a",
-            borderRadius: 99,
-            height: 6,
-            overflow: "hidden",
-          }}>
-            <div style={{
-              height: "100%",
-              borderRadius: 99,
-              width: `${Math.min((kcal / budgetMax) * 100, 100)}%`,
-              background: kcal > budgetMax ? "#ef4444" : kcal > budgetMax * 0.9 ? "#f59e0b" : "#10b981",
-              transition: "width 0.3s",
-            }} />
-          </div>
-
-          <span style={{
-            fontSize: 12,
-            fontWeight: 700,
-            whiteSpace: "nowrap",
-            color: kcal > budgetMax ? "#ef4444" : kcal > budgetMax * 0.9 ? "#f59e0b" : "#10b981",
-          }}>
-            {restant >= 0 ? `reste ${restant}` : `dépassé ${Math.abs(restant)}`}
-          </span>
-        </div>
-      )}
 
       <div style={{
         display: "flex",
@@ -743,18 +669,6 @@ function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJo
         />
 
         <span style={{ fontSize: 12, color: "#64748b" }}>kcal</span>
-
-        {hasGarmin && hasKcal && (
-          <span style={{
-            fontSize: 12,
-            padding: "3px 8px",
-            borderRadius: 6,
-            background: garmin - kcal > 0 ? "#064e3b" : "#450a0a",
-            color: garmin - kcal > 0 ? "#6ee7b7" : "#fca5a5",
-          }}>
-            Déficit : {Math.round(garmin - kcal)} kcal
-          </span>
-        )}
       </div>
     </div>
   );
