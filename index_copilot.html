@@ -230,15 +230,16 @@ function count(arr, code) {
 }
 
 function badge(ok, txt) {
+  const isWarn = ok === "warn";
   return (
     <span style={{
       padding: "3px 10px",
       borderRadius: 99,
       fontSize: 12,
       fontWeight: 600,
-      background: ok === true ? "#d1fae5" : ok === false ? "#fee2e2" : "#f1f5f9",
-      color: ok === true ? "#065f46" : ok === false ? "#991b1b" : "#64748b",
-      border: `1px solid ${ok === true ? "#6ee7b7" : ok === false ? "#fca5a5" : "#e2e8f0"}`,
+      background: ok === true ? "#d1fae5" : isWarn ? "#ffedd5" : ok === false ? "#fee2e2" : "#f1f5f9",
+      color: ok === true ? "#065f46" : isWarn ? "#9a3412" : ok === false ? "#991b1b" : "#64748b",
+      border: `1px solid ${ok === true ? "#6ee7b7" : isWarn ? "#fdba74" : ok === false ? "#fca5a5" : "#e2e8f0"}`,
       whiteSpace: "nowrap",
     }}>
       {txt}
@@ -248,6 +249,23 @@ function badge(ok, txt) {
 
 function dot(ok) {
   return ok === true ? "🟢" : ok === false ? "🔴" : "⚪";
+}
+
+function getDeficitStatus(deficitReel, deficitCible) {
+  if (deficitReel === null || deficitReel === undefined) return null;
+  const deficit = Number(deficitReel);
+  const cible = Number(deficitCible) || 0;
+  if (isNaN(deficit)) return null;
+  if (deficit < 0) return false;
+  if (cible <= 0) return true;
+  return deficit >= cible * 0.9 ? true : "warn";
+}
+
+function getDeficitColors(status) {
+  if (status === true) return { bg: "#064e3b", color: "#6ee7b7", icon: "✅" };
+  if (status === "warn") return { bg: "#78350f", color: "#fbbf24", icon: "⚠️" };
+  if (status === false) return { bg: "#450a0a", color: "#fca5a5", icon: "❌" };
+  return { bg: "#1e293b", color: "#64748b", icon: "" };
 }
 
 function WeekSummary({ weekSport, joursData }) {
@@ -557,7 +575,8 @@ function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJo
   const hasGarmin = garmin > 0;
   const hasDeficit = hasKcal && hasGarmin;
   const deficit = hasDeficit ? Math.round(garmin - kcal) : null;
-  const deficitOk = hasDeficit ? deficit >= deficitCibleJour - 50 : null;
+  const deficitStatus = hasDeficit ? getDeficitStatus(deficit, deficitCibleJour) : null;
+  const deficitColors = getDeficitColors(deficitStatus);
 
   return (
     <div style={{
@@ -596,10 +615,10 @@ function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJo
               borderRadius: 6,
               fontSize: 11,
               fontWeight: 700,
-              background: deficitOk ? "#064e3b" : "#450a0a",
-              color: deficitOk ? "#6ee7b7" : "#fca5a5",
+              background: deficitColors.bg,
+              color: deficitColors.color,
             }}>
-              {deficitOk ? "✅" : "❌"} Déficit : {deficit} kcal
+              {deficitColors.icon} Déficit : {deficit} kcal
             </span>
           )}
         </div>
@@ -1934,7 +1953,8 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
       deficitReel = Math.round(deficitCumul);
     }
 
-    const deficitOk = deficitReel !== null && deficitReel >= deficitCible * 0.85;
+    const deficitStatus = getDeficitStatus(deficitReel, deficitCible);
+    const deficitOk = deficitStatus;
 
     return {
       poids,
@@ -1948,6 +1968,7 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
       caloriesJourOk,
       deficitCible,
       deficitReel,
+      deficitStatus,
       deficitOk,
     };
   };
@@ -2183,7 +2204,9 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
                       : !hasData ? "#1e293b"
                       : (k.poidsOk === false || k.deficitOk === false || k.sportOk === false)
                         ? "#450a0a"
-                        : "#064e3b",
+                        : k.deficitOk === "warn"
+                          ? "#78350f"
+                          : "#064e3b",
                     color: activeSem === p.sem ? "white" : "#e2e8f0",
                     outline: activeSem === p.sem ? "2px solid #818cf8" : "none",
                   }}>
@@ -2505,15 +2528,20 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
                       <td style={{ padding: "10px 8px", textAlign: "center" }}>
                         {hasData && k.deficitReel !== null ? (
                           <div>
-                            <span style={{
-                              padding: "2px 8px",
-                              borderRadius: 6,
-                              fontSize: 12,
-                              background: k.deficitOk ? "#064e3b" : "#450a0a",
-                              color: k.deficitOk ? "#6ee7b7" : "#fca5a5",
-                            }}>
-                              {k.deficitReel} kcal
-                            </span>
+                            {(() => {
+                              const colors = getDeficitColors(k.deficitStatus);
+                              return (
+                                <span style={{
+                                  padding: "2px 8px",
+                                  borderRadius: 6,
+                                  fontSize: 12,
+                                  background: colors.bg,
+                                  color: colors.color,
+                                }}>
+                                  {k.deficitReel} kcal
+                                </span>
+                              );
+                            })()}
 
                             <div style={{ fontSize: 10, color: "#10b981", marginTop: 2 }}>
                               ⌚ cumulé
