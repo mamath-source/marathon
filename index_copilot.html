@@ -774,17 +774,20 @@ function buildRewardsStatus({ allWeeks, allKpis, data, marathonData, bodyComposi
   }, 0);
   const runningPlanDone = Object.values(data?._runningPlanChecks || {}).filter(Boolean).length;
 
-  const isGreenWeek = (sem) => {
+  const isSportValidatedWeek = (sem) => {
     const k = allKpis[sem - 1];
-    return hasWeekData(data[sem]) && k.poidsOk !== false && k.deficitOk !== false && k.sportOk !== false;
+    return hasWeekData(data[sem]) && k.sportOk === true;
   };
 
   const blockStats = (start, end) => {
-    const weeks = allWeeks.slice(start - 1, end);
-    const greenWeeks = Array.from({ length: end - start + 1 }, (_, i) => start + i).filter(isGreenWeek).length;
-    const sorties = countSessionsInWeeks(weeks, COURSE_CODES);
-    return { greenWeeks, sorties };
-  };
+  const weeks = allWeeks.slice(start - 1, end);
+  const sportValidatedWeeks = Array.from(
+    { length: end - start + 1 },
+    (_, i) => start + i
+  ).filter(isSportValidatedWeek).length;
+  const sorties = countSessionsInWeeks(weeks, COURSE_CODES);
+  return { sportValidatedWeeks, sorties };
+};
 
   const weightReward = (reward, threshold) => {
     const unlocked = minWeight !== null && minWeight < threshold;
