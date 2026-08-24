@@ -701,10 +701,10 @@ const REWARDS = [
   { id: 4, category: "⚖️ Poids & composition corporelle", name: "Bye Bye Sixty-Five", condition: "Sous 65 kg", reward: "Robe Lady V 👗" },
   { id: 5, category: "⚖️ Poids & composition corporelle", name: "Mieux que prévu", condition: "Sous 64 kg", reward: "Robe Desigual 👗" },
   { id: 7, category: "⚖️ Poids & composition corporelle", name: "Volonté de fer", condition: "Vacances : écart S8-S5 ≤ 1 kg", reward: "Manucure 💅" },
-  { id: 8, category: "🏃 Bloc sport", name: "En route !", condition: "S1-S4 : ≥3 semaines sport validées & ≥12 sorties", reward: "Nouveau roman 📚" },
-  { id: 9, category: "🏃 Bloc sport", name: "On tient bon", condition: "S5-S8 : ≥3 semaines sport validées & ≥12 sorties", reward: "Massage dos/nuque 💆" },
-  { id: 10, category: "🏃 Bloc sport", name: "Plus rien ne peut m'arrêter", condition: "S9-S12 : ≥3 semaines sport validées & ≥12 sorties", reward: "Resto indien ou pizzeria 🍕" },
-  { id: 11, category: "🏃 Bloc sport", name: "La ligne droite", condition: "S13-S16 : ≥3 semaines sport validées & ≥12 sorties", reward: "Bulle flottante ou expérience zen 🧘" },
+  { id: 8, category: "🏃 Bloc sport", name: "En route !", condition: "S1-S4 : ≥3 semaines vertes & ≥12 sorties", reward: "Nouveau roman 📚" },
+  { id: 9, category: "🏃 Bloc sport", name: "On tient bon", condition: "S5-S8 : ≥3 semaines vertes & ≥12 sorties", reward: "Massage dos/nuque 💆" },
+  { id: 10, category: "🏃 Bloc sport", name: "Plus rien ne peut m'arrêter", condition: "S9-S12 : ≥3 semaines vertes & ≥12 sorties", reward: "Resto indien ou pizzeria 🍕" },
+  { id: 11, category: "🏃 Bloc sport", name: "La ligne droite", condition: "S13-S16 : ≥3 semaines vertes & ≥12 sorties", reward: "Bulle flottante ou expérience zen 🧘" },
   { id: 12, category: "🎽 Sorties longues", name: "C'est long…", condition: "10 SL réalisées", reward: "Mitraillette 🥖" },
   { id: 13, category: "🎽 Sorties longues", name: "C'est très long…", condition: "14 SL du plan réalisées", reward: "Massage complet 💆" },
   { id: 14, category: "🔥 Semaines parfaites", name: "Bien partie", condition: "6 semaines parfaites", reward: "Demi-journée off ☀️" },
@@ -774,20 +774,17 @@ function buildRewardsStatus({ allWeeks, allKpis, data, marathonData, bodyComposi
   }, 0);
   const runningPlanDone = Object.values(data?._runningPlanChecks || {}).filter(Boolean).length;
 
-const isSportValidatedWeek = (sem) => {
-const k = allKpis[sem - 1];
-return hasWeekData(data[sem]) && k.sportOk === true;
-};
+  const isGreenWeek = (sem) => {
+    const k = allKpis[sem - 1];
+    return hasWeekData(data[sem]) && k.poidsOk !== false && k.deficitOk !== false && k.sportOk !== false;
+  };
 
-const blockStats = (start, end) => {
-const weeks = allWeeks.slice(start - 1, end);
-const sportValidatedWeeks = Array.from(
-{ length: end - start + 1 },
-(_, i) => start + i
-).filter(isSportValidatedWeek).length;
-const sorties = countSessionsInWeeks(weeks, COURSE_CODES);
-return { sportValidatedWeeks, sorties };
-};
+  const blockStats = (start, end) => {
+    const weeks = allWeeks.slice(start - 1, end);
+    const greenWeeks = Array.from({ length: end - start + 1 }, (_, i) => start + i).filter(isGreenWeek).length;
+    const sorties = countSessionsInWeeks(weeks, COURSE_CODES);
+    return { greenWeeks, sorties };
+  };
 
   const weightReward = (reward, threshold) => {
     const unlocked = minWeight !== null && minWeight < threshold;
@@ -797,44 +794,19 @@ return { sportValidatedWeeks, sorties };
     return { ...reward, unlocked, progress, detail, remaining };
   };
 
-const blockReward = (reward, start, end) => {
-const stats = blockStats(start, end);
-const unlocked =
-stats.sportValidatedWeeks >= 3 &&
-stats.sorties >= 12;
- 
-const progress = Math.min(
-1,
-Math.min(
-stats.sportValidatedWeeks / 3,
-stats.sorties / 12
-)
-);
-const missingSportWeeks =
-Math.max(0, 3 - stats.sportValidatedWeeks);
-const missingRuns =
-Math.max(0, 12 - stats.sorties);
-const missing = [];
-if (missingSportWeeks) {
-missing.push(
-`${missingSportWeeks} semaine${missingSportWeeks > 1 ? "s" : ""} sport validée${missingSportWeeks > 1 ? "s" : ""}`
-);
-}
-if (missingRuns) {
-missing.push(
-`${missingRuns} sortie${missingRuns > 1 ? "s" : ""}`
-);
-}
-return {
-...reward,
-unlocked,
-progress,
-detail: `${stats.sportValidatedWeeks}/3 semaines sport validées · ${stats.sorties}/12 sorties`,
-remaining: unlocked
-? "Débloquée"
-: `Encore ${missing.join(" + ")}`
-};
-};
+  const blockReward = (reward, start, end) => {
+    const stats = blockStats(start, end);
+    const unlocked = stats.greenWeeks >= 3 && stats.sorties >= 12;
+    const progress = Math.min(1, Math.min(stats.greenWeeks / 3, stats.sorties / 12));
+    const missingGreen = Math.max(0, 3 - stats.greenWeeks);
+    const missingRuns = Math.max(0, 12 - stats.sorties);
+    const missing = [];
+    if (missingGreen) missing.push(`${missingGreen} semaine${missingGreen > 1 ? "s" : ""} verte${missingGreen > 1 ? "s" : ""}`);
+    if (missingRuns) missing.push(`${missingRuns} sortie${missingRuns > 1 ? "s" : ""}`);
+    const detail = `${stats.greenWeeks}/3 semaines vertes · ${stats.sorties}/12 sorties`;
+    return { ...reward, unlocked, progress, detail, remaining: unlocked ? "Débloquée" : `Encore ${missing.join(" + ")}` };
+  };
+
   const perfectReward = (reward, target) => ({
     ...reward,
     unlocked: perfectWeeks >= target,
@@ -2228,27 +2200,13 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
                     fontSize: 12,
                     fontWeight: 600,
                     cursor: "pointer",
-
-background:activeSem === p.sem
-? "#6366f1"
-: !hasData
-? "#1e293b"
-: k.sportOk === false
-? "#450a0a"
-: k.sportOk === true && k.poidsOk === false
-? "#f59e0b"
-: k.sportOk === true &&
-k.poidsOk === true &&
-k.deficitOk !== true
-? "#22c55e"
-: k.sportOk === true &&
-k.poidsOk === true &&
-k.deficitOk === true
-? "#064e3b"
-: "#1e293b"
-
-
-
+                    background: activeSem === p.sem ? "#6366f1"
+                      : !hasData ? "#1e293b"
+                      : (k.poidsOk === false || k.deficitOk === false || k.sportOk === false)
+                        ? "#450a0a"
+                        : k.deficitOk === "warn"
+                          ? "#78350f"
+                          : "#064e3b",
                     color: activeSem === p.sem ? "white" : "#e2e8f0",
                     outline: activeSem === p.sem ? "2px solid #818cf8" : "none",
                   }}>
