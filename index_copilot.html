@@ -2200,13 +2200,24 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
                     fontSize: 12,
                     fontWeight: 600,
                     cursor: "pointer",
-                    background: activeSem === p.sem ? "#6366f1"
-                      : !hasData ? "#1e293b"
-                      : (k.poidsOk === false || k.deficitOk === false || k.sportOk === false)
-                        ? "#450a0a"
-                        : k.deficitOk === "warn"
-                          ? "#78350f"
-                          : "#064e3b",
+                    background:
+  activeSem === p.sem
+    ? "#6366f1"
+    : !hasData
+      ? "#1e293b"
+      : k.sportOk === false
+        ? "#450a0a"
+        : k.sportOk === true && k.poidsOk === false
+          ? "#f59e0b"
+          : k.sportOk === true &&
+            k.poidsOk === true &&
+            k.deficitOk !== true
+              ? "#22c55e"
+              : k.sportOk === true &&
+                k.poidsOk === true &&
+                k.deficitOk === true
+                  ? "#064e3b"
+                  : "#1e293b",
                     color: activeSem === p.sem ? "white" : "#e2e8f0",
                     outline: activeSem === p.sem ? "2px solid #818cf8" : "none",
                   }}>
