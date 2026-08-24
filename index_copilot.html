@@ -798,17 +798,50 @@ function buildRewardsStatus({ allWeeks, allKpis, data, marathonData, bodyComposi
   };
 
   const blockReward = (reward, start, end) => {
-    const stats = blockStats(start, end);
-    const unlocked = stats.greenWeeks >= 3 && stats.sorties >= 12;
-    const progress = Math.min(1, Math.min(stats.greenWeeks / 3, stats.sorties / 12));
-    const missingGreen = Math.max(0, 3 - stats.greenWeeks);
-    const missingRuns = Math.max(0, 12 - stats.sorties);
-    const missing = [];
-    if (missingGreen) missing.push(`${missingGreen} semaine${missingGreen > 1 ? "s" : ""} verte${missingGreen > 1 ? "s" : ""}`);
-    if (missingRuns) missing.push(`${missingRuns} sortie${missingRuns > 1 ? "s" : ""}`);
-    const detail = `${stats.greenWeeks}/3 semaines vertes · ${stats.sorties}/12 sorties`;
-    return { ...reward, unlocked, progress, detail, remaining: unlocked ? "Débloquée" : `Encore ${missing.join(" + ")}` };
+  const stats = blockStats(start, end);
+
+  const unlocked =
+    stats.sportValidatedWeeks >= 3 &&
+    stats.sorties >= 12;
+
+  const progress = Math.min(
+    1,
+    Math.min(
+      stats.sportValidatedWeeks / 3,
+      stats.sorties / 12
+    )
+  );
+
+  const missingSportWeeks =
+    Math.max(0, 3 - stats.sportValidatedWeeks);
+
+  const missingRuns =
+    Math.max(0, 12 - stats.sorties);
+
+  const missing = [];
+
+  if (missingSportWeeks) {
+    missing.push(
+      `${missingSportWeeks} semaine${missingSportWeeks > 1 ? "s" : ""} sport validée${missingSportWeeks > 1 ? "s" : ""}`
+    );
+  }
+
+  if (missingRuns) {
+    missing.push(
+      `${missingRuns} sortie${missingRuns > 1 ? "s" : ""}`
+    );
+  }
+
+  return {
+    ...reward,
+    unlocked,
+    progress,
+    detail: `${stats.sportValidatedWeeks}/3 semaines sport validées · ${stats.sorties}/12 sorties`,
+    remaining: unlocked
+      ? "Débloquée"
+      : `Encore ${missing.join(" + ")}`
   };
+};
 
   const perfectReward = (reward, target) => ({
     ...reward,
