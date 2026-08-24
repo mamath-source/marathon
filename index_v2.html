@@ -1,295 +1,146 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Marathon Venise">
-  <meta name="theme-color" content="#0a0f1e">
-  <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iIzBmMTcyYSIvPjxjaXJjbGUgY3g9IjMyMCIgY3k9IjEwMCIgcj0iNDUiIGZpbGw9IiM2MzY2ZjEiLz48cGF0aCBkPSJNMjgwIDE1NSBMMjIwIDI4MCBMMjYwIDI4MCBMMjAwIDQyMCBMMzIwIDI4MCBMMjc1IDI4MCBMMzQwIDE1NSBaIiBmaWxsPSIjNjM2NmYxIi8+PHBhdGggZD0iTTE4MCAyMDAgUTE2MCAyNjAgMTgwIDMyMCIgc3Ryb2tlPSIjMTBiOTgxIiBzdHJva2Utd2lkdGg9IjE4IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMzQwIDIwMCBRMzcwIDI2MCAzNDAgMzIwIiBzdHJva2U9IiMxMGI5ODEiIHN0cm9rZS13aWR0aD0iMTgiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iIzBmMTcyYSIvPjxjaXJjbGUgY3g9IjMyMCIgY3k9IjEwMCIgcj0iNDUiIGZpbGw9IiM2MzY2ZjEiLz48cGF0aCBkPSJNMjgwIDE1NSBMMjIwIDI4MCBMMjYwIDI4MCBMMjAwIDQyMCBMMzIwIDI4MCBMMjc1IDI4MCBMMzQwIDE1NSBaIiBmaWxsPSIjNjM2NmYxIi8+PHBhdGggZD0iTTE4MCAyMDAgUTE2MCAyNjAgMTgwIDMyMCIgc3Ryb2tlPSIjMTBiOTgxIiBzdHJva2Utd2lkdGg9IjE4IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMzQwIDIwMCBRMzcwIDI2MCAzNDAgMzIwIiBzdHJva2U9IiMxMGI5ODEiIHN0cm9rZS13aWR0aD0iMTgiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==">
-  <title>Suivi Marathon Venise 🏃</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Marathon Venise" />
+  <meta name="theme-color" content="#0a0f1e" />
+  
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+
+  <title>Marathon Venise</title>
+
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{background:#0a0f1e;font-family:Georgia,serif}
-    input,button,textarea{font-family:Georgia,serif}
-    #root{min-height:100vh}
-    #loading{display:flex;align-items:center;justify-content:center;min-height:100vh;color:#94a3b8;font-size:18px;flex-direction:column;gap:16px}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0a0f1e;
+      font-family: Georgia, serif;
+      color: #e2e8f0;
+    }
+    input, button, textarea {
+      font-family: Georgia, serif;
+    }
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+    #root {
+      min-height: 100vh;
+    }
+    #loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #94a3b8;
+      font-size: 18px;
+      flex-direction: column;
+      gap: 16px;
+    }
   </style>
 </head>
+
 <body>
 <div id="loading">
   <div>🏃 Chargement...</div>
-  <div style="font-size:13px;color:#475569">Première ouverture : 10-15 secondes</div>
+  <div style="font-size:13px;color:#475569">Première ouverture : quelques secondes</div>
 </div>
+
 <div id="root" style="display:none"></div>
+
 <script>
 var scripts = [
   "https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js",
   "https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js",
   "https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"
 ];
+
 var idx = 0;
+
 function loadNext() {
-  if (idx >= scripts.length) { startApp(); return; }
-  var s = document.createElement('script');
+  if (idx >= scripts.length) {
+    startApp();
+    return;
+  }
+
+  var s = document.createElement("script");
   s.src = scripts[idx++];
   s.onload = loadNext;
   s.onerror = function() {
-    document.getElementById('loading').innerHTML = '<div>❌ Erreur réseau</div><div style="font-size:13px;color:#64748b">Vérifie ta connexion et recharge</div>';
+    document.getElementById("loading").innerHTML =
+      '<div>❌ Erreur réseau</div><div style="font-size:13px;color:#64748b">Vérifie ta connexion et recharge</div>';
   };
   document.head.appendChild(s);
 }
+
 function startApp() {
   try {
-    var appCode = document.getElementById('app-code').textContent;
-    var transformed = Babel.transform(appCode, { presets: ['react'] }).code;
+    var appCode = document.getElementById("app-code").textContent;
+    var transformed = Babel.transform(appCode, { presets: ["react"] }).code;
     eval(transformed);
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('root').style.display = 'block';
+
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("root").style.display = "block";
   } catch(e) {
-    document.getElementById('loading').innerHTML = '<div>❌ Erreur: ' + e.message.substring(0,120) + '</div>';
+    document.getElementById("loading").innerHTML =
+      '<div>❌ Erreur : ' + e.message.substring(0, 140) + '</div>';
     console.error(e);
   }
 }
+
 loadNext();
 </script>
+
 <script id="app-code" type="text/plain">
 const { useState, useEffect } = React;
 
+const STORAGE_KEY = "suivi-marathon-v2";
 
-// ── PLAN (déficit & poids cible par semaine) ──────────────────────────────────
-const P16 = [1650, 1650, 1550, 1650, 1650, 2000, 1650]; // Phase 3 : repos mer, SL sam
-const VAC = [2000, 2000, 2000, 2000, 2000, 2000, 2000];
-const AFF = [1650, 1650, 1550, 1650, 1650, 1900, 1650]; // Affûtage : SL réduite
+const MARATHON = [1650, 1650, 1550, 1650, 1650, 2000, 1650];
+const VACANCES = [2000, 2000, 2000, 2000, 2000, 2000, 2000];
+
+// Phase toujours "Marathon", mais sortie longue réduite en fin de préparation.
+const MARATHON_FIN = [1650, 1650, 1550, 1650, 1650, 1900, 1650];
 
 const DEFICIT_CIBLE = {
-  1:2426, 2:2426, 3:2426, 4:2426, 5:2426,
-  6:0, 7:0,
-  8:2426, 9:2426, 10:2426, 11:2426, 12:2426, 13:2426,
-  14:2426, 15:2426, 16:0,
+  1: 2426, 2: 2426, 3: 2426, 4: 2426, 5: 2426,
+  6: 0, 7: 0,
+  8: 2426, 9: 2426, 10: 2426, 11: 2426, 12: 2426, 13: 2426,
+  14: 2426, 15: 2426, 16: 0,
 };
 
 const PLAN = [
-  { sem: 1,  lundi: "6 juil",   phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 69.60, sessionsTargets: 4 },
-  { sem: 2,  lundi: "13 juil",  phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 69.28, sessionsTargets: 4 },
-  { sem: 3,  lundi: "20 juil",  phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 68.97, sessionsTargets: 4 },
-  { sem: 4,  lundi: "27 juil",  phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 68.65, sessionsTargets: 4 },
-  { sem: 5,  lundi: "3 août",   phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 68.34, sessionsTargets: 4 },
-  { sem: 6,  lundi: "10 août",  phase: "Vacances",  cibleKcalJours: VAC, ciblePoids: 68.02, sessionsTargets: 3 },
-  { sem: 7,  lundi: "17 août",  phase: "Vacances",  cibleKcalJours: VAC, ciblePoids: 68.02, sessionsTargets: 3 },
-  { sem: 8,  lundi: "24 août",  phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 68.02, sessionsTargets: 4 },
-  { sem: 9,  lundi: "31 août",  phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 67.71, sessionsTargets: 4 },
-  { sem: 10, lundi: "7 sept",   phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 67.39, sessionsTargets: 4 },
-  { sem: 11, lundi: "14 sept",  phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 67.08, sessionsTargets: 4 },
-  { sem: 12, lundi: "21 sept",  phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 66.76, sessionsTargets: 4 },
-  { sem: 13, lundi: "28 sept",  phase: "Marathon",  cibleKcalJours: P16, ciblePoids: 66.45, sessionsTargets: 4 },
-  { sem: 14, lundi: "5 oct",    phase: "Marathon",  cibleKcalJours: AFF, ciblePoids: 66.13, sessionsTargets: 3 },
-  { sem: 15, lundi: "12 oct",   phase: "Marathon",  cibleKcalJours: AFF, ciblePoids: 65.82, sessionsTargets: 3 },
-  { sem: 16, lundi: "19 oct",   phase: "Marathon",  cibleKcalJours: AFF, ciblePoids: 65.50, sessionsTargets: 2 },
+  { sem: 1,  lundi: "6 juil",  phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 69.60, sessionsTargets: 4 },
+  { sem: 2,  lundi: "13 juil", phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 69.28, sessionsTargets: 4 },
+  { sem: 3,  lundi: "20 juil", phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 68.97, sessionsTargets: 4 },
+  { sem: 4,  lundi: "27 juil", phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 68.65, sessionsTargets: 4 },
+  { sem: 5,  lundi: "3 août",  phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 68.34, sessionsTargets: 4 },
+
+  { sem: 6,  lundi: "10 août", phase: "Vacances", cibleKcalJours: VACANCES,     ciblePoids: 68.02, sessionsTargets: 3 },
+  { sem: 7,  lundi: "17 août", phase: "Vacances", cibleKcalJours: VACANCES,     ciblePoids: 68.02, sessionsTargets: 3 },
+
+  { sem: 8,  lundi: "24 août", phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 68.02, sessionsTargets: 4 },
+  { sem: 9,  lundi: "31 août", phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 67.71, sessionsTargets: 4 },
+  { sem: 10, lundi: "7 sept",  phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 67.39, sessionsTargets: 4 },
+  { sem: 11, lundi: "14 sept", phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 67.08, sessionsTargets: 4 },
+  { sem: 12, lundi: "21 sept", phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 66.76, sessionsTargets: 4 },
+  { sem: 13, lundi: "28 sept", phase: "Marathon", cibleKcalJours: MARATHON,     ciblePoids: 66.45, sessionsTargets: 4 },
+
+  { sem: 14, lundi: "5 oct",   phase: "Marathon", cibleKcalJours: MARATHON_FIN, ciblePoids: 66.13, sessionsTargets: 3 },
+  { sem: 15, lundi: "12 oct",  phase: "Marathon", cibleKcalJours: MARATHON_FIN, ciblePoids: 65.82, sessionsTargets: 3 },
+  { sem: 16, lundi: "19 oct",  phase: "Marathon", cibleKcalJours: MARATHON_FIN, ciblePoids: 65.50, sessionsTargets: 2 },
 ];
 
-
 const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+
 const PHASE_COLORS = {
-  "Marathon": "#6366f1",
-  "Vacances": "#10b981",
-  "Affûtage": "#6366f1",
+  Marathon: "#6366f1",
+  Vacances: "#10b981",
 };
 
-// Sessions disponibles
-const SESSIONS_COURSE = ["EF", "SL", "VMA"];
-const SESSIONS_RENFO = ["RJ", "RA", "RB", "RAB"];
-
-const EMPTY_JOUR = () => ({
-  sessionsFaites: [],   // ex: ["EF", "RA"]
-  garminKcal: "",
-  kCalTotales: "",
-});
-
-const EMPTY_WEEK_SPORT = () => ({
-  // Planning semaine : sessions prévues (liste globale)
-  coursesPrevues: [],   // ex: ["EF", "EF", "SL", "VMA"]
-  renfoPrevus: [],      // ex: ["RJ", "RA", "RB"]
-  autresPrevus: 0,      // nombre de "Autre" prévus
-  // Placement par jour : sessions planifiées par jour
-  planningJours: Array(7).fill(null).map(() => []),
-});
-
-const EMPTY_WEEK = () => ({
-  poidsLundi: "",
-  // Ancien planning texte (deprecated mais gardé pour compat)
-  planningSport: ["", "", "", "", "", "", ""],
-  // Nouveau planning structuré
-  sport: EMPTY_WEEK_SPORT(),
-  jours: Array(7).fill(null).map(() => EMPTY_JOUR()),
-});
-
-
-
-// ── CALCUL DYNAMIQUE DES OBJECTIFS CALORIQUES ────────────────────────────────
-// Détecte le type de session depuis le texte du planning
-function detectSessionType(text) {
-  if (!text || text.trim() === "" || /repos|rest|off|rien/i.test(text)) return "repos";
-  if (/sortie.?long|long.?run|sl\b|1h[23456]|1h[23456]0/i.test(text)) return "longue";
-  return "sport";
-}
-
-function getCibleKcalDynamique(plan, planningSport) {
-  // Phase 1 et Vacances : objectifs fixes
-  if (plan.phase === "Phase 1" || plan.phase === "Vacances") return plan.cibleKcalJours;
-
-  // Phase 2 : 1550 si repos, 1650 sinon (pas de sortie longue)
-  if (plan.phase === "Phase 2") {
-    return planningSport.map(s => {
-      const type = detectSessionType(s);
-      return type === "repos" ? 1550 : 1650;
-    });
-  }
-
-  // Phase 3 : 1550 repos, 2000 sortie longue, 1650 sport normal
-  return planningSport.map(s => {
-    const type = detectSessionType(s);
-    if (type === "repos") return 1550;
-    if (type === "longue") return 2000;
-    return 1650;
-  });
-}
-
-
-
-// ── RÉSUMÉ SEMAINE ────────────────────────────────────────────────────────────
-function WeekSummary({ weekSport, joursData }) {
-  const sport = weekSport || { coursesPrevues: [], renfoPrevus: [], autresPrevus: 0, planningJours: Array(7).fill([]) };
-
-  // Sessions planifiées = agrégation de tout ce qui est dans la colonne "Planifié" des 7 jours
-  const planningJours = sport.planningJours || Array(7).fill([]);
-  const prevues = planningJours.flatMap(jour => (jour||[]).flatMap(s => s === "RAB" ? ["RA", "RB"] : [s]));
-
-  // Sessions réalisées (toutes les journées)
-  const faites = joursData.flatMap(j => {
-    const sessions = [...(j.sessionsFaites || [])];
-    // RAB → compte comme RA + RB
-    return sessions.flatMap(s => s === "RAB" ? ["RA", "RB", "RAB"] : [s]);
-  });
-
-  // Boxes fixes à afficher dans l'ordre
-  const BOXES = [
-    { code: "EF",  idx: 0, label: "EF",  color: "#6366f1", cat: "course" },
-    { code: "EF",  idx: 1, label: "EF",  color: "#6366f1", cat: "course" },
-    { code: "SL",  idx: 0, label: "SL",  color: "#8b5cf6", cat: "course" },
-    { code: "VMA", idx: 0, label: "VMA", color: "#a855f7", cat: "course" },
-    { code: "RJ",  idx: 0, label: "RJ",  color: "#10b981", cat: "renfo" },
-    { code: "RA",  idx: 0, label: "RA",  color: "#059669", cat: "renfo" },
-    { code: "RB",  idx: 0, label: "RB",  color: "#047857", cat: "renfo" },
-  ];
-
-  // Pour chaque box, combien de fois le code apparaît dans prévues/faites
-  const countIn = (arr, code) => arr.filter(s => s === code).length;
-
-  // Box EF : besoin de savoir si la 1ère / 2ème est planifiée/faite
-  const efPrevues = countIn(prevues, "EF");
-  const efFaites = countIn(faites, "EF");
-
-  const isPlanned = (code, idx) => {
-    if (code === "EF") return efPrevues > idx;
-    return prevues.includes(code);
-  };
-
-  const isDone = (code, idx) => {
-    if (code === "EF") return efFaites > idx;
-    return faites.includes(code);
-  };
-
-  // Critères validation
-  const courseOk = efFaites >= 1 && faites.includes("SL") && faites.includes("VMA");
-  const renfoOk = faites.includes("RJ") || (faites.includes("RA") && faites.includes("RB")) || faites.includes("RAB");
-
-  return (
-    <div style={{ background: "#0f172a", borderRadius: 10, padding: "12px 14px", marginBottom: 12, border: "1px solid #1e293b" }}>
-      <div style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>
-        Vue semaine
-      </div>
-      <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-        {/* Course */}
-        <div>
-          <div style={{ fontSize: 10, color: courseOk ? "#10b981" : "#475569", marginBottom: 6, fontWeight: 600 }}>
-            🏃 COURSE {courseOk ? "✓" : ""}
-          </div>
-          <div style={{ display: "flex", gap: 5 }}>
-            {BOXES.filter(b => b.cat === "course").map((b, i) => {
-              const planned = isPlanned(b.code, b.idx);
-              const done = isDone(b.code, b.idx);
-              const colorPlan = "#f59e0b";  // orange = planifié
-              const colorDone = "#10b981";  // vert = réalisé
-              return (
-                <div key={i} style={{
-                  width: 38, height: 38, borderRadius: 8,
-                  background: done ? colorDone + "22" : "#1e293b",
-                  border: `2px solid ${done ? colorDone : "#334155"}`,
-                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                  position: "relative",
-                }}>
-                  <span style={{ fontSize: 10, fontWeight: 700,
-                    color: done ? colorDone : planned ? colorPlan : "#475569" }}>
-                    {b.label}
-                  </span>
-                  {planned && !done && (
-                    <div style={{
-                      width: 7, height: 7, borderRadius: "50%",
-                      background: colorPlan, position: "absolute", bottom: 4,
-                    }} />
-                  )}
-                  {done && (
-                    <div style={{ fontSize: 8, color: colorDone }}>✓</div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Renfo */}
-        <div>
-          <div style={{ fontSize: 10, color: renfoOk ? "#8b5cf6" : "#475569", marginBottom: 6, fontWeight: 600 }}>
-            💪 RENFO {renfoOk ? "✓" : ""}
-          </div>
-          <div style={{ display: "flex", gap: 5 }}>
-            {BOXES.filter(b => b.cat === "renfo").map((b, i) => {
-              const planned = isPlanned(b.code, b.idx);
-              const done = isDone(b.code, b.idx);
-              const colorPlan = "#f59e0b";
-              const colorDone = "#059669";
-              return (
-                <div key={i} style={{
-                  width: 38, height: 38, borderRadius: 8,
-                  background: done ? colorDone + "22" : "#1e293b",
-                  border: `2px solid ${done ? colorDone : "#334155"}`,
-                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                  position: "relative",
-                }}>
-                  <span style={{ fontSize: 10, fontWeight: 700,
-                    color: done ? colorDone : planned ? colorPlan : "#475569" }}>
-                    {b.label}
-                  </span>
-                  {planned && !done && (
-                    <div style={{ width: 7, height: 7, borderRadius: "50%", background: colorPlan, position: "absolute", bottom: 4 }} />
-                  )}
-                  {done && (
-                    <div style={{ fontSize: 8, color: colorDone }}>✓</div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── SPORT PANEL v2 ────────────────────────────────────────────────────────────
 const SESSION_DEFS = {
   EF:  { label: "EF",  desc: "Endurance fondamentale", color: "#10b981", cat: "course" },
   SL:  { label: "SL",  desc: "Sortie longue",           color: "#059669", cat: "course" },
@@ -297,343 +148,418 @@ const SESSION_DEFS = {
   RJ:  { label: "RJ",  desc: "Renfo jambes",             color: "#8b5cf6", cat: "renfo" },
   RA:  { label: "RA",  desc: "Renfo bras",               color: "#a855f7", cat: "renfo" },
   RB:  { label: "RB",  desc: "Renfo bras B",             color: "#7c3aed", cat: "renfo" },
-  RAB: { label: "RAB", desc: "Renfo bras+jambes (light)",color: "#6d28d9", cat: "renfo" },
+  RAB: { label: "RAB", desc: "Renfo bras + jambes",      color: "#6d28d9", cat: "renfo" },
+  AUTRE: { label: "Autre", desc: "Autre sport",          color: "#f59e0b", cat: "autre" },
 };
 
-function SessionBadge({ code, active, onClick, small }) {
-  const def = SESSION_DEFS[code] || { label: code, color: "#64748b", cat: "autre" };
-  return (
-    <button onClick={onClick} style={{
-      padding: small ? "3px 8px" : "6px 12px",
-      borderRadius: 99,
-      border: `2px solid ${active ? def.color : "#334155"}`,
-      background: active ? def.color + "33" : "transparent",
-      color: active ? def.color : "#64748b",
-      fontSize: small ? 11 : 13,
-      fontWeight: 700,
-      cursor: "pointer",
-      fontFamily: "inherit",
-      transition: "all 0.15s",
-      letterSpacing: 0.5,
-    }}>
-      {def.label}
-    </button>
+const EMPTY_JOUR = () => ({
+  sessionsFaites: [],
+  garminKcal: "",
+  kCalTotales: "",
+});
+
+const EMPTY_WEEK_SPORT = () => ({
+  planningJours: Array.from({ length: 7 }, () => []),
+});
+
+const EMPTY_WEEK = () => ({
+  poidsLundi: "",
+  sport: EMPTY_WEEK_SPORT(),
+  jours: Array.from({ length: 7 }, () => EMPTY_JOUR()),
+});
+
+function normalizeWeek(rawWeek) {
+  const empty = EMPTY_WEEK();
+  const raw = rawWeek || {};
+
+  return {
+    ...empty,
+    ...raw,
+    sport: {
+      ...empty.sport,
+      ...(raw.sport || {}),
+      planningJours: Array.from({ length: 7 }, (_, i) =>
+        raw.sport?.planningJours?.[i] || []
+      ),
+    },
+    jours: Array.from({ length: 7 }, (_, i) => ({
+      ...EMPTY_JOUR(),
+      ...(raw.jours?.[i] || {}),
+      sessionsFaites: raw.jours?.[i]?.sessionsFaites || [],
+    })),
+  };
+}
+
+function hasWeekData(rawWeek) {
+  if (!rawWeek) return false;
+
+  const w = normalizeWeek(rawWeek);
+
+  if (w.poidsLundi) return true;
+  if (w.sport?.planningJours?.some(j => j && j.length > 0)) return true;
+
+  return w.jours.some(j =>
+    j.garminKcal ||
+    j.kCalTotales ||
+    (j.sessionsFaites && j.sessionsFaites.length > 0)
   );
 }
 
-function SportWeekPanel({ weekSport, joursData, onUpdate }) {
-  const sport = weekSport || { coursesPrevues: [], renfoPrevus: [], autresPrevus: 0, planningJours: Array(7).fill([]) };
+function getCibleKcalDynamique(plan, weekSport) {
+  if (plan.phase === "Vacances") {
+    return plan.cibleKcalJours;
+  }
 
-  const toggleCourse = (s) => {
-    const arr = [...(sport.coursesPrevues || [])];
-    const idx = arr.indexOf(s);
-    if (idx >= 0) arr.splice(idx, 1); else arr.push(s);
-    onUpdate({ ...sport, coursesPrevues: arr });
+  const planningJours = weekSport?.planningJours || Array.from({ length: 7 }, () => []);
+
+  return planningJours.map((jour, i) => {
+    const sessions = jour || [];
+
+    if (sessions.length === 0) return 1550;
+
+    if (sessions.includes("SL")) {
+      return plan.cibleKcalJours?.[i] ?? 2000;
+    }
+
+    return plan.cibleKcalJours?.[i] ?? 1650;
+  });
+}
+
+function count(arr, code) {
+  return (arr || []).filter(x => x === code).length;
+}
+
+function badge(ok, txt) {
+  const isWarn = ok === "warn";
+  return (
+    <span style={{
+      padding: "3px 10px",
+      borderRadius: 99,
+      fontSize: 12,
+      fontWeight: 600,
+      background: ok === true ? "#d1fae5" : isWarn ? "#ffedd5" : ok === false ? "#fee2e2" : "#f1f5f9",
+      color: ok === true ? "#065f46" : isWarn ? "#9a3412" : ok === false ? "#991b1b" : "#64748b",
+      border: `1px solid ${ok === true ? "#6ee7b7" : isWarn ? "#fdba74" : ok === false ? "#fca5a5" : "#e2e8f0"}`,
+      whiteSpace: "nowrap",
+    }}>
+      {txt}
+    </span>
+  );
+}
+
+function dot(ok) {
+  return ok === true ? "🟢" : ok === false ? "🔴" : "⚪";
+}
+
+function getDeficitStatus(deficitReel, deficitCible) {
+  if (deficitReel === null || deficitReel === undefined) return null;
+  const deficit = Number(deficitReel);
+  const cible = Number(deficitCible) || 0;
+  if (isNaN(deficit)) return null;
+  if (deficit < 0) return false;
+  if (cible <= 0) return true;
+  return deficit >= cible * 0.9 ? true : "warn";
+}
+
+function getDeficitColors(status) {
+  if (status === true) return { bg: "#064e3b", color: "#6ee7b7", icon: "✅" };
+  if (status === "warn") return { bg: "#78350f", color: "#fbbf24", icon: "⚠️" };
+  if (status === false) return { bg: "#450a0a", color: "#fca5a5", icon: "❌" };
+  return { bg: "#1e293b", color: "#64748b", icon: "" };
+}
+
+function WeekSummary({ weekSport, joursData }) {
+  const planningJours = weekSport?.planningJours || Array.from({ length: 7 }, () => []);
+  const prevues = planningJours.flat();
+  const faites = (joursData || []).flatMap(j => j.sessionsFaites || []);
+
+  const courseOk =
+    count(faites, "EF") >= 1 &&
+    faites.includes("SL") &&
+    faites.includes("VMA");
+
+  const renfoOk =
+    faites.includes("RJ") ||
+    (faites.includes("RA") && faites.includes("RB")) ||
+    faites.includes("RAB");
+
+  const boxes = [
+    { code: "EF", idx: 0, label: "EF", cat: "course" },
+    { code: "EF", idx: 1, label: "EF", cat: "course" },
+    { code: "SL", idx: 0, label: "SL", cat: "course" },
+    { code: "VMA", idx: 0, label: "VMA", cat: "course" },
+    { code: "RJ", idx: 0, label: "RJ", cat: "renfo" },
+    { code: "RA", idx: 0, label: "RA", cat: "renfo" },
+    { code: "RB", idx: 0, label: "RB", cat: "renfo" },
+  ];
+
+  const isPlanned = (code, idx) => {
+    if (code === "EF") return count(prevues, "EF") > idx;
+    return prevues.includes(code);
   };
 
-  const toggleRendoSem = (s) => {
-    const arr = [...(sport.renfoPrevus || [])];
-    const idx = arr.indexOf(s);
-    if (idx >= 0) arr.splice(idx, 1); else arr.push(s);
-    onUpdate({ ...sport, renfoPrevus: arr });
+  const isDone = (code, idx) => {
+    if (code === "EF") return count(faites, "EF") > idx;
+    return faites.includes(code);
   };
 
-  // Count EF planned
-  const efCount = (sport.coursesPrevues || []).filter(s => s === "EF").length;
-  const addEF = () => onUpdate({ ...sport, coursesPrevues: [...(sport.coursesPrevues||[]), "EF"] });
-  const removeEF = () => {
-    const arr = [...(sport.coursesPrevues||[])];
-    const i = arr.lastIndexOf("EF");
-    if (i >= 0) arr.splice(i, 1);
-    onUpdate({ ...sport, coursesPrevues: arr });
+  const renderBox = (b, i) => {
+    const planned = isPlanned(b.code, b.idx);
+    const done = isDone(b.code, b.idx);
+    const colorPlan = "#f59e0b";
+    const colorDone = b.cat === "course" ? "#10b981" : "#059669";
+
+    return (
+      <div key={i} style={{
+        width: 38,
+        height: 38,
+        borderRadius: 8,
+        background: done ? colorDone + "22" : "#1e293b",
+        border: `2px solid ${done ? colorDone : "#334155"}`,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+      }}>
+        <span style={{
+          fontSize: 10,
+          fontWeight: 700,
+          color: done ? colorDone : planned ? colorPlan : "#475569",
+        }}>
+          {b.label}
+        </span>
+
+        {planned && !done && (
+          <div style={{
+            width: 7,
+            height: 7,
+            borderRadius: "50%",
+            background: colorPlan,
+            position: "absolute",
+            bottom: 4,
+          }} />
+        )}
+
+        {done && <div style={{ fontSize: 8, color: colorDone }}>✓</div>}
+      </div>
+    );
   };
-
-  const autresCount = sport.autresPrevus || 0;
-
-  // Validation
-  const toutPlanifie = [...(sport.coursesPrevues||[]), ...(sport.renfoPrevus||[])];
-  const courseValide = toutPlanifie.includes("SL") && toutPlanifie.includes("VMA") && toutPlanifie.includes("EF");
-  const renfoValide = toutPlanifie.includes("RJ") || (toutPlanifie.includes("RA") && toutPlanifie.includes("RB")) || toutPlanifie.includes("RAB");
 
   return (
-    <div style={{ background: "#1e293b", borderRadius: 14, padding: "16px", border: "1px solid #334155", marginBottom: 12 }}>
-      <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600, marginBottom: 12 }}>
-        📋 Planning semaine
+    <div style={{
+      background: "#0f172a",
+      borderRadius: 10,
+      padding: "12px 14px",
+      marginBottom: 12,
+      border: "1px solid #1e293b",
+    }}>
+      <div style={{
+        fontSize: 11,
+        color: "#64748b",
+        textTransform: "uppercase",
+        letterSpacing: 1,
+        marginBottom: 10,
+      }}>
+        Vue semaine
       </div>
 
-      {/* Résumé visuel */}
-      <WeekSummary weekSport={weekSport} joursData={joursData || []} />
-
-      {/* Course */}
-      <div style={{ marginBottom: 10 }}>
-        <div style={{ fontSize: 11, color: "#10b981", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>
-          🏃 Course {courseValide ? "✓" : ""}
-        </div>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
-          {/* EF avec compteur */}
-          <div style={{ display: "flex", alignItems: "center", gap: 4, border: "2px solid #334155", borderRadius: 99, padding: "4px 8px" }}>
-            <button onClick={removeEF} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 14, lineHeight: 1 }}>−</button>
-            <span style={{ color: efCount > 0 ? "#6366f1" : "#64748b", fontWeight: 700, fontSize: 13, minWidth: 24, textAlign: "center" }}>
-              {efCount}×EF
-            </span>
-            <button onClick={addEF} style={{ background: "none", border: "none", color: "#6366f1", cursor: "pointer", fontSize: 14, lineHeight: 1 }}>+</button>
+      <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+        <div>
+          <div style={{
+            fontSize: 10,
+            color: courseOk ? "#10b981" : "#475569",
+            marginBottom: 6,
+            fontWeight: 600,
+          }}>
+            🏃 COURSE {courseOk ? "✓" : ""}
           </div>
-          {["SL", "VMA"].map(s => (
-            <SessionBadge key={s} code={s}
-              active={(sport.coursesPrevues||[]).includes(s)}
-              onClick={() => toggleCourse(s)} />
-          ))}
+          <div style={{ display: "flex", gap: 5 }}>
+            {boxes.filter(b => b.cat === "course").map(renderBox)}
+          </div>
         </div>
-      </div>
 
-      {/* Renfo */}
-      <div style={{ marginBottom: 10 }}>
-        <div style={{ fontSize: 11, color: "#10b981", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>
-          💪 Renfo {renfoValide ? "✓" : ""}
-        </div>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          {["RJ", "RA", "RB", "RAB"].map(s => (
-            <SessionBadge key={s} code={s}
-              active={(sport.renfoPrevus||[]).includes(s)}
-              onClick={() => toggleRendoSem(s)} />
-          ))}
-        </div>
-      </div>
-
-      {/* Autre */}
-      <div>
-        <div style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>➕ Autre</div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button onClick={() => onUpdate({ ...sport, autresPrevus: Math.max(0, autresCount-1) })}
-            style={{ background: "#1e293b", border: "1px solid #334155", color: "#64748b", borderRadius: 6, width: 28, height: 28, cursor: "pointer", fontSize: 16 }}>−</button>
-          <span style={{ color: autresCount > 0 ? "#f59e0b" : "#64748b", fontWeight: 700, fontSize: 14 }}>{autresCount}</span>
-          <button onClick={() => onUpdate({ ...sport, autresPrevus: autresCount+1 })}
-            style={{ background: "#1e293b", border: "1px solid #334155", color: "#f59e0b", borderRadius: 6, width: 28, height: 28, cursor: "pointer", fontSize: 16 }}>+</button>
+        <div>
+          <div style={{
+            fontSize: 10,
+            color: renfoOk ? "#059669" : "#475569",
+            marginBottom: 6,
+            fontWeight: 600,
+          }}>
+            💪 RENFO {renfoOk ? "✓" : ""}
+          </div>
+          <div style={{ display: "flex", gap: 5 }}>
+            {boxes.filter(b => b.cat === "renfo").map(renderBox)}
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function SportDayPanel({ jour, jourIdx, weekSport, activeSem, updateJour, updateWeekSport }) {
+function CollapsibleSportPanel({ jour, jourIdx, weekSport, activeSem, updateJour, updateWeekSport }) {
+  const [collapsed, setCollapsed] = useState(true);
+
   const faites = jour.sessionsFaites || [];
-  const sport = weekSport || { coursesPrevues: [], renfoPrevus: [], autresPrevus: 0, planningJours: Array(7).fill([]) };
-  const planningJours = sport.planningJours || Array(7).fill([]);
+  const planningJours = weekSport?.planningJours || Array.from({ length: 7 }, () => []);
   const prevues = planningJours[jourIdx] || [];
-
-  const toggleFaite = (s) => {
-    const arr = [...faites];
-    const i = arr.indexOf(s);
-    if (i >= 0) arr.splice(i, 1); else arr.push(s);
-    updateJour(activeSem, jourIdx, "sessionsFaites", arr);
-  };
-
-  const togglePrevue = (s) => {
-    const newPlanning = (planningJours).map((d, i) => i === jourIdx ? (() => {
-      const arr = [...(d||[])];
-      const idx = arr.indexOf(s);
-      if (idx >= 0) arr.splice(idx, 1); else arr.push(s);
-      return arr;
-    })() : d);
-    updateWeekSport({ ...sport, planningJours: newPlanning });
-  };
-
-  // Autres planifiés/faits ce jour
-  const autresPrevusJour = prevues.filter(s => s === "AUTRE").length;
-  const autresFaitsJour = faites.filter(s => s === "AUTRE").length;
-
   const allSessions = ["EF", "SL", "VMA", "RJ", "RA", "RB", "RAB"];
 
-  return (
-    <div style={{ background: "#1e293b", borderRadius: 14, padding: "16px", border: "1px solid #334155" }}>
-      <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600, marginBottom: 12 }}>🏃 Sport</div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
-        <div style={{ fontSize: 11, color: "#f59e0b", textAlign: "center", paddingBottom: 4, borderBottom: "1px solid #1e293b" }}>Planifié</div>
-        <div style={{ fontSize: 11, color: "#10b981", textAlign: "center", paddingBottom: 4, borderBottom: "1px solid #1e293b" }}>Réalisé</div>
-      </div>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        {allSessions.map(s => {
-          const isPrevue = prevues.includes(s);
-          const isFaite = faites.includes(s);
-          const def = SESSION_DEFS[s];
-          return (
-            <div key={s} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, alignItems: "center" }}>
-              {(() => {
-                const c = def.cat === "course" ? "#10b981" : "#8b5cf6";
-                return (<>
-                  <button onClick={() => togglePrevue(s)} style={{
-                    padding: "5px 10px", borderRadius: 99,
-                    border: `1.5px solid ${isPrevue ? c : "#1e293b"}`,
-                    background: isPrevue ? c + "22" : "#0f172a",
-                    color: isPrevue ? c : "#334155",
-                    fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-                  }}>{def.label}</button>
-                  <button onClick={() => toggleFaite(s)} style={{
-                    padding: "5px 10px", borderRadius: 99,
-                    border: `1.5px solid ${isFaite ? c : "#1e293b"}`,
-                    background: isFaite ? c + "33" : "#0f172a",
-                    color: isFaite ? c : "#334155",
-                    fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-                  }}>{isFaite ? "✓ " : ""}{def.label}</button>
-                </>);
-              })()}
-            </div>
-          );
-        })}
-
-        {/* Autre — 1 bouton planifié / 1 bouton réalisé */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, alignItems: "center", marginTop: 4 }}>
-          <button onClick={() => {
-            const np = planningJours.map((d,i) => {
-              if (i !== jourIdx) return d;
-              const arr = [...(d||[])];
-              const idx = arr.indexOf("AUTRE");
-              if (idx >= 0) arr.splice(idx, 1); else arr.push("AUTRE");
-              return arr;
-            });
-            updateWeekSport({...sport, planningJours: np});
-          }} style={{
-            padding: "5px 10px", borderRadius: 99,
-            border: `1.5px solid ${autresPrevusJour > 0 ? "#f59e0b" : "#1e293b"}`,
-            background: autresPrevusJour > 0 ? "#f59e0b22" : "#0f172a",
-            color: autresPrevusJour > 0 ? "#f59e0b" : "#334155",
-            fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-          }}>Autre</button>
-          <button onClick={() => {
-            const arr = [...faites];
-            const idx = arr.indexOf("AUTRE");
-            if (idx >= 0) arr.splice(idx, 1); else arr.push("AUTRE");
-            updateJour(activeSem, jourIdx, "sessionsFaites", arr);
-          }} style={{
-            padding: "5px 10px", borderRadius: 99,
-            border: `1.5px solid ${autresFaitsJour > 0 ? "#f59e0b" : "#1e293b"}`,
-            background: autresFaitsJour > 0 ? "#f59e0b33" : "#0f172a",
-            color: autresFaitsJour > 0 ? "#f59e0b" : "#334155",
-            fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-          }}>{autresFaitsJour > 0 ? "✓ " : ""}Autre</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
-// ── COLLAPSIBLE SPORT PANEL ───────────────────────────────────────────────────
-function CollapsibleSportPanel({ jour, jourIdx, weekSport, activeSem, updateJour, updateWeekSport }) {
-  const [collapsed, setCollapsed] = useState(false);
-  const faites = jour.sessionsFaites || [];
-  const sport = weekSport || { planningJours: Array(7).fill([]) };
-  const planningJours = sport.planningJours || Array(7).fill([]);
-  const prevues = planningJours[jourIdx] || [];
-
   const toggleFaite = (s) => {
     const arr = [...faites];
     const i = arr.indexOf(s);
-    if (i >= 0) arr.splice(i, 1); else arr.push(s);
+    if (i >= 0) arr.splice(i, 1);
+    else arr.push(s);
+
     updateJour(activeSem, jourIdx, "sessionsFaites", arr);
   };
 
   const togglePrevue = (s) => {
     const newPlanning = planningJours.map((d, i) => {
-      if (i !== jourIdx) return d;
-      const arr = [...(d||[])];
+      if (i !== jourIdx) return d || [];
+
+      const arr = [...(d || [])];
       const idx = arr.indexOf(s);
-      if (idx >= 0) arr.splice(idx, 1); else arr.push(s);
+      if (idx >= 0) arr.splice(idx, 1);
+      else arr.push(s);
+
       return arr;
     });
-    updateWeekSport({ ...sport, planningJours: newPlanning });
+
+    updateWeekSport({
+      ...(weekSport || EMPTY_WEEK_SPORT()),
+      planningJours: newPlanning,
+    });
   };
 
-  const allSessions = ["EF", "SL", "VMA", "RJ", "RA", "RB", "RAB"];
-  const autresPrevus = prevues.filter(s => s === "AUTRE").length;
-  const autresFaits = faites.filter(s => s === "AUTRE").length;
-
-  // A row is "active" if at least one side (planned or done) is selected
   const isActive = (s) => prevues.includes(s) || faites.includes(s);
-  const autreActive = autresPrevus > 0 || autresFaits > 0;
 
   return (
-    <div style={{ background: "#1e293b", borderRadius: 14, border: "1px solid #334155" }}>
-      {/* Header */}
-      <div style={{ padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>🏃 Sport</div>
+    <div style={{
+      background: "#1e293b",
+      borderRadius: 14,
+      border: "1px solid #334155",
+    }}>
+      <div style={{
+        padding: "12px 16px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}>
+        <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>
+          🏃 Sport
+        </div>
+
         <button onClick={() => setCollapsed(!collapsed)} style={{
-          background: "#0f172a", border: "1px solid #334155", color: "#94a3b8",
-          borderRadius: 6, width: 28, height: 28, cursor: "pointer",
-          fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center",
-          fontFamily: "inherit",
-        }}>{collapsed ? "▼" : "▲"}</button>
+          background: "#0f172a",
+          border: "1px solid #334155",
+          color: "#94a3b8",
+          borderRadius: 6,
+          width: 28,
+          height: 28,
+          cursor: "pointer",
+          fontSize: 12,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}>
+          {collapsed ? "▼" : "▲"}
+        </button>
       </div>
 
-      {/* Column headers - always visible */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, padding: "0 10px 6px", borderTop: "none" }}>
-        <div style={{ fontSize: 11, color: "#f59e0b", textAlign: "center", paddingBottom: 4 }}>Planifié</div>
-        <div style={{ fontSize: 11, color: "#10b981", textAlign: "center", paddingBottom: 4 }}>Réalisé</div>
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 8,
+        padding: "0 10px 6px",
+      }}>
+        <div style={{ fontSize: 11, color: "#f59e0b", textAlign: "center" }}>Planifié</div>
+        <div style={{ fontSize: 11, color: "#10b981", textAlign: "center" }}>Réalisé</div>
       </div>
 
-      {/* Rows - filtered when collapsed */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "0 10px 12px" }}>
+      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 6,
+        padding: "0 10px 12px",
+      }}>
         {allSessions
           .filter(s => !collapsed || isActive(s))
           .map(s => {
+            const def = SESSION_DEFS[s];
             const isPrevue = prevues.includes(s);
             const isFaite = faites.includes(s);
-            const def = SESSION_DEFS[s];
-            const c = def.cat === "course" ? "#10b981" : "#8b5cf6";
+            const doneColor = def.cat === "course" ? "#10b981" : "#8b5cf6";
+
             return (
-              <div key={s} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              <div key={s} style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 8,
+              }}>
                 <button onClick={() => togglePrevue(s)} style={{
-                  padding: "5px 4px", borderRadius: 99, width: "100%",
+                  padding: "5px 4px",
+                  borderRadius: 99,
+                  width: "100%",
                   border: `1.5px solid ${isPrevue ? "#f59e0b" : "#1e293b"}`,
                   background: isPrevue ? "#f59e0b22" : "#0f172a",
                   color: isPrevue ? "#f59e0b" : "#334155",
-                  fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-                }}>{s}</button>
+                  fontSize: 11,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}>
+                  {s}
+                </button>
+
                 <button onClick={() => toggleFaite(s)} style={{
-                  padding: "5px 4px", borderRadius: 99, width: "100%",
-                  border: `1.5px solid ${isFaite ? c : "#1e293b"}`,
-                  background: isFaite ? c + "33" : "#0f172a",
-                  color: isFaite ? c : "#334155",
-                  fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-                }}>{isFaite ? "✓ " : ""}{s}</button>
+                  padding: "5px 4px",
+                  borderRadius: 99,
+                  width: "100%",
+                  border: `1.5px solid ${isFaite ? doneColor : "#1e293b"}`,
+                  background: isFaite ? doneColor + "33" : "#0f172a",
+                  color: isFaite ? doneColor : "#334155",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}>
+                  {isFaite ? "✓ " : ""}{s}
+                </button>
               </div>
             );
-          })
-        }
+          })}
 
-        {/* Autre - show if active or not collapsed */}
-        {(!collapsed || autreActive) && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 4 }}>
-            <button onClick={() => {
-              const np = planningJours.map((d, i) => {
-                if (i !== jourIdx) return d;
-                const arr = [...(d||[])];
-                const idx = arr.indexOf("AUTRE");
-                if (idx >= 0) arr.splice(idx, 1); else arr.push("AUTRE");
-                return arr;
-              });
-              updateWeekSport({ ...sport, planningJours: np });
-            }} style={{
-              padding: "5px 10px", borderRadius: 99,
-              border: `1.5px solid ${autresPrevus > 0 ? "#f59e0b" : "#1e293b"}`,
-              background: autresPrevus > 0 ? "#f59e0b22" : "#0f172a",
-              color: autresPrevus > 0 ? "#f59e0b" : "#334155",
-              fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-            }}>Autre</button>
-            <button onClick={() => {
-              const arr = [...faites];
-              const idx = arr.indexOf("AUTRE");
-              if (idx >= 0) arr.splice(idx, 1); else arr.push("AUTRE");
-              updateJour(activeSem, jourIdx, "sessionsFaites", arr);
-            }} style={{
-              padding: "5px 10px", borderRadius: 99,
-              border: `1.5px solid ${autresFaits > 0 ? "#10b981" : "#1e293b"}`,
-              background: autresFaits > 0 ? "#10b98133" : "#0f172a",
-              color: autresFaits > 0 ? "#10b981" : "#334155",
-              fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-            }}>{autresFaits > 0 ? "✓ " : ""}Autre</button>
+        {(!collapsed || prevues.includes("AUTRE") || faites.includes("AUTRE")) && (
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 8,
+            marginTop: 4,
+          }}>
+            <button onClick={() => togglePrevue("AUTRE")} style={{
+              padding: "5px 10px",
+              borderRadius: 99,
+              border: `1.5px solid ${prevues.includes("AUTRE") ? "#f59e0b" : "#1e293b"}`,
+              background: prevues.includes("AUTRE") ? "#f59e0b22" : "#0f172a",
+              color: prevues.includes("AUTRE") ? "#f59e0b" : "#334155",
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}>
+              Autre
+            </button>
+
+            <button onClick={() => toggleFaite("AUTRE")} style={{
+              padding: "5px 10px",
+              borderRadius: 99,
+              border: `1.5px solid ${faites.includes("AUTRE") ? "#10b981" : "#1e293b"}`,
+              background: faites.includes("AUTRE") ? "#10b98133" : "#0f172a",
+              color: faites.includes("AUTRE") ? "#10b981" : "#334155",
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}>
+              {faites.includes("AUTRE") ? "✓ " : ""}Autre
+            </button>
           </div>
         )}
       </div>
@@ -641,139 +567,1166 @@ function CollapsibleSportPanel({ jour, jourIdx, weekSport, activeSem, updateJour
   );
 }
 
-// ── NUTRITION PANEL with AI macro calculation ─────────────────────────────────
 function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJour, updateJour }) {
-  const repas = [
-    { key: "petitDejMacros", label: "🌅 Petit déj" },
-    { key: "dejeunerMacros",  label: "☀️ Déjeuner" },
-    { key: "collationMacros", label: "🍎 Collation" },
-    { key: "dinerMacros",     label: "🌙 Dîner" },
-  ];
-
-  // Total : priorité total manuel > somme repas
-  const sommeRepas = repas.reduce((acc, r) => acc + (jour[r.key]?.kcal || 0), 0);
-  const totalManuel = parseFloat(jour.kCalTotales) || 0;
-  const totalEffectif = totalManuel > 0 ? totalManuel : sommeRepas;
-  const hasTotaux = totalEffectif > 0;
-
-  // Budget basé sur Garmin si dispo
+  const kcal = parseFloat(jour.kCalTotales) || 0;
   const garmin = parseFloat(jour.garminKcal) || 0;
-  const budgetMax = garmin > 0 ? Math.round(garmin - (deficitCibleJour || 0)) : cibleKcal;
-  const restant = budgetMax - totalEffectif;
-  const kcalOk = hasTotaux && totalEffectif <= budgetMax + 80;
+
+  const hasKcal = kcal > 0;
+  const hasGarmin = garmin > 0;
+  const hasDeficit = hasKcal && hasGarmin;
+  const deficit = hasDeficit ? Math.round(garmin - kcal) : null;
+  const deficitStatus = hasDeficit ? getDeficitStatus(deficit, deficitCibleJour) : null;
+  const deficitColors = getDeficitColors(deficitStatus);
 
   return (
-    <div style={{ background: "#1e293b", borderRadius: 14, padding: "14px", border: "1px solid #334155", width: "100%", boxSizing: "border-box" }}>
-      {/* Header budget */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-        <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>🍽️ Nutrition</div>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          {/* Déficit cible : toujours visible */}
-          <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 11, background: "#f59e0b22", color: "#f59e0b" }}>
+    <div style={{
+      background: "#1e293b",
+      borderRadius: 14,
+      padding: "14px",
+      border: "1px solid #334155",
+      width: "100%",
+    }}>
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 14,
+        flexWrap: "wrap",
+        gap: 8,
+      }}>
+        <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>
+          🍽️ Nutrition
+        </div>
+
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <span style={{
+            padding: "2px 8px",
+            borderRadius: 6,
+            fontSize: 11,
+            background: "#f59e0b22",
+            color: "#f59e0b",
+          }}>
             🎯 Déficit visé : {deficitCibleJour} kcal
           </span>
-          {garmin > 0 ? (
-            <>
-              <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 11, background: "#10b98122", color: "#10b981" }}>
-                ⌚ Brûlé : {garmin} kcal
-              </span>
-              <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 11, fontWeight: 700, background: "#6366f122", color: "#6366f1" }}>
-                💡 Budget : {budgetMax} kcal
-              </span>
-            </>
-          ) : (
-            <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 11, background: "#6366f122", color: "#6366f1" }}>
-              🎯 Objectif calories : {cibleKcal} kcal
-            </span>
-          )}
-          {hasTotaux && (
+
+          {hasDeficit && (
             <span style={{
-              padding: "2px 8px", borderRadius: 99, fontSize: 11, fontWeight: 700,
-              background: kcalOk ? "#064e3b" : "#450a0a",
-              color: kcalOk ? "#6ee7b7" : "#fca5a5",
-            }}>{totalEffectif} kcal {kcalOk ? "✓" : "✗"}</span>
+              padding: "2px 8px",
+              borderRadius: 6,
+              fontSize: 11,
+              fontWeight: 700,
+              background: deficitColors.bg,
+              color: deficitColors.color,
+            }}>
+              {deficitColors.icon} Déficit : {deficit} kcal
+            </span>
           )}
         </div>
       </div>
 
-      {/* Barre de progression */}
-      {hasTotaux && (
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-          <div style={{ flex: 1, background: "#0f172a", borderRadius: 99, height: 6, overflow: "hidden" }}>
-            <div style={{
-              height: "100%", borderRadius: 99,
-              width: `${Math.min((totalEffectif / budgetMax) * 100, 100)}%`,
-              background: totalEffectif > budgetMax ? "#ef4444" : totalEffectif > budgetMax * 0.9 ? "#f59e0b" : "#10b981",
-              transition: "width 0.3s",
-            }} />
-          </div>
-          <span style={{ fontSize: 12, fontWeight: 700, whiteSpace: "nowrap",
-            color: totalEffectif > budgetMax ? "#ef4444" : totalEffectif > budgetMax * 0.9 ? "#f59e0b" : "#10b981" }}>
-            {restant >= 0 ? `reste ${restant}` : `dépassé ${Math.abs(restant)}`}
-          </span>
-        </div>
-      )}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        marginTop: 4,
+        marginBottom: 12,
+        flexWrap: "wrap",
+      }}>
+        <span style={{ fontSize: 13, color: "#94a3b8", whiteSpace: "nowrap" }}>
+          🍴 Calories consommées
+        </span>
 
-      {/* Calories consommées */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4, marginBottom: 12 }}>
-        <span style={{ fontSize: 13, color: "#94a3b8", whiteSpace: "nowrap" }}>🍴 Calories consommées</span>
-        <input type="number"
+        <input
+          type="number"
           value={jour.kCalTotales}
           onChange={e => updateJour(activeSem, activeJour, "kCalTotales", e.target.value)}
           placeholder="ex: 1650"
           style={{
-            width: 120, padding: "10px 14px", borderRadius: 8,
+            width: 90,
+            padding: "6px 8px",
+            borderRadius: 8,
             border: `1.5px solid ${jour.kCalTotales ? "#10b981" : "#334155"}`,
-            background: "#0f172a", color: "#f8fafc", fontSize: 15, fontFamily: "inherit",
+            background: "#0f172a",
+            color: "#f8fafc",
+            fontSize: 13,
+            textAlign: "center",
           }}
         />
+
         <span style={{ fontSize: 13, color: "#64748b" }}>kcal</span>
       </div>
-      {/* Garmin */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 10, borderTop: "1px solid #1e293b" }}>
+
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        paddingTop: 10,
+        borderTop: "1px solid #1e293b",
+        flexWrap: "wrap",
+      }}>
         <span style={{ fontSize: 16 }}>⌚</span>
-        <span style={{ fontSize: 13, color: "#94a3b8", whiteSpace: "nowrap" }}>Calories brûlées</span>
-        <input type="number"
+
+        <span style={{ fontSize: 13, color: "#94a3b8", whiteSpace: "nowrap" }}>
+          Calories brûlées
+        </span>
+
+        <input
+          type="number"
           value={jour.garminKcal}
           onChange={e => updateJour(activeSem, activeJour, "garminKcal", e.target.value)}
           placeholder="ex: 2150"
           style={{
-            width: 120, padding: "8px 12px", borderRadius: 8,
+            width: 90,
+            padding: "6px 8px",
+            borderRadius: 8,
             border: `1.5px solid ${jour.garminKcal ? "#10b981" : "#334155"}`,
-            background: "#0f172a", color: "#f8fafc", fontSize: 13, fontFamily: "inherit",
+            background: "#0f172a",
+            color: "#f8fafc",
+            fontSize: 13,
+            textAlign: "center",
           }}
         />
+
         <span style={{ fontSize: 12, color: "#64748b" }}>kcal</span>
-        {jour.garminKcal && jour.kCalTotales && (
-          <span style={{
-            fontSize: 12, padding: "3px 8px", borderRadius: 6,
-            background: parseFloat(jour.garminKcal) - parseFloat(jour.kCalTotales||0) > 0 ? "#064e3b" : "#450a0a",
-            color: parseFloat(jour.garminKcal) - parseFloat(jour.kCalTotales||0) > 0 ? "#6ee7b7" : "#fca5a5",
-          }}>
-            Déficit : {Math.round(parseFloat(jour.garminKcal) - parseFloat(jour.kCalTotales||0))} kcal
-          </span>
-        )}
       </div>
     </div>
   );
 }
 
 
+const REWARDS = [
+  { id: 1, category: "⚖️ Poids & composition corporelle", name: "It's a good start", condition: "Sous 68 kg", reward: "Bouquet de fleurs 💐" },
+  { id: 2, category: "⚖️ Poids & composition corporelle", name: "Goed Bezig!", condition: "Sous 67 kg", reward: "Merveilleux Pain Quotidien 🍰" },
+  { id: 3, category: "⚖️ Poids & composition corporelle", name: "On lâche rien", condition: "Sous 66 kg", reward: "Jeu Switch 🎮" },
+  { id: 4, category: "⚖️ Poids & composition corporelle", name: "Bye Bye Sixty-Five", condition: "Sous 65 kg", reward: "Robe Lady V 👗" },
+  { id: 5, category: "⚖️ Poids & composition corporelle", name: "Mieux que prévu", condition: "Sous 64 kg", reward: "Robe Desigual 👗" },
+  { id: 7, category: "⚖️ Poids & composition corporelle", name: "Volonté de fer", condition: "Vacances : écart S8-S5 ≤ 1 kg", reward: "Manucure 💅" },
+  { id: 8, category: "🏃 Bloc sport", name: "En route !", condition: "S1-S4 : ≥3 semaines vertes & ≥12 sorties", reward: "Nouveau roman 📚" },
+  { id: 9, category: "🏃 Bloc sport", name: "On tient bon", condition: "S5-S8 : ≥3 semaines vertes & ≥12 sorties", reward: "Massage dos/nuque 💆" },
+  { id: 10, category: "🏃 Bloc sport", name: "Plus rien ne peut m'arrêter", condition: "S9-S12 : ≥3 semaines vertes & ≥12 sorties", reward: "Resto indien ou pizzeria 🍕" },
+  { id: 11, category: "🏃 Bloc sport", name: "La ligne droite", condition: "S13-S16 : ≥3 semaines vertes & ≥12 sorties", reward: "Bulle flottante ou expérience zen 🧘" },
+  { id: 12, category: "🎽 Sorties longues", name: "C'est long…", condition: "10 SL réalisées", reward: "Mitraillette 🥖" },
+  { id: 13, category: "🎽 Sorties longues", name: "C'est très long…", condition: "14 SL du plan réalisées", reward: "Massage complet 💆" },
+  { id: 14, category: "🔥 Semaines parfaites", name: "Bien partie", condition: "6 semaines parfaites", reward: "Demi-journée off ☀️" },
+  { id: 15, category: "🔥 Semaines parfaites", name: "Régulière comme une horloge", condition: "9 semaines parfaites", reward: "BD ou manga 📚" },
+  { id: 16, category: "🔥 Semaines parfaites", name: "Discipline de fer", condition: "13 semaines parfaites", reward: "Pédicure 💅" },
+  { id: 17, category: "🔥 Semaines parfaites", name: "The best of the best", condition: "16 semaines parfaites", reward: "Cadeau de moi à moi à Venise 🎁" },
+  { id: 18, category: "🏁 Marathon", name: "Déjà mieux que Valence", condition: "Finisher", reward: "Un parfum" },
+  { id: 19, category: "🏁 Marathon", name: "Tu cartonnes", condition: "Sous 3h50", reward: "Expérience spéciale à Venise 🇮🇹" },
+  { id: 20, category: "⚖️ Poids & composition corporelle", name: "Athlète 2.0", condition: "Gras < 27 % et muscle > 31 %", reward: "Bijou ✨" },
+  { id: 21, category: "🏁 Marathon", name: "Trust the plan", condition: "55 séances du plan running cochées", reward: "Séance VR en amoureux 🥽" },
+];
+
+const COURSE_CODES = ["EF", "SL", "VMA"];
+
+function getMarathonData(data) {
+  return data?._marathon || { finished: false, time: "" };
+}
+
+function getBodyCompositionData(data) {
+  return data?._bodyComposition || { fatUnder27: false, muscleOver31: false };
+}
+
+function revealSecretText(encoded) {
+  try {
+    return decodeURIComponent(escape(atob(encoded)));
+  } catch(e) {
+    return "Récompense secrète";
+  }
+}
+
+function parseMarathonTimeToSeconds(value) {
+  if (!value) return null;
+  const parts = String(value).trim().split(":").map(x => parseInt(x, 10));
+  if (parts.some(x => isNaN(x))) return null;
+  if (parts.length === 2) return parts[0] * 3600 + parts[1] * 60;
+  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  return null;
+}
+
+function countSessionsInWeeks(weeks, acceptedCodes) {
+  return weeks.reduce((acc, w) => {
+    return acc + (w.jours || []).reduce((dayAcc, j) => {
+      return dayAcc + (j.sessionsFaites || []).filter(s => acceptedCodes.includes(s)).length;
+    }, 0);
+  }, 0);
+}
+
+function getMinWeight(allWeeks) {
+  const weights = allWeeks
+    .map(w => parseFloat(w.poidsLundi))
+    .filter(w => !isNaN(w) && w > 0);
+  return weights.length ? Math.min(...weights) : null;
+}
+
+function buildRewardsStatus({ allWeeks, allKpis, data, marathonData, bodyCompositionData }) {
+  const minWeight = getMinWeight(allWeeks);
+  const totalSL = countSessionsInWeeks(allWeeks, ["SL"]);
+  const perfectWeeks = allKpis.filter(k => k.poidsOk === true && k.sportOk === true).length;
+  const marathonSeconds = parseMarathonTimeToSeconds(marathonData.time);
+  const completedWeeks = PLAN.filter(p => hasWeekData(data[p.sem])).length;
+  const completedDays = allWeeks.reduce((acc, w) => {
+    return acc + (w.jours || []).filter(j =>
+      j.kCalTotales ||
+      j.garminKcal ||
+      (j.sessionsFaites && j.sessionsFaites.length > 0)
+    ).length;
+  }, 0);
+  const runningPlanDone = Object.values(data?._runningPlanChecks || {}).filter(Boolean).length;
+
+  const isGreenWeek = (sem) => {
+    const k = allKpis[sem - 1];
+    return hasWeekData(data[sem]) && k.poidsOk !== false && k.deficitOk !== false && k.sportOk !== false;
+  };
+
+  const blockStats = (start, end) => {
+    const weeks = allWeeks.slice(start - 1, end);
+    const greenWeeks = Array.from({ length: end - start + 1 }, (_, i) => start + i).filter(isGreenWeek).length;
+    const sorties = countSessionsInWeeks(weeks, COURSE_CODES);
+    return { greenWeeks, sorties };
+  };
+
+  const weightReward = (reward, threshold) => {
+    const unlocked = minWeight !== null && minWeight < threshold;
+    const progress = minWeight === null ? 0 : Math.max(0, Math.min(1, (70 - minWeight) / (70 - threshold)));
+    const detail = minWeight === null ? "Poids non saisi" : `Meilleur poids : ${minWeight.toFixed(1)} kg`;
+    const remaining = minWeight === null ? "Saisir un poids" : unlocked ? "Débloquée" : `Encore ${(minWeight - threshold + 0.1).toFixed(1)} kg environ`;
+    return { ...reward, unlocked, progress, detail, remaining };
+  };
+
+  const blockReward = (reward, start, end) => {
+    const stats = blockStats(start, end);
+    const unlocked = stats.greenWeeks >= 3 && stats.sorties >= 12;
+    const progress = Math.min(1, Math.min(stats.greenWeeks / 3, stats.sorties / 12));
+    const missingGreen = Math.max(0, 3 - stats.greenWeeks);
+    const missingRuns = Math.max(0, 12 - stats.sorties);
+    const missing = [];
+    if (missingGreen) missing.push(`${missingGreen} semaine${missingGreen > 1 ? "s" : ""} verte${missingGreen > 1 ? "s" : ""}`);
+    if (missingRuns) missing.push(`${missingRuns} sortie${missingRuns > 1 ? "s" : ""}`);
+    const detail = `${stats.greenWeeks}/3 semaines vertes · ${stats.sorties}/12 sorties`;
+    return { ...reward, unlocked, progress, detail, remaining: unlocked ? "Débloquée" : `Encore ${missing.join(" + ")}` };
+  };
+
+  const perfectReward = (reward, target) => ({
+    ...reward,
+    unlocked: perfectWeeks >= target,
+    progress: Math.min(1, perfectWeeks / target),
+    detail: `${perfectWeeks}/${target} semaines parfaites`,
+    remaining: perfectWeeks >= target ? "Débloquée" : `Encore ${target - perfectWeeks} semaine${target - perfectWeeks > 1 ? "s" : ""} parfaite${target - perfectWeeks > 1 ? "s" : ""}`,
+  });
+
+  const baseRewards = REWARDS.map(reward => {
+    if (reward.id === 1) return weightReward(reward, 68);
+    if (reward.id === 2) return weightReward(reward, 67);
+    if (reward.id === 3) return weightReward(reward, 66);
+    if (reward.id === 4) return weightReward(reward, 65);
+    if (reward.id === 5) return weightReward(reward, 64);
+    if (reward.id === 7) {
+      const p5 = parseFloat(allWeeks[4]?.poidsLundi);
+      const p8 = parseFloat(allWeeks[7]?.poidsLundi);
+      const hasBoth = !isNaN(p5) && !isNaN(p8);
+      const diff = hasBoth ? Math.abs(p8 - p5) : null;
+      const unlocked = hasBoth && diff <= 1;
+      return {
+        ...reward,
+        unlocked,
+        progress: !hasBoth ? 0 : Math.max(0, Math.min(1, 1 - Math.max(0, diff - 1) / 2)),
+        detail: hasBoth ? `Écart S8-S5 : ${diff.toFixed(1)} kg` : "Poids S5 et S8 requis",
+        remaining: !hasBoth ? "Saisir les poids S5 et S8" : unlocked ? "Débloquée" : `Réduire l'écart de ${(diff - 1).toFixed(1)} kg`,
+      };
+    }
+    if (reward.id === 8) return blockReward(reward, 1, 4);
+    if (reward.id === 9) return blockReward(reward, 5, 8);
+    if (reward.id === 10) return blockReward(reward, 9, 12);
+    if (reward.id === 11) return blockReward(reward, 13, 16);
+    if (reward.id === 12) return { ...reward, unlocked: totalSL >= 10, progress: Math.min(1, totalSL / 10), detail: `${totalSL}/10 SL réalisées`, remaining: totalSL >= 10 ? "Débloquée" : `Encore ${10 - totalSL} SL` };
+    if (reward.id === 13) return { ...reward, unlocked: totalSL >= 14, progress: Math.min(1, totalSL / 14), detail: `${totalSL}/14 SL réalisées`, remaining: totalSL >= 14 ? "Débloquée" : `Encore ${14 - totalSL} SL` };
+    if (reward.id === 14) return perfectReward(reward, 6);
+    if (reward.id === 15) return perfectReward(reward, 9);
+    if (reward.id === 16) return perfectReward(reward, 13);
+    if (reward.id === 17) return perfectReward(reward, 16);
+    if (reward.id === 18) return { ...reward, unlocked: !!marathonData.finished, progress: marathonData.finished ? 1 : 0, detail: marathonData.finished ? "Marathon terminé" : "À valider après la course", remaining: marathonData.finished ? "Débloquée" : "Cocher Finisher" };
+    if (reward.id === 19) {
+      const target = 3 * 3600 + 50 * 60;
+      const unlocked = marathonSeconds !== null && marathonSeconds < target;
+      return { ...reward, unlocked, progress: unlocked ? 1 : 0, detail: marathonData.time ? `Temps saisi : ${marathonData.time}` : "Temps à saisir après la course", remaining: unlocked ? "Débloquée" : "Saisir un temps < 3h50" };
+    }
+    if (reward.id === 20) {
+      const fatOk = !!bodyCompositionData.fatUnder27;
+      const muscleOk = !!bodyCompositionData.muscleOver31;
+      const unlocked = fatOk && muscleOk;
+      const progress = (fatOk ? 0.5 : 0) + (muscleOk ? 0.5 : 0);
+      const missing = [];
+      if (!fatOk) missing.push("gras < 27 %");
+      if (!muscleOk) missing.push("muscle > 31 %");
+      return {
+        ...reward,
+        unlocked,
+        progress,
+        detail: `${fatOk ? "✓" : "☐"} Gras < 27 % · ${muscleOk ? "✓" : "☐"} Muscle > 31 %`,
+        remaining: unlocked ? "Débloquée" : `Encore : ${missing.join(" + ")}`,
+      };
+    }
+    if (reward.id === 21) {
+      return {
+        ...reward,
+        unlocked: runningPlanDone >= 55,
+        progress: Math.min(1, runningPlanDone / 55),
+        detail: `${runningPlanDone}/55 séances cochées`,
+        remaining: runningPlanDone >= 55 ? "Débloquée" : `Encore ${55 - runningPlanDone} séance${55 - runningPlanDone > 1 ? "s" : ""}`,
+      };
+    }
+    return { ...reward, unlocked: false, progress: 0, detail: "", remaining: "" };
+  });
+
+  const secretStartDate = new Date(2026, 9, 25);
+  const secretToday = new Date();
+  const secretA = parseFloat(revealSecretText("NjUuNQ=="));
+  const secretB = parseInt(revealSecretText("NTU="), 10);
+  const secretUnlocked = secretToday >= secretStartDate && !!marathonData.finished && minWeight !== null && minWeight <= secretA && runningPlanDone >= secretB;
+  const secretRewardText = revealSecretText("VW4gY2FybmV0IEFyb3VuZCB0aGUgd29ybGQgZXQgMSBzdHlsbyBkb3LDqSBwb3VyIGxhIHByw6lwYXJhdGlvbiBTw6l2aWxsZSDinKg=");
+
+  baseRewards.push({
+    id: "secret-locked-chest",
+    category: "🔐 Secret",
+    name: secretUnlocked ? "Coffre secret ouvert" : "Coffre verrouillé",
+    condition: secretUnlocked ? "Objectif secret validé" : "Cette récompense ne peut être débloquée qu'en fin de préparation. Les conditions seront révélées au moment opportun.",
+    reward: secretUnlocked ? secretRewardText : "Mystère 🔐",
+    unlocked: secretUnlocked,
+    progress: secretUnlocked ? 1 : 0,
+    detail: secretUnlocked ? "Tu as débloqué la récompense surprise." : "Coffre verrouillé",
+    remaining: secretUnlocked ? "Débloquée" : "Conditions secrètes",
+    secret: true,
+    bonus: true,
+  });
+
+  return baseRewards;
+}
+
+function RewardsTab({ rewardsStatus, marathonData, updateMarathonField, bodyCompositionData, updateBodyCompositionField }) {
+  const visibleRewards = rewardsStatus.filter(r => !r.bonus);
+  const secretReward = rewardsStatus.find(r => r.secret);
+  const unlockedCount = visibleRewards.filter(r => r.unlocked).length;
+  const total = visibleRewards.length;
+  const globalProgress = total ? unlockedCount / total : 0;
+  const lockedRewards = visibleRewards.filter(r => !r.unlocked);
+  const nextReward = lockedRewards.length
+    ? [...lockedRewards].sort((a, b) => (b.progress || 0) - (a.progress || 0))[0]
+    : null;
+
+  const startDate = new Date(2026, 6, 6);
+  const raceDate = new Date(2026, 9, 25);
+  const today = new Date();
+  const totalMs = raceDate - startDate;
+  const elapsedMs = Math.max(0, Math.min(today - startDate, totalMs));
+  const dateProgress = totalMs > 0 ? elapsedMs / totalMs : 0;
+  const roadProgress = Math.min(1, (dateProgress * 0.55) + (globalProgress * 0.45));
+  const daysLeft = Math.max(0, Math.ceil((raceDate - today) / (1000 * 60 * 60 * 24)));
+
+  const categories = visibleRewards.reduce((acc, r) => {
+    if (!acc[r.category]) acc[r.category] = [];
+    acc[r.category].push(r);
+    return acc;
+  }, {});
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+      <div style={{
+        background: "linear-gradient(135deg, #0f766e 0%, #0f172a 72%)",
+        borderRadius: 16,
+        padding: 20,
+        border: "1px solid #134e4a",
+      }}>
+        <div style={{ fontSize: 12, color: "#99f6e4", textTransform: "uppercase", letterSpacing: 1, fontWeight: 700, marginBottom: 8 }}>
+          🇮🇹 Road to Venice
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "flex-end" }}>
+          <div>
+            <div style={{ fontSize: 22, color: "#f8fafc", fontWeight: 800 }}>
+              Marathon de Venise
+            </div>
+            <div style={{ fontSize: 13, color: "#cbd5e1", marginTop: 4 }}>
+              {daysLeft} jour{daysLeft > 1 ? "s" : ""} restant{daysLeft > 1 ? "s" : ""} · {unlockedCount}/{total} récompenses
+            </div>
+          </div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#5eead4" }}>
+            {Math.round(roadProgress * 100)}%
+          </div>
+        </div>
+        <div style={{ height: 9, background: "#0f172a", borderRadius: 99, overflow: "hidden", marginTop: 14 }}>
+          <div style={{
+            height: "100%",
+            width: `${Math.round(roadProgress * 100)}%`,
+            borderRadius: 99,
+            background: "linear-gradient(90deg, #2dd4bf, #f59e0b)",
+          }} />
+        </div>
+      </div>
+
+      <div style={{
+        background: "linear-gradient(135deg, #312e81 0%, #0f172a 100%)",
+        borderRadius: 16,
+        padding: 20,
+        border: "1px solid #334155",
+      }}>
+        <div style={{ fontSize: 30, marginBottom: 8 }}>🏆</div>
+        <div style={{ fontSize: 20, color: "#f8fafc", fontWeight: 700, marginBottom: 4 }}>
+          Récompenses
+        </div>
+        <div style={{ fontSize: 13, color: "#cbd5e1", marginBottom: 12 }}>
+          {unlockedCount}/{total} récompenses débloquées
+        </div>
+        <div style={{ height: 8, background: "#0f172a", borderRadius: 99, overflow: "hidden" }}>
+          <div style={{
+            height: "100%",
+            width: `${Math.round(globalProgress * 100)}%`,
+            borderRadius: 99,
+            background: "linear-gradient(90deg, #f59e0b, #10b981)",
+          }} />
+        </div>
+      </div>
+
+      {nextReward && (
+        <div style={{
+          background: "#1e293b",
+          borderRadius: 14,
+          padding: 16,
+          border: "1px solid #334155",
+        }}>
+          <div style={{ fontSize: 12, color: "#f59e0b", textTransform: "uppercase", letterSpacing: 1, fontWeight: 700, marginBottom: 8 }}>
+            🎯 Prochaine récompense
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+            <div>
+              <div style={{ fontSize: 17, color: "#f8fafc", fontWeight: 800 }}>{nextReward.name}</div>
+              <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>{nextReward.condition}</div>
+              <div style={{ fontSize: 12, color: "#fef3c7", marginTop: 6 }}>🎁 {nextReward.reward}</div>
+              <div style={{ fontSize: 12, color: "#cbd5e1", marginTop: 6 }}>{nextReward.remaining || nextReward.detail}</div>
+            </div>
+            <div style={{ minWidth: 84, textAlign: "right", color: "#f59e0b", fontSize: 22, fontWeight: 800 }}>
+              {Math.round((nextReward.progress || 0) * 100)}%
+            </div>
+          </div>
+          <div style={{ marginTop: 10, height: 7, background: "#0f172a", borderRadius: 99, overflow: "hidden" }}>
+            <div style={{
+              height: "100%",
+              width: `${Math.round((nextReward.progress || 0) * 100)}%`,
+              background: "linear-gradient(90deg, #f59e0b, #10b981)",
+              borderRadius: 99,
+            }} />
+          </div>
+        </div>
+      )}
+
+      <div style={{
+        background: "#1e293b",
+        borderRadius: 14,
+        padding: 16,
+        border: "1px solid #334155",
+      }}>
+        <div style={{ fontSize: 13, color: "#f8fafc", fontWeight: 700, marginBottom: 10 }}>
+          🏁 Résultat marathon
+        </div>
+        <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, color: "#cbd5e1", fontSize: 13 }}>
+            <input
+              type="checkbox"
+              checked={!!marathonData.finished}
+              onChange={e => updateMarathonField("finished", e.target.checked)}
+            />
+            Finisher
+          </label>
+          <input
+            type="text"
+            value={marathonData.time || ""}
+            onChange={e => updateMarathonField("time", e.target.value)}
+            placeholder="ex: 03:49:30"
+            style={{
+              width: 110,
+              padding: "6px 8px",
+              borderRadius: 8,
+              border: "1.5px solid #334155",
+              background: "#0f172a",
+              color: "#f8fafc",
+              fontSize: 13,
+              textAlign: "center",
+            }}
+          />
+          <span style={{ fontSize: 12, color: "#64748b" }}>Format : HH:MM ou HH:MM:SS</span>
+        </div>
+      </div>
+
+
+      <div style={{
+        background: "#1e293b",
+        borderRadius: 14,
+        padding: 16,
+        border: "1px solid #334155",
+      }}>
+        <div style={{ fontSize: 13, color: "#f8fafc", fontWeight: 700, marginBottom: 10 }}>
+          ⚖️ Composition corporelle
+        </div>
+        <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, color: "#cbd5e1", fontSize: 13 }}>
+            <input
+              type="checkbox"
+              checked={!!bodyCompositionData.fatUnder27}
+              onChange={e => updateBodyCompositionField("fatUnder27", e.target.checked)}
+            />
+            Gras &lt; 27 %
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, color: "#cbd5e1", fontSize: 13 }}>
+            <input
+              type="checkbox"
+              checked={!!bodyCompositionData.muscleOver31}
+              onChange={e => updateBodyCompositionField("muscleOver31", e.target.checked)}
+            />
+            Muscle &gt; 31 %
+          </label>
+          <span style={{ fontSize: 12, color: "#64748b" }}>
+            Les deux cases débloquent Athlète 2.0.
+          </span>
+        </div>
+      </div>
+
+      {secretReward && (
+        <div style={{
+          background: secretReward.unlocked ? "linear-gradient(135deg, #4c1d95, #0f172a)" : "#111827",
+          borderRadius: 16,
+          padding: 16,
+          border: `1px solid ${secretReward.unlocked ? "#a78bfa" : "#334155"}`,
+          boxShadow: secretReward.unlocked ? "0 0 0 1px #a78bfa33 inset" : "none",
+        }}>
+          <div style={{ fontSize: 12, color: secretReward.unlocked ? "#ddd6fe" : "#94a3b8", textTransform: "uppercase", letterSpacing: 1, fontWeight: 800, marginBottom: 8 }}>
+            {secretReward.unlocked ? "🎁 Secret débloqué" : "🔐 Coffre verrouillé"}
+          </div>
+          <div style={{ fontSize: 17, color: "#f8fafc", fontWeight: 800 }}>
+            {secretReward.name}
+          </div>
+          <div style={{ fontSize: 12, color: secretReward.unlocked ? "#fef3c7" : "#94a3b8", marginTop: 6, lineHeight: 1.4 }}>
+            {secretReward.condition}
+          </div>
+          <div style={{ fontSize: 12, color: secretReward.unlocked ? "#fef3c7" : "#64748b", marginTop: 8, fontWeight: 700 }}>
+            🎁 {secretReward.reward}
+          </div>
+        </div>
+      )}
+
+      {Object.entries(categories).map(([category, rewards]) => {
+        const catUnlocked = rewards.filter(r => r.unlocked).length;
+        return (
+          <div key={category}>
+            <div style={{
+              fontSize: 12,
+              color: "#94a3b8",
+              textTransform: "uppercase",
+              letterSpacing: 1,
+              fontWeight: 700,
+              marginBottom: 10,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}>
+              <span>{category}</span>
+              <span>{catUnlocked}/{rewards.length}</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 12 }}>
+              {rewards.map(r => {
+                const pct = Math.round((r.progress || 0) * 100);
+                return (
+                  <div key={r.id} style={{
+                    background: r.unlocked ? "#064e3b" : "#1e293b",
+                    border: `1px solid ${r.unlocked ? "#10b981" : "#334155"}`,
+                    borderRadius: 14,
+                    padding: 14,
+                    opacity: r.unlocked ? 1 : 0.58,
+                    filter: r.unlocked ? "none" : "grayscale(0.8)",
+                    position: "relative",
+                    overflow: "hidden",
+                  }}>
+                    <div style={{ position: "absolute", top: 10, right: 12, fontSize: 16 }}>
+                      {r.unlocked ? "✅" : "🔒"}
+                    </div>
+                    <div style={{ fontSize: 15, color: r.unlocked ? "#d1fae5" : "#e2e8f0", fontWeight: 700, paddingRight: 24 }}>
+                      {r.name}
+                    </div>
+                    <div style={{ fontSize: 12, color: r.unlocked ? "#bbf7d0" : "#94a3b8", marginTop: 6, lineHeight: 1.35 }}>
+                      {r.condition}
+                    </div>
+                    <div style={{ fontSize: 12, color: r.unlocked ? "#fef3c7" : "#cbd5e1", marginTop: 8, fontWeight: 600 }}>
+                      🎁 {r.reward}
+                    </div>
+                    <div style={{ fontSize: 11, color: r.unlocked ? "#a7f3d0" : "#64748b", marginTop: 8 }}>
+                      {r.detail}
+                    </div>
+                    <div style={{ marginTop: 8, height: 5, background: "#0f172a", borderRadius: 99, overflow: "hidden" }}>
+                      <div style={{
+                        height: "100%",
+                        width: `${pct}%`,
+                        background: r.unlocked ? "#10b981" : "#64748b",
+                        borderRadius: 99,
+                      }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+const RUNNING_PLAN = [
+  {
+    "week": 1,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45'"
+      },
+      {
+        "title": "VMA 100",
+        "details": "2x (8 x 30\"30\") - R3'"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 50'"
+      },
+      {
+        "title": "SL - 1h10",
+        "details": "EF 75%"
+      }
+    ]
+  },
+  {
+    "week": 2,
+    "sessions": [
+      {
+        "title": "PPG",
+        "details": "20 min + 2x6' PPG"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "VMA 105",
+        "details": "2x (8x200m-30\") - R3'"
+      },
+      {
+        "title": "SL - 1h30",
+        "details": "2x8' AS21"
+      }
+    ]
+  },
+  {
+    "week": 3,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45' à 1h"
+      },
+      {
+        "title": "PPG",
+        "details": "20 min + 2x8' PPG"
+      },
+      {
+        "title": "VMA 95",
+        "details": "2x (5x 400m - 1') - R3'"
+      },
+      {
+        "title": "SL - 1h30",
+        "details": "2x12' AS42"
+      }
+    ]
+  },
+  {
+    "week": 4,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45'"
+      },
+      {
+        "title": "VMA 105",
+        "details": "2x (8x 30\"-30\") - R3'"
+      },
+      {
+        "title": "SL - 1h20",
+        "details": "75%FCM"
+      },
+      {
+        "title": "/",
+        "details": "",
+        "empty": true
+      }
+    ]
+  },
+  {
+    "week": 5,
+    "sessions": [
+      {
+        "title": "VMA 100",
+        "details": "12x300m - 50\""
+      },
+      {
+        "title": "EF",
+        "details": "Footing 45' à 1h"
+      },
+      {
+        "title": "VMA 95",
+        "details": "2x (5x 400m - 1') - R3'"
+      },
+      {
+        "title": "SL - 1h30",
+        "details": "3x8' AS21"
+      }
+    ]
+  },
+  {
+    "week": 6,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45'"
+      },
+      {
+        "title": "PPG",
+        "details": "20 min + 2x10' PPG"
+      },
+      {
+        "title": "VMA 100",
+        "details": "2x (6x 300m - 45\") - R3'"
+      },
+      {
+        "title": "SL - 1h30",
+        "details": "3x12' AS42"
+      }
+    ]
+  },
+  {
+    "week": 7,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45' à 1h"
+      },
+      {
+        "title": "VMA 95",
+        "details": "2x (4x 500m - 1') - R3'"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "SL - 1h30",
+        "details": "3x10' AS21"
+      }
+    ]
+  },
+  {
+    "week": 8,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45'"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 45'"
+      },
+      {
+        "title": "SL - 1h20",
+        "details": "75%FCM"
+      },
+      {
+        "title": "/",
+        "details": "",
+        "empty": true
+      }
+    ]
+  },
+  {
+    "week": 9,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45' à 1h"
+      },
+      {
+        "title": "VMA 100",
+        "details": "10x 300m - 50\""
+      },
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "SL - 1h40",
+        "details": "3x 3km AS42"
+      }
+    ]
+  },
+  {
+    "week": 10,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45' à 1h"
+      },
+      {
+        "title": "AS21",
+        "details": "10' + 8' + 6' AS21 - R2'"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "SL - 1h50",
+        "details": "2x (4km + 3km) AS42"
+      }
+    ]
+  },
+  {
+    "week": 11,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45' à 1h"
+      },
+      {
+        "title": "VMA 105",
+        "details": "2x(10x200m-30\") - R2'"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "SL - 2h",
+        "details": "3x4km AS42"
+      }
+    ]
+  },
+  {
+    "week": 12,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 50'"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 40'"
+      },
+      {
+        "title": "SL - AS42",
+        "details": "Semi à AS42"
+      }
+    ]
+  },
+  {
+    "week": 13,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45'"
+      },
+      {
+        "title": "AS21",
+        "details": "2x 10' à 85-90% - R2'"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 50'"
+      },
+      {
+        "title": "SL - 2h15",
+        "details": "5km + 4km + 3km AS42"
+      }
+    ]
+  },
+  {
+    "week": 14,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45'"
+      },
+      {
+        "title": "VMA 100",
+        "details": "2x (12 x 30\"30\") - R3'"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "SL - 1h50",
+        "details": "2x5km AS42"
+      }
+    ]
+  },
+  {
+    "week": 15,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 45' à 1h"
+      },
+      {
+        "title": "AS42",
+        "details": "30' EF + 30' AS42"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "SL - 1h20",
+        "details": "2x20' AS42"
+      }
+    ]
+  },
+  {
+    "week": 16,
+    "sessions": [
+      {
+        "title": "EF",
+        "details": "Footing 1h"
+      },
+      {
+        "title": "EF",
+        "details": "Footing 50'"
+      },
+      {
+        "title": "/",
+        "details": "",
+        "empty": true
+      },
+      {
+        "title": "MARATHON",
+        "details": ""
+      }
+    ]
+  }
+];
+
+
+function RunningPlanTab({ runningChecks, updateRunningPlanCheck, currentSem }) {
+  const [showPastWeeks, setShowPastWeeks] = useState(false);
+  const pastWeeks = RUNNING_PLAN.filter(w => w.week < currentSem);
+  const visibleWeeks = RUNNING_PLAN.filter(w => w.week >= currentSem);
+
+  const getWeekStats = (weekData) => {
+    const realSessions = weekData.sessions.filter(s => !s.empty);
+    const doneCount = realSessions.filter((_, idx) => runningChecks[`S${weekData.week}-${idx}`]).length;
+    const totalCount = realSessions.length;
+    const pct = totalCount ? doneCount / totalCount : 0;
+    const complete = totalCount > 0 && doneCount === totalCount;
+    return { doneCount, totalCount, pct, complete };
+  };
+
+  const getGroupStats = (weeks) => weeks.reduce((acc, weekData) => {
+    const stats = getWeekStats(weekData);
+    return { done: acc.done + stats.doneCount, total: acc.total + stats.totalCount };
+  }, { done: 0, total: 0 });
+
+  const renderSessionCell = (weekData, session, idx) => {
+    const key = `S${weekData.week}-${idx}`;
+    const done = !!runningChecks[key];
+
+    if (session.empty) {
+      return (
+        <div key={idx} style={{
+          background: "#0f172a",
+          border: "1px dashed #334155",
+          borderRadius: 10,
+          minHeight: 74,
+          color: "#334155",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 18,
+          fontWeight: 800,
+        }}>/</div>
+      );
+    }
+
+    return (
+      <button key={idx} onClick={() => updateRunningPlanCheck(key, !done)} style={{
+        background: done ? "#064e3b" : "#1e293b",
+        border: `1.5px solid ${done ? "#10b981" : "#334155"}`,
+        borderRadius: 10,
+        minHeight: 74,
+        padding: "10px 8px",
+        color: done ? "#d1fae5" : "#cbd5e1",
+        cursor: "pointer",
+        textAlign: "center",
+        fontFamily: "inherit",
+        boxShadow: done ? "0 0 0 1px #10b98133 inset" : "none",
+      }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: done ? "#86efac" : "#e2e8f0", marginBottom: 4 }}>
+          {done ? "✓ " : ""}{session.title}
+        </div>
+        {session.details && (
+          <div style={{ fontSize: 11, lineHeight: 1.25, color: done ? "#bbf7d0" : "#94a3b8", whiteSpace: "pre-line" }}>
+            {session.details}
+          </div>
+        )}
+      </button>
+    );
+  };
+
+  const renderWeekRow = (weekData) => {
+    const { doneCount, totalCount, pct, complete } = getWeekStats(weekData);
+
+    return (
+      <div key={weekData.week} style={{
+        display: "grid",
+        gridTemplateColumns: "54px 1fr 1fr",
+        gridTemplateRows: "auto auto",
+        gap: 6,
+        alignItems: "stretch",
+        marginBottom: 10,
+      }}>
+        <div style={{
+          gridRow: "1 / span 2",
+          background: complete ? "#064e3b" : "#0f172a",
+          border: `1.5px solid ${complete ? "#10b981" : "#334155"}`,
+          borderRadius: 10,
+          minHeight: 154,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          color: complete ? "#d1fae5" : "#f8fafc",
+          fontWeight: 800,
+          fontSize: 16,
+          boxShadow: complete ? "0 0 0 1px #10b98133 inset" : "none",
+        }}>
+          <div>{complete ? "✓ " : ""}S{weekData.week}</div>
+          <div style={{ fontSize: 10, color: complete ? "#bbf7d0" : "#94a3b8", marginTop: 4 }}>{doneCount}/{totalCount}</div>
+          <div style={{ width: 34, height: 4, borderRadius: 99, background: "#1e293b", overflow: "hidden", marginTop: 5 }}>
+            <div style={{ width: `${Math.round(pct * 100)}%`, height: "100%", background: "#10b981" }} />
+          </div>
+        </div>
+        {weekData.sessions.map((session, idx) => renderSessionCell(weekData, session, idx))}
+      </div>
+    );
+  };
+
+  const pastStats = getGroupStats(pastWeeks);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <div style={{
+        background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+        borderRadius: 16,
+        padding: 18,
+        border: "1px solid #334155",
+      }}>
+        <div style={{ fontSize: 20, color: "#f8fafc", fontWeight: 800 }}>🏃 Plan running</div>
+        <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
+          Vue 2×2 sans scroll horizontal · clic sur une case pour la valider
+        </div>
+      </div>
+
+      {pastWeeks.length > 0 && (
+        <div>
+          <button onClick={() => setShowPastWeeks(!showPastWeeks)} style={{
+            width: "100%",
+            background: "#1e293b",
+            border: "1px solid #334155",
+            color: "#cbd5e1",
+            borderRadius: 10,
+            padding: "10px 12px",
+            fontFamily: "inherit",
+            fontSize: 13,
+            fontWeight: 700,
+            cursor: "pointer",
+            textAlign: "left",
+            marginBottom: showPastWeeks ? 10 : 0,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 8,
+          }}>
+            <span>{showPastWeeks ? "▼" : "▶"} Semaines passées ({pastWeeks[0].week} à {pastWeeks[pastWeeks.length - 1].week})</span>
+            <span style={{
+              padding: "2px 8px",
+              borderRadius: 99,
+              background: pastStats.total > 0 && pastStats.done === pastStats.total ? "#064e3b" : "#0f172a",
+              color: pastStats.total > 0 && pastStats.done === pastStats.total ? "#bbf7d0" : "#94a3b8",
+              border: "1px solid #334155",
+              fontSize: 11,
+              whiteSpace: "nowrap",
+            }}>
+              {pastStats.done}/{pastStats.total} cochées
+            </span>
+          </button>
+          {showPastWeeks && <div>{pastWeeks.map(renderWeekRow)}</div>}
+        </div>
+      )}
+
+      <div>
+        {visibleWeeks.map(renderWeekRow)}
+      </div>
+    </div>
+  );
+}
+
+function getCurrentPlanningPosition() {
+  const start = new Date(2026, 6, 6); // 6 juillet 2026
+  const today = new Date();
+
+  const diffDays = Math.floor(
+    (today - start) / (1000 * 60 * 60 * 24)
+  );
+
+  if (diffDays < 0) {
+    return { sem: 1, jour: 0 };
+  }
+
+  const sem = Math.min(
+    Math.floor(diffDays / 7) + 1,
+    16
+  );
+
+  const jour = Math.min(
+    Math.max(diffDays % 7, 0),
+    6
+  );
+
+  return { sem, jour };
+}
+
+  
 function App() {
   const [data, setData] = useState({});
-  const [activeSem, setActiveSem] = useState(1);
-  const [activeTab, setActiveTab] = useState("saisie");
-  const [activeJour, setActiveJour] = useState(0);
+ const initialPos = getCurrentPlanningPosition();
+
+const [activeSem, setActiveSem] = useState(initialPos.sem);
+const [activeTab, setActiveTab] = useState("saisie");
+const [activeJour, setActiveJour] = useState(initialPos.jour);
   const [loaded, setLoaded] = useState(false);
-  const [loadingMacros, setLoadingMacros] = useState({});
   const [showExport, setShowExport] = useState(false);
-  const [importText, setImportText] = useState("");
   const [showImport, setShowImport] = useState(false);
+  const [importText, setImportText] = useState("");
   const [copyMsg, setCopyMsg] = useState("");
+  const [rewardToast, setRewardToast] = useState(null);
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("suivi-marathon-v2");
+      const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) setData(JSON.parse(saved));
     } catch(e) {}
     setLoaded(true);
@@ -781,36 +1734,73 @@ function App() {
 
   const save = (newData) => {
     setData(newData);
-    try { localStorage.setItem("suivi-marathon-v2", JSON.stringify(newData)); } catch(e) {}
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
+    } catch(e) {}
   };
 
-  const resetAll = () => {
-    if (!window.confirm("Effacer toutes les données ?")) return;
-    try { localStorage.removeItem("suivi-marathon-v1"); } catch {}
-    save({});
-    setCopyMsg("✅ Toutes les données effacées !");
+  const getWeek = (s) => normalizeWeek(data[s]);
+
+  const updateJour = (sem, jour, field, val) => {
+    const w = normalizeWeek(data[sem]);
+    w.jours = w.jours.map((j, i) =>
+      i === jour ? { ...j, [field]: val } : j
+    );
+    save({ ...data, [sem]: w });
+  };
+
+  const updateWeek = (sem, field, val) => {
+    const w = normalizeWeek(data[sem]);
+    w[field] = val;
+    save({ ...data, [sem]: w });
+  };
+
+  const updateWeekSport = (sem, sportData) => {
+    const w = normalizeWeek(data[sem]);
+    w.sport = {
+      ...EMPTY_WEEK_SPORT(),
+      ...sportData,
+      planningJours: Array.from({ length: 7 }, (_, i) =>
+        sportData?.planningJours?.[i] || []
+      ),
+    };
+    save({ ...data, [sem]: w });
   };
 
   const resetWeek = (sem) => {
     if (!window.confirm("Effacer toutes les données de S" + sem + " ? Cette action est irréversible.")) return;
+
     const newData = { ...data };
     delete newData[sem];
+
     save(newData);
     setCopyMsg("✅ Semaine S" + sem + " réinitialisée !");
   };
 
-  // Export — copier dans le presse-papier
+  const resetAll = () => {
+    if (!window.confirm("Effacer toutes les données ?")) return;
+
+    try {
+      localStorage.removeItem("suivi-marathon-v1");
+      localStorage.removeItem("suivi-marathon-v2");
+      localStorage.removeItem(STORAGE_KEY);
+    } catch(e) {}
+
+    save({});
+    setCopyMsg("✅ Toutes les données effacées !");
+  };
+
   const exportData = async () => {
     const txt = JSON.stringify(data);
+
     try {
       await navigator.clipboard.writeText(txt);
-      setCopyMsg("✅ Copié ! Colle-le dans Notes ou un doc.");
-    } catch {
+      setCopyMsg("✅ Copié ! Colle-le dans Notes ou un document.");
+    } catch(e) {
       setShowExport(true);
     }
   };
 
-  // Import — coller depuis le presse-papier
   const importData = async () => {
     try {
       const txt = await navigator.clipboard.readText();
@@ -818,149 +1808,141 @@ function App() {
       save(parsed);
       setCopyMsg("✅ Données importées !");
       setShowImport(false);
-    } catch {
+    } catch(e) {
       setShowImport(true);
     }
   };
 
-  const doImportText = async () => {
+  const doImportText = () => {
     try {
       const parsed = JSON.parse(importText);
       save(parsed);
       setCopyMsg("✅ Données importées !");
       setShowImport(false);
       setImportText("");
-    } catch {
+    } catch(e) {
       setCopyMsg("❌ Texte invalide, réessaie.");
     }
   };
 
-  const getWeek = (s) => data[s] || EMPTY_WEEK();
+  const marathonData = getMarathonData(data);
+  const runningChecks = data._runningPlanChecks || {};
+  const bodyCompositionData = getBodyCompositionData(data);
 
-  const updateJour = (sem, jour, field, val) => {
-    const w = { ...getWeek(sem) };
-    w.jours = w.jours.map((j, i) => i === jour ? { ...j, [field]: val } : j);
-    save({ ...data, [sem]: w });
+  const updateRunningPlanCheck = (key, val) => {
+    save({
+      ...data,
+      _runningPlanChecks: {
+        ...runningChecks,
+        [key]: val,
+      }
+    });
   };
 
-  const updateWeek = (sem, field, val) => {
-    const w = { ...getWeek(sem) };
-    w[field] = val;
-    save({ ...data, [sem]: w });
+  const updateMarathonField = (field, val) => {
+    save({
+      ...data,
+      _marathon: {
+        ...marathonData,
+        [field]: val,
+      }
+    });
   };
 
-  const updatePlanning = (sem, jour, val) => {
-    const w = { ...getWeek(sem) };
-    w.planningSport = w.planningSport.map((v, i) => i === jour ? val : v);
-    save({ ...data, [sem]: w });
+  const updateBodyCompositionField = (field, val) => {
+    save({
+      ...data,
+      _bodyComposition: {
+        ...bodyCompositionData,
+        [field]: val,
+      }
+    });
   };
 
-  const updateWeekSport = (sem, sportData) => {
-    const w = { ...getWeek(sem) };
-    w.sport = sportData;
-    save({ ...data, [sem]: w });
-  };
-
-  // KPI calc
   const kpiSem = (s) => {
     const plan = PLAN[s - 1];
     const w = getWeek(s);
     const joursData = w.jours;
+    const sport = w.sport || EMPTY_WEEK_SPORT();
+    const planningJours = sport.planningJours || Array.from({ length: 7 }, () => []);
+    const cibleKcalDyn = getCibleKcalDynamique(plan, sport);
 
-    // Poids
     const poids = parseFloat(w.poidsLundi) || null;
     const poidsOk = poids !== null && poids <= plan.ciblePoids + 0.2;
 
-    // Objectifs caloriques dynamiques selon planning sport
-    const cibleKcalDyn = getCibleKcalDynamique(plan, w.planningSport);
-
-    // Calories — objectif par jour
     const kcals = joursData.map(j => {
       const tot = parseFloat(j.kCalTotales);
-      if (!isNaN(tot) && tot > 0) return tot;
-      // Somme des macros calculés par repas
-      const macros = [j.petitDejMacros, j.dejeunerMacros, j.collationMacros, j.dinerMacros];
-      const sum = macros.reduce((a, m) => a + (m?.kcal || 0), 0);
-      return sum > 0 ? sum : null;
+      return !isNaN(tot) && tot > 0 ? tot : null;
     });
-    const kcalsValides = kcals.filter(k => k !== null);
-    const moyKcal = kcalsValides.length ? Math.round(kcalsValides.reduce((a, b) => a + b, 0) / kcalsValides.length) : null;
-    // Objectif moyen de la semaine
-    const cibleMoyenne = Math.round(cibleKcalDyn.reduce((a, b) => a + b, 0) / 7);
-    // kcalOk basé uniquement sur le déficit cumulé (voir deficitOk plus bas)
 
-    // Sport v2 — validation semaine
-    const sport = w.sport || { coursesPrevues: [], renfoPrevus: [], autresPrevus: 0, planningJours: Array(7).fill([]) };
+    const kcalsValides = kcals.filter(k => k !== null);
+    const moyKcal = kcalsValides.length
+      ? Math.round(kcalsValides.reduce((a, b) => a + b, 0) / kcalsValides.length)
+      : null;
+
     const toutesSessionsFaites = joursData.flatMap(j => j.sessionsFaites || []);
 
-    // Critère course : SL + VMA + au moins 1 EF
-    const aEF = toutesSessionsFaites.filter(s => s === "EF").length >= 1;
-    const aSL = toutesSessionsFaites.includes("SL");
-    const aVMA = toutesSessionsFaites.includes("VMA");
-    const courseOk = aEF && aSL && aVMA;
+    const courseOk =
+      count(toutesSessionsFaites, "EF") >= 1 &&
+      toutesSessionsFaites.includes("SL") &&
+      toutesSessionsFaites.includes("VMA");
 
-    // Critère renfo : RJ OU (RA+RB) OU RAB
-    const aRJ = toutesSessionsFaites.includes("RJ");
-    const aRA = toutesSessionsFaites.includes("RA");
-    const aRB = toutesSessionsFaites.includes("RB");
-    const aRAB = toutesSessionsFaites.includes("RAB");
-    const renfoOk = aRJ || (aRA && aRB) || aRAB;
+    const renfoOk =
+      toutesSessionsFaites.includes("RJ") ||
+      (toutesSessionsFaites.includes("RA") && toutesSessionsFaites.includes("RB")) ||
+      toutesSessionsFaites.includes("RAB");
 
-    const sportOk = toutesSessionsFaites.length === 0 ? null : (courseOk && renfoOk);
-    const planSessions = sport.coursesPrevues.length + sport.renfoPrevus.length + sport.autresPrevus;
+    const sportOk = toutesSessionsFaites.length === 0 ? null : courseOk && renfoOk;
+
+    const planSessions = planningJours.flat().length;
     const faitSessions = toutesSessionsFaites.length;
 
-    // Par jour : deux critères séparés
-    const deficitCibleJour = Math.round((DEFICIT_CIBLE[s] || 0) / 7);
+    const deficitCible = DEFICIT_CIBLE[s] || 0;
+    const deficitCibleJour = Math.round(deficitCible / 7);
 
-    // sportJourOk : compare planning jour vs sessions faites ce jour
-    const planningJours = sport.planningJours || Array(7).fill([]);
     const sportJourOk = joursData.map((j, i) => {
       const prevues = planningJours[i] || [];
       const faites = j.sessionsFaites || [];
+
       if (prevues.length === 0 && faites.length === 0) return null;
-      if (prevues.length === 0 && faites.length > 0) return true; // bonus
-      // Toutes les sessions prévues ont été faites ?
-      const toutFait = prevues.every(s => faites.includes(s));
-      return toutFait ? true : false;
+      if (prevues.length === 0 && faites.length > 0) return true;
+
+      return prevues.every(session => faites.includes(session));
     });
 
-    // caloriesJourOk : vert si déficit atteint (ou objectif calories respecté)
     const caloriesJourOk = joursData.map((j, i) => {
       const kcal = kcals[i];
       const garmin = parseFloat(j.garminKcal) || null;
       const cibleJour = cibleKcalDyn[i];
+
       if (!kcal) return null;
+
       if (garmin !== null) {
-        return (garmin - kcal) >= deficitCibleJour - 50;
+        return garmin - kcal >= deficitCibleJour - 50;
       }
+
       return kcal <= cibleJour + 80;
     });
 
-    // joursOk global (pour compatibilité) = les deux ok
     const joursOk = joursData.map((j, i) => {
-      const s = sportJourOk[i];
-      const c = caloriesJourOk[i];
-      if (s === null && c === null) return null;
-      if (s === false || c === false) return false;
-      if (s === true || c === true) return true;
+      const sOk = sportJourOk[i];
+      const cOk = caloriesJourOk[i];
+
+      if (sOk === null && cOk === null) return null;
+      if (sOk === false || cOk === false) return false;
+      if (sOk === true || cOk === true) return true;
+
       return null;
     });
 
-    // Déficit réel = somme kcal brûlées estimées - kcal mangées (sur jours avec données)
-    const deficitCible = DEFICIT_CIBLE[s] || 0;
-
-    // Déficit réel = somme cumulée des déficits journaliers (Garmin - calories)
-    // Uniquement sur les jours où les deux valeurs sont saisies
-    const apportCibleSem = cibleKcalDyn.reduce((a, b) => a + b, 0);
     let deficitReel = null;
-    let deficitSource = "—";
     let deficitCumul = 0;
     let joursComplets = 0;
 
     joursData.forEach((j, i) => {
       const garmin = parseFloat(j.garminKcal);
-      const cal = parseFloat(j.kCalTotales) || kcals[i];
+      const cal = kcals[i];
+
       if (!isNaN(garmin) && garmin > 0 && cal !== null && cal > 0) {
         deficitCumul += garmin - cal;
         joursComplets++;
@@ -969,242 +1951,420 @@ function App() {
 
     if (joursComplets > 0) {
       deficitReel = Math.round(deficitCumul);
-      deficitSource = "garmin";
     }
-    const deficitOk = deficitReel !== null && deficitReel >= deficitCible * 0.85;
 
-    return { poids, poidsOk, moyKcal, cibleMoyenne, kcalOk: deficitOk, faitSessions, planSessions, sportOk, joursOk, sportJourOk, caloriesJourOk, deficitCible, deficitReel, deficitOk, deficitSource };
+    const deficitStatus = getDeficitStatus(deficitReel, deficitCible);
+    const deficitOk = deficitStatus;
+
+    return {
+      poids,
+      poidsOk,
+      moyKcal,
+      faitSessions,
+      planSessions,
+      sportOk,
+      joursOk,
+      sportJourOk,
+      caloriesJourOk,
+      deficitCible,
+      deficitReel,
+      deficitStatus,
+      deficitOk,
+    };
   };
+
+  useEffect(() => {
+    if (!loaded) return;
+    const marathonDataForCheck = getMarathonData(data);
+    const bodyCompositionDataForCheck = getBodyCompositionData(data);
+    const allKpisForCheck = PLAN.map(p => kpiSem(p.sem));
+    const allWeeksForCheck = PLAN.map(p => getWeek(p.sem));
+    const statusForCheck = buildRewardsStatus({
+      allWeeks: allWeeksForCheck,
+      allKpis: allKpisForCheck,
+      data,
+      marathonData: marathonDataForCheck,
+      bodyCompositionData: bodyCompositionDataForCheck,
+    });
+    const unlockedIds = statusForCheck.filter(r => r.unlocked).map(r => String(r.id));
+    let previousIds = [];
+    try {
+      previousIds = JSON.parse(localStorage.getItem("suivi-marathon-unlocked-rewards-v1") || "[]");
+    } catch(e) {
+      previousIds = [];
+    }
+    const newlyUnlockedIds = unlockedIds.filter(id => !previousIds.includes(id));
+    if (newlyUnlockedIds.length > 0) {
+      const newest = statusForCheck.find(r => String(r.id) === newlyUnlockedIds[newlyUnlockedIds.length - 1]);
+      if (newest) {
+        setRewardToast(newest);
+        window.setTimeout(() => setRewardToast(null), 4200);
+      }
+    }
+    try {
+      localStorage.setItem("suivi-marathon-unlocked-rewards-v1", JSON.stringify(Array.from(new Set([...previousIds, ...unlockedIds]))));
+    } catch(e) {}
+  }, [data, loaded]);
+
+  if (!loaded) {
+    return (
+      <div style={{
+        color: "#94a3b8",
+        padding: 40,
+        textAlign: "center",
+      }}>
+        Chargement...
+      </div>
+    );
+  }
 
   const plan = PLAN[activeSem - 1];
   const week = getWeek(activeSem);
   const kpi = kpiSem(activeSem);
 
-  // Chart data
-  const chartData = PLAN.map(p => {
+  const totalJours = 112;
+  const joursSaisis = PLAN.reduce((acc, p) => {
     const w = getWeek(p.sem);
-    const poids = parseFloat(w.poidsLundi) || null;
-    return { sem: `S${p.sem}`, cible: p.ciblePoids, reel: poids };
-  }).filter(d => d.reel !== null || PLAN.findIndex(p => `S${p.sem}` === d.sem) <= activeSem);
+    return acc + w.jours.filter(j => j.kCalTotales || j.garminKcal || (j.sessionsFaites && j.sessionsFaites.length > 0)).length;
+  }, 0);
 
-  const kcalChart = PLAN.map(p => {
-    const k = kpiSem(p.sem);
-    return { sem: `S${p.sem}`, cible: p.cibleKcal, reel: k.moyKcal };
-  }).filter(d => d.reel !== null);
+  const progression = joursSaisis / totalJours;
 
-  const dot = (ok) => ok === true ? "🟢" : ok === false ? "🔴" : "⚪";
-  const badge = (ok, txt) => (
-    <span style={{
-      padding: "3px 10px", borderRadius: 99, fontSize: 12, fontWeight: 600,
-      background: ok === true ? "#d1fae5" : ok === false ? "#fee2e2" : "#f1f5f9",
-      color: ok === true ? "#065f46" : ok === false ? "#991b1b" : "#64748b",
-      border: `1px solid ${ok === true ? "#6ee7b7" : ok === false ? "#fca5a5" : "#e2e8f0"}`,
-    }}>{txt}</span>
-  );
-
-  if (!loaded) return <div style={{ color: "#94a3b8", padding: 40, textAlign: "center", fontFamily: "Georgia" }}>Chargement...</div>;
+  const r = 44;
+  const cx = 52;
+  const cy = 52;
+  const stroke = 6;
+  const circ = 2 * Math.PI * r;
+  const dash = progression * circ;
+  const col = progression < 0.33 ? "#6366f1" : progression < 0.66 ? "#f59e0b" : "#10b981";
+  const allKpis = PLAN.map(p => kpiSem(p.sem));
+  const allWeeks = PLAN.map(p => getWeek(p.sem));
+  const rewardsStatus = buildRewardsStatus({ allWeeks, allKpis, data, marathonData, bodyCompositionData });
+  const currentPlanningPositionForTab = getCurrentPlanningPosition();
 
   return (
     <div style={{
       minHeight: "100vh",
       background: "#0a0f1e",
-      fontFamily: "'Georgia', serif",
       color: "#e2e8f0",
     }}>
-      {/* Header */}
       <div style={{
         background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
         borderBottom: "1px solid #1e293b",
         padding: "20px 24px",
       }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 12,
+          }}>
             <div>
-              <h1 style={{ margin: 0, fontSize: 22, color: "#f8fafc", letterSpacing: "-0.5px" }}>
+              <h1 style={{
+                margin: 0,
+                fontSize: 22,
+                color: "#f8fafc",
+                letterSpacing: "-0.5px",
+              }}>
                 🏃 Mon suivi marathon
               </h1>
-              <p style={{ margin: "4px 0 0", fontSize: 13, color: "#64748b" }}>
+
+              <p style={{
+                margin: "4px 0 0",
+                fontSize: 13,
+                color: "#64748b",
+              }}>
                 Venise · 25 octobre · Objectif 65 kg
               </p>
             </div>
+
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {["saisie", "tableau", "graphiques"].map(t => (
+              {["saisie", "tableau", "graphiques", "recompenses", "planRunning"].map(t => (
                 <button key={t} onClick={() => setActiveTab(t)} style={{
-                  padding: "7px 16px", borderRadius: 8, fontSize: 13, cursor: "pointer",
-                  fontFamily: "inherit", border: "none", transition: "all 0.2s",
+                  padding: "7px 16px",
+                  borderRadius: 8,
+                  fontSize: 13,
+                  cursor: "pointer",
+                  border: "none",
                   background: activeTab === t ? "#6366f1" : "#1e293b",
                   color: activeTab === t ? "white" : "#94a3b8",
                 }}>
-                  {t === "saisie" ? "📝 Saisie" : t === "tableau" ? "📅 Tableau" : "📈 Graphiques"}
+                  {t === "saisie" ? "📝 Saisie" : t === "tableau" ? "📅 Tableau" : t === "graphiques" ? "📈 Graphiques" : t === "recompenses" ? "🏆 Récompenses" : "🏃 Plan Running"}
                 </button>
               ))}
-              <button onClick={exportData} style={{
-                padding: "7px 14px", borderRadius: 8, fontSize: 13, cursor: "pointer",
-                fontFamily: "inherit", border: "1px solid #334155",
-                background: "transparent", color: "#10b981",
-              }}>💾 Sauver</button>
-              <button onClick={importData} style={{
-                padding: "7px 14px", borderRadius: 8, fontSize: 13, cursor: "pointer",
-                fontFamily: "inherit", border: "1px solid #334155",
-                background: "transparent", color: "#f59e0b",
-              }}>📂 Charger</button>
 
+              <button onClick={exportData} style={{
+                padding: "7px 14px",
+                borderRadius: 8,
+                fontSize: 13,
+                cursor: "pointer",
+                border: "1px solid #334155",
+                background: "transparent",
+                color: "#10b981",
+              }}>
+                💾 Sauver
+              </button>
+
+              <button onClick={importData} style={{
+                padding: "7px 14px",
+                borderRadius: 8,
+                fontSize: 13,
+                cursor: "pointer",
+                border: "1px solid #334155",
+                background: "transparent",
+                color: "#f59e0b",
+              }}>
+                📂 Charger
+              </button>
             </div>
           </div>
         </div>
       </div>
 
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "24px 16px" }}>
-
-        {/* ── SAISIE ──────────────────────────────────────────────── */}
         {activeTab === "saisie" && (
           <div>
-            {/* 1. Compteur jours */}
-            {(() => {
-              const totalJours = 112;
-              const joursOk = PLAN.reduce((acc, p) => {
-                const w = getWeek(p.sem);
-                return acc + w.jours.filter(j => j.kCalTotales || j.garminKcal).length;
-              }, 0);
-              const pct = joursOk / totalJours;
-              const r = 44, cx = 52, cy = 52, stroke = 6;
-              const circ = 2 * Math.PI * r;
-              const dash = pct * circ;
-              const col = pct < 0.33 ? "#6366f1" : pct < 0.66 ? "#f59e0b" : "#10b981";
-              return (
-                <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20, padding: "12px 16px", background: "#1e293b", borderRadius: 14, border: "1px solid #334155" }}>
-                  <svg width={104} height={104}>
-                    <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1e293b" strokeWidth={stroke}/>
-                    <circle cx={cx} cy={cy} r={r} fill="none" stroke="#0f172a" strokeWidth={stroke+2}/>
-                    <circle cx={cx} cy={cy} r={r} fill="none" stroke={col} strokeWidth={stroke}
-                      strokeDasharray={`${dash} ${circ}`}
-                      strokeLinecap="round"
-                      transform={`rotate(-90 ${cx} ${cy})`}
-                      style={{ transition: "stroke-dasharray 0.5s ease" }}
-                    />
-                    <text x={cx} y={cy-6} textAnchor="middle" fill="#f8fafc" fontSize="16" fontWeight="bold">{joursOk}</text>
-                    <text x={cx} y={cy+10} textAnchor="middle" fill="#64748b" fontSize="11">/{totalJours}</text>
-                    <text x={cx} y={cy+24} textAnchor="middle" fill={col} fontSize="10">{Math.round(pct*100)}%</text>
-                  </svg>
-                  <div>
-                    <div style={{ fontSize: 15, color: "#f8fafc", fontWeight: 600 }}>Progression</div>
-                    <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 4 }}>
-                      {joursOk} jour{joursOk > 1 ? "s" : ""} saisi{joursOk > 1 ? "s" : ""}
-                    </div>
-                    <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
-                      sur {totalJours} jours au total
-                    </div>
-                    <div style={{ fontSize: 12, color: col, marginTop: 4, fontWeight: 600 }}>
-                      {totalJours - joursOk} jours restants
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              marginBottom: 20,
+              padding: "12px 16px",
+              background: "#1e293b",
+              borderRadius: 14,
+              border: "1px solid #334155",
+            }}>
+              <svg width={104} height={104}>
+                <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1e293b" strokeWidth={stroke} />
+                <circle cx={cx} cy={cy} r={r} fill="none" stroke="#0f172a" strokeWidth={stroke + 2} />
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r={r}
+                  fill="none"
+                  stroke={col}
+                  strokeWidth={stroke}
+                  strokeDasharray={`${dash} ${circ}`}
+                  strokeLinecap="round"
+                  transform={`rotate(-90 ${cx} ${cy})`}
+                  style={{ transition: "stroke-dasharray 0.5s ease" }}
+                />
+                <text x={cx} y={cy - 6} textAnchor="middle" fill="#f8fafc" fontSize="16" fontWeight="bold">
+                  {joursSaisis}
+                </text>
+                <text x={cx} y={cy + 10} textAnchor="middle" fill="#64748b" fontSize="11">
+                  /{totalJours}
+                </text>
+                <text x={cx} y={cy + 24} textAnchor="middle" fill={col} fontSize="10">
+                  {Math.round(progression * 100)}%
+                </text>
+              </svg>
 
-            {/* 2. Sélecteur semaine */}
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
+              <div>
+                <div style={{ fontSize: 15, color: "#f8fafc", fontWeight: 600 }}>
+                  Progression
+                </div>
+
+                <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 4 }}>
+                  {joursSaisis} jour{joursSaisis > 1 ? "s" : ""} saisi{joursSaisis > 1 ? "s" : ""}
+                </div>
+
+                <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
+                  sur {totalJours} jours au total
+                </div>
+
+                <div style={{ fontSize: 12, color: col, marginTop: 4, fontWeight: 600 }}>
+                  {totalJours - joursSaisis} jours restants
+                </div>
+              </div>
+            </div>
+
+            <div style={{
+              display: "flex",
+              gap: 6,
+              flexWrap: "wrap",
+              marginBottom: 20,
+            }}>
               {PLAN.map(p => {
                 const k = kpiSem(p.sem);
-                const hasData = (() => {
-                  const w = data[p.sem];
-                  if (!w) return false;
-                  if (w.poidsLundi) return true;
-                  if (w.planningSport?.some(s => s?.trim())) return true;
-                  if (w.jours?.some(j => j.sportFait?.trim() || j.garminKcal?.trim() || j.kCalTotales?.trim() ||
-                    j.petitDejMacros || j.dejeunerMacros || j.collationMacros || j.dinerMacros ||
-                    (j.sessionsFaites && j.sessionsFaites.length > 0))) return true;
-                  return false;
-                })();
+                const hasData = hasWeekData(data[p.sem]);
+
                 return (
                   <button key={p.sem} onClick={() => setActiveSem(p.sem)} style={{
-                    width: 38, height: 38, borderRadius: 8, border: "none",
-                    fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                    width: 38,
+                    height: 38,
+                    borderRadius: 8,
+                    border: "none",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: "pointer",
                     background: activeSem === p.sem ? "#6366f1"
                       : !hasData ? "#1e293b"
-                      : (k.poidsOk === false || k.kcalOk === false || k.sportOk === false)
-                        ? "#450a0a" : "#064e3b",
+                      : (k.poidsOk === false || k.deficitOk === false || k.sportOk === false)
+                        ? "#450a0a"
+                        : k.deficitOk === "warn"
+                          ? "#78350f"
+                          : "#064e3b",
+                    color: activeSem === p.sem ? "white" : "#e2e8f0",
                     outline: activeSem === p.sem ? "2px solid #818cf8" : "none",
-                  }}>S{p.sem}</button>
+                  }}>
+                    S{p.sem}
+                  </button>
                 );
               })}
             </div>
 
-            {/* 3. KPI de la semaine */}
             <div style={{
-              marginBottom: 16, background: "#1e293b", borderRadius: 14,
-              padding: "14px 20px", border: "1px solid #334155",
+              marginBottom: 16,
+              background: "#1e293b",
+              borderRadius: 14,
+              padding: "14px 20px",
+              border: "1px solid #334155",
             }}>
-              <div style={{ fontSize: 12, color: "#64748b", marginBottom: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>
+              <div style={{
+                fontSize: 12,
+                color: "#64748b",
+                marginBottom: 10,
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: 1,
+              }}>
                 📊 KPI semaine
               </div>
+
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                {badge(kpi.poidsOk,
+                {badge(
+                  kpi.poidsOk,
                   kpi.poids ? `⚖️ ${kpi.poids} kg (cible ${plan.ciblePoids})` : "⚖️ Poids non saisi"
                 )}
-                {badge(kpi.kcalOk,
+
+                {badge(
+                  kpi.deficitOk,
                   kpi.deficitReel !== null
                     ? `🍽️ Déficit : ${kpi.deficitReel} kcal (cible ${kpi.deficitCible})`
                     : "🍽️ Pas assez de données"
                 )}
+
                 {badge(kpi.sportOk, "🏃 Sport")}
               </div>
             </div>
 
-            {/* 4. Semaine header avec poids */}
             <div style={{
-              background: "#1e293b", borderRadius: 14, padding: "16px 20px",
-              marginBottom: 16, border: "1px solid #334155",
-              display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center",
+              background: "#1e293b",
+              borderRadius: 14,
+              padding: "16px 20px",
+              marginBottom: 16,
+              border: "1px solid #334155",
+              display: "flex",
+              gap: 16,
+              flexWrap: "wrap",
+              alignItems: "center",
             }}>
               <div>
-                <div style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase", letterSpacing: 1 }}>
+                <div style={{
+                  fontSize: 11,
+                  color: "#64748b",
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                }}>
                   Semaine {activeSem} · {plan.lundi}
                 </div>
-                <div style={{ fontSize: 15, color: "#f8fafc", fontWeight: 600, marginTop: 4 }}>
+
+                <div style={{
+                  fontSize: 15,
+                  color: "#f8fafc",
+                  fontWeight: 600,
+                  marginTop: 4,
+                }}>
                   <span style={{
-                    display: "inline-block", padding: "2px 10px", borderRadius: 99, fontSize: 12,
+                    display: "inline-block",
+                    padding: "2px 10px",
+                    borderRadius: 99,
+                    fontSize: 12,
                     background: PHASE_COLORS[plan.phase] + "33",
-                    color: PHASE_COLORS[plan.phase], marginRight: 8,
-                  }}>{plan.phase}</span>
+                    color: PHASE_COLORS[plan.phase],
+                    marginRight: 8,
+                  }}>
+                    {plan.phase}
+                  </span>
                   Objectif {plan.ciblePoids} kg
                 </div>
               </div>
-              <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                <label style={{ fontSize: 13, color: "#94a3b8" }}>⚖️ Poids lundi</label>
+
+              <div style={{
+                marginLeft: "auto",
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                flexWrap: "wrap",
+              }}>
+                <label style={{ fontSize: 13, color: "#94a3b8" }}>
+                  ⚖️ Poids lundi
+                </label>
+
                 <input
-                  type="number" step="0.1"
+                  type="number"
+                  step="0.1"
                   value={week.poidsLundi}
                   onChange={e => updateWeek(activeSem, "poidsLundi", e.target.value)}
                   placeholder="69.5"
                   style={{
-                    width: 80, padding: "6px 10px", borderRadius: 8,
-                    border: "1.5px solid #334155", background: "#0f172a",
-                    color: "#f8fafc", fontSize: 14, fontFamily: "inherit", textAlign: "center",
+                    width: 80,
+                    padding: "6px 10px",
+                    borderRadius: 8,
+                    border: "1.5px solid #334155",
+                    background: "#0f172a",
+                    color: "#f8fafc",
+                    fontSize: 14,
+                    textAlign: "center",
                   }}
                 />
+
                 <span style={{ fontSize: 13, color: "#64748b" }}>kg</span>
+
                 <button onClick={() => resetWeek(activeSem)} style={{
-                  padding: "4px 10px", borderRadius: 6, border: "1px solid #450a0a",
-                  background: "transparent", color: "#ef4444", fontSize: 11, cursor: "pointer", fontFamily: "inherit",
-                }}>🗑 Réinit.</button>
+                  padding: "4px 10px",
+                  borderRadius: 6,
+                  border: "1px solid #450a0a",
+                  background: "transparent",
+                  color: "#ef4444",
+                  fontSize: 11,
+                  cursor: "pointer",
+                }}>
+                  🗑 Réinit.
+                </button>
               </div>
             </div>
 
-            {/* 5. Sport de la semaine (vue résumé) */}
             <WeekSummary weekSport={week.sport} joursData={week.jours || []} />
 
-            {/* 6. Sélecteur jour */}
-            <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
+            <div style={{
+              display: "flex",
+              gap: 6,
+              marginBottom: 16,
+            }}>
               {JOURS.map((j, i) => {
                 const ok = kpi.joursOk[i];
+
                 return (
                   <button key={i} onClick={() => setActiveJour(i)} style={{
-                    flex: 1, padding: "8px 4px", borderRadius: 8, border: "none",
-                    fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                    flex: 1,
+                    padding: "8px 4px",
+                    borderRadius: 8,
+                    border: "none",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: "pointer",
                     background: activeJour === i ? "#6366f1"
-                      : ok === true ? "#064e3b" : ok === false ? "#450a0a" : "#1e293b",
-                    color: activeJour === i ? "white" : ok === true ? "#6ee7b7" : ok === false ? "#fca5a5" : "#64748b",
+                      : ok === true ? "#064e3b"
+                      : ok === false ? "#450a0a"
+                      : "#1e293b",
+                    color: activeJour === i ? "white"
+                      : ok === true ? "#6ee7b7"
+                      : ok === false ? "#fca5a5"
+                      : "#64748b",
                   }}>
                     {j}<br />
                     <span style={{ fontSize: 10, opacity: 0.7 }}>{dot(ok)}</span>
@@ -1213,71 +2373,85 @@ function App() {
               })}
             </div>
 
-            {/* 7. Saisie jour */}
-            {(() => {
-              const j = week.jours[activeJour];
-              return (
-                <div style={{ display: "grid", gap: 12 }}>
-                  {/* Sport collapsible */}
-                  <CollapsibleSportPanel
-                    jour={j}
-                    jourIdx={activeJour}
-                    weekSport={week.sport}
-                    activeSem={activeSem}
-                    updateJour={updateJour}
-                    updateWeekSport={(sportData) => updateWeekSport(activeSem, sportData)}
-                  />
+            <div style={{ display: "grid", gap: 12 }}>
+              <CollapsibleSportPanel
+                jour={week.jours[activeJour]}
+                jourIdx={activeJour}
+                weekSport={week.sport}
+                activeSem={activeSem}
+                updateJour={updateJour}
+                updateWeekSport={(sportData) => updateWeekSport(activeSem, sportData)}
+              />
 
-                  {/* Nutrition + Garmin */}
-                  <NutritionPanel
-                    jour={j}
-                    activeJour={activeJour}
-                    activeSem={activeSem}
-                    cibleKcal={getCibleKcalDynamique(plan, week.planningSport)[activeJour]}
-                    deficitCibleJour={Math.round((DEFICIT_CIBLE[activeSem] || 0) / 7)}
-                    updateJour={updateJour}
-                  />
-                </div>
-              );
-            })()}
+              <NutritionPanel
+                jour={week.jours[activeJour]}
+                activeJour={activeJour}
+                activeSem={activeSem}
+                cibleKcal={getCibleKcalDynamique(plan, week.sport)[activeJour]}
+                deficitCibleJour={Math.round((DEFICIT_CIBLE[activeSem] || 0) / 7)}
+                updateJour={updateJour}
+              />
+            </div>
           </div>
         )}
 
-        {/* ── TABLEAU ──────────────────────────────────────────────── */}
         {activeTab === "tableau" && (
           <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+            <table style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: 12,
+            }}>
               <thead>
                 <tr>
                   <th style={{ padding: "8px 12px", textAlign: "left", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>Semaine</th>
                   <th style={{ padding: "8px 12px", textAlign: "left", color: "#64748b", borderBottom: "1px solid #1e293b" }}>Phase</th>
-                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>⚖️ Poids réel</th>
+                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>⚖️ Réel</th>
                   <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>📉 Plan</th>
                   <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🔮 Projection</th>
-                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🔥 Déficit cible</th>
-                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🍽️ Déficit réel</th>
+                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🔥 Cible</th>
+                  <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b", whiteSpace: "nowrap" }}>🍽️ Réel</th>
                   <th style={{ padding: "8px 12px", color: "#64748b", borderBottom: "1px solid #1e293b" }}>🏃 Sport</th>
                   {JOURS.map(j => (
                     <th key={j} style={{ padding: "8px 8px", color: "#64748b", borderBottom: "1px solid #1e293b", textAlign: "center" }}>{j}</th>
                   ))}
                 </tr>
               </thead>
+
               <tbody>
                 {PLAN.map(p => {
                   const k = kpiSem(p.sem);
-                  const hasData = (() => {
-                  const w = data[p.sem];
-                  if (!w) return false;
-                  if (w.poidsLundi) return true;
-                  if (w.planningSport?.some(s => s?.trim())) return true;
-                  if (w.jours?.some(j => j.sportFait?.trim() || j.garminKcal?.trim() || j.kCalTotales?.trim() ||
-                    j.petitDejMacros || j.dejeunerMacros || j.collationMacros || j.dinerMacros)) return true;
-                  return false;
-                })();
+                  const hasData = hasWeekData(data[p.sem]);
                   const isActive = p.sem === activeSem;
+
+                  let lastPoids = null;
+                  let lastSem = 0;
+
+                  PLAN.forEach(pp => {
+                    const ww = getWeek(pp.sem);
+                    const po = parseFloat(ww.poidsLundi);
+
+                    if (!isNaN(po) && po > 0) {
+                      lastPoids = po;
+                      lastSem = pp.sem;
+                    }
+                  });
+
+                  let projection = null;
+                  let delta = null;
+
+                  if (lastPoids !== null && p.sem >= lastSem) {
+                    const planLastSem = PLAN[lastSem - 1]?.ciblePoids || lastPoids;
+                    delta = Math.round((lastPoids - planLastSem) * 100) / 100;
+                    projection = Math.round((p.ciblePoids + delta) * 10) / 10;
+                  }
+
                   return (
                     <tr key={p.sem}
-                      onClick={() => { setActiveSem(p.sem); setActiveTab("saisie"); }}
+                      onClick={() => {
+                        setActiveSem(p.sem);
+                        setActiveTab("saisie");
+                      }}
                       style={{
                         cursor: "pointer",
                         background: isActive ? "#1e293b33" : "transparent",
@@ -1287,97 +2461,122 @@ function App() {
                       <td style={{ padding: "10px 12px", color: "#f8fafc", fontWeight: isActive ? 700 : 400, whiteSpace: "nowrap" }}>
                         S{p.sem} · {p.lundi}
                       </td>
+
                       <td style={{ padding: "10px 12px" }}>
                         <span style={{
-                          padding: "2px 8px", borderRadius: 99, fontSize: 11,
+                          padding: "2px 8px",
+                          borderRadius: 99,
+                          fontSize: 11,
                           background: PHASE_COLORS[p.phase] + "22",
                           color: PHASE_COLORS[p.phase],
-                        }}>{p.phase}</span>
+                        }}>
+                          {p.phase}
+                        </span>
                       </td>
-                      {/* Poids réel */}
+
                       <td style={{ padding: "10px 8px", textAlign: "center" }}>
                         {hasData ? (
                           <span style={{
-                            padding: "2px 8px", borderRadius: 6, fontSize: 12,
+                            padding: "2px 8px",
+                            borderRadius: 6,
+                            fontSize: 12,
                             background: k.poidsOk ? "#064e3b" : k.poids ? "#450a0a" : "#1e293b",
                             color: k.poidsOk ? "#6ee7b7" : k.poids ? "#fca5a5" : "#64748b",
-                          }}>{k.poids ? `${k.poids} kg` : "—"}</span>
+                          }}>
+                            {k.poids ? `${k.poids} kg` : "—"}
+                          </span>
                         ) : <span style={{ color: "#334155" }}>—</span>}
                       </td>
-                      {/* Poids estimé selon plan */}
+
                       <td style={{ padding: "10px 8px", textAlign: "center" }}>
-                        <span style={{ fontSize: 12, color: "#475569" }}>{p.ciblePoids} kg</span>
+                        <span style={{ fontSize: 12, color: "#475569" }}>
+                          {p.ciblePoids} kg
+                        </span>
                       </td>
 
-                      {/* Projection : delta constant depuis dernier poids mesuré */}
                       <td style={{ padding: "10px 8px", textAlign: "center" }}>
-                        {(() => {
-                          // Trouver le dernier poids réel mesuré
-                          let lastPoids = null, lastSem = 0;
-                          PLAN.forEach(pp => {
-                            const ww = getWeek(pp.sem);
-                            const po = parseFloat(ww.poidsLundi);
-                            if (!isNaN(po) && po > 0) { lastPoids = po; lastSem = pp.sem; }
-                          });
-                          if (lastPoids === null) return <span style={{ color: "#334155" }}>—</span>;
-                          if (p.sem < lastSem) return <span style={{ color: "#334155" }}>—</span>;
-                          // Delta = écart entre poids mesuré et poids plan à cette semaine
-                          const planLastSem = PLAN[lastSem - 1]?.ciblePoids || lastPoids;
-                          const delta = Math.round((lastPoids - planLastSem) * 100) / 100;
-                          // Projection = poids plan de cette semaine + delta (constant)
-                          const projection = Math.round((p.ciblePoids + delta) * 10) / 10;
-                          const color = Math.abs(delta) < 0.15 ? "#64748b" : delta < 0 ? "#6366f1" : "#ef4444";
-                          return (
-                            <div>
-                              <span style={{ fontSize: 12, color, fontWeight: 600 }}>{projection} kg</span>
-                              {Math.abs(delta) >= 0.1 && (
-                                <div style={{ fontSize: 10, color: "#64748b" }}>
-                                  {delta > 0 ? "+" : ""}{delta} vs plan
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })()}
+                        {projection === null ? (
+                          <span style={{ color: "#334155" }}>—</span>
+                        ) : (
+                          <div>
+                            <span style={{
+                              fontSize: 12,
+                              color: Math.abs(delta) < 0.15 ? "#64748b" : delta < 0 ? "#6366f1" : "#ef4444",
+                              fontWeight: 600,
+                            }}>
+                              {projection} kg
+                            </span>
+
+                            {Math.abs(delta) >= 0.1 && (
+                              <div style={{ fontSize: 10, color: "#64748b" }}>
+                                {delta > 0 ? "+" : ""}{delta} vs plan
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </td>
-                      {/* Déficit cible */}
+
                       <td style={{ padding: "10px 8px", textAlign: "center" }}>
-                        <span style={{ fontSize: 12, color: k.deficitCible > 0 ? "#f59e0b" : "#334155" }}>
+                        <span style={{
+                          fontSize: 12,
+                          color: k.deficitCible > 0 ? "#f59e0b" : "#334155",
+                        }}>
                           {k.deficitCible > 0 ? `${k.deficitCible} kcal` : "—"}
                         </span>
                       </td>
-                      {/* Déficit réel */}
+
                       <td style={{ padding: "10px 8px", textAlign: "center" }}>
                         {hasData && k.deficitReel !== null ? (
                           <div>
-                            <span style={{
-                              padding: "2px 8px", borderRadius: 6, fontSize: 12,
-                              background: k.deficitOk ? "#064e3b" : "#450a0a",
-                              color: k.deficitOk ? "#6ee7b7" : "#fca5a5",
-                            }}>{k.deficitReel} kcal</span>
+                            {(() => {
+                              const colors = getDeficitColors(k.deficitStatus);
+                              return (
+                                <span style={{
+                                  padding: "2px 8px",
+                                  borderRadius: 6,
+                                  fontSize: 12,
+                                  background: colors.bg,
+                                  color: colors.color,
+                                }}>
+                                  {k.deficitReel} kcal
+                                </span>
+                              );
+                            })()}
+
                             <div style={{ fontSize: 10, color: "#10b981", marginTop: 2 }}>
                               ⌚ cumulé
                             </div>
                           </div>
                         ) : <span style={{ color: "#334155" }}>—</span>}
                       </td>
-                      {/* Sport */}
+
                       <td style={{ padding: "10px 8px", textAlign: "center" }}>
                         {hasData ? (
                           <span style={{
-                            padding: "2px 8px", borderRadius: 6, fontSize: 12,
+                            padding: "2px 8px",
+                            borderRadius: 6,
+                            fontSize: 12,
                             background: k.sportOk === true ? "#064e3b" : k.sportOk === false ? "#450a0a" : "#1e293b",
                             color: k.sportOk === true ? "#6ee7b7" : k.sportOk === false ? "#fca5a5" : "#64748b",
-                          }}>{k.planSessions > 0 ? `${k.faitSessions}/${k.planSessions}` : "—"}</span>
+                          }}>
+                            {k.planSessions > 0 ? `${k.faitSessions}/${k.planSessions}` : "—"}
+                          </span>
                         ) : <span style={{ color: "#334155" }}>—</span>}
                       </td>
-                      {/* Jours */}
+
                       {k.sportJourOk.map((ok, i) => (
                         <td key={i} style={{ padding: "8px 4px", textAlign: "center" }}>
                           <div style={{
-                            width: 28, height: 28, borderRadius: 6, margin: "0 auto",
+                            width: 28,
+                            height: 28,
+                            borderRadius: 6,
+                            margin: "0 auto",
                             background: ok === true ? "#064e3b" : ok === false ? "#450a0a" : "#1e293b",
-                            display: "flex", alignItems: "center", justifyContent: "center",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
                             fontSize: 14,
+                            color: ok === true ? "#6ee7b7" : ok === false ? "#fca5a5" : "#334155",
                           }}>
                             {ok === true ? "✓" : ok === false ? "✗" : ""}
                           </div>
@@ -1388,109 +2587,147 @@ function App() {
                 })}
               </tbody>
             </table>
+
             <div style={{ marginTop: 12, fontSize: 12, color: "#64748b" }}>
-              💡 Clique sur une ligne pour saisir les données de la semaine
+              💡 Clique sur une ligne pour saisir les données de la semaine.
             </div>
           </div>
         )}
 
-        {/* ── GRAPHIQUES ──────────────────────────────────────────── */}
         {activeTab === "graphiques" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-            {/* Poids — graphe SVG avec 3 courbes */}
-            <div style={{ background: "#1e293b", borderRadius: 14, padding: "20px", border: "1px solid #334155" }}>
-              <div style={{ fontSize: 14, color: "#f8fafc", fontWeight: 600, marginBottom: 8 }}>
+            <div style={{
+              background: "#1e293b",
+              borderRadius: 14,
+              padding: "20px",
+              border: "1px solid #334155",
+            }}>
+              <div style={{
+                fontSize: 14,
+                color: "#f8fafc",
+                fontWeight: 600,
+                marginBottom: 8,
+              }}>
                 ⚖️ Évolution du poids
               </div>
-              <div style={{ display: "flex", gap: 16, marginBottom: 12, flexWrap: "wrap" }}>
-                <span style={{ fontSize: 11, color: "#334155", display: "flex", alignItems: "center", gap: 4 }}>
-                  <span style={{ display: "inline-block", width: 20, height: 2, background: "#334155" }}/>
-                  Objectif plan
-                </span>
-                <span style={{ fontSize: 11, color: "#f59e0b", display: "flex", alignItems: "center", gap: 4 }}>
-                  <span style={{ display: "inline-block", width: 20, height: 2, background: "#f59e0b", borderTop: "2px dashed #f59e0b" }}/>
-                  Poids estimé
-                </span>
-                <span style={{ fontSize: 11, color: "#6366f1", display: "flex", alignItems: "center", gap: 4 }}>
-                  <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "#6366f1" }}/>
-                  Poids mesuré
-                </span>
-              </div>
+
               {(() => {
                 const chartData = PLAN.map(p => {
                   const w = getWeek(p.sem);
                   return {
-                    sem: "S"+p.sem,
+                    sem: "S" + p.sem,
                     objectif: p.ciblePoids,
-                    estime: p.ciblePoids, // même que objectif = poids estimé selon plan
                     mesure: parseFloat(w.poidsLundi) || null,
                   };
                 });
-                const W = 600, H = 480;
+
+                const W = 600;
+                const H = 420;
                 const pad = { t: 20, r: 20, b: 40, l: 48 };
-                const cW = W - pad.l - pad.r, cH = H - pad.t - pad.b;
-                const yMin = 64, yMax = 70;
+                const cW = W - pad.l - pad.r;
+                const cH = H - pad.t - pad.b;
+                const yMin = 64;
+                const yMax = 70;
+
                 const xS = i => pad.l + (i / (chartData.length - 1)) * cW;
                 const yS = v => pad.t + cH - ((v - yMin) / (yMax - yMin)) * cH;
-                const segs = (key) => {
-                  const s = []; let cur = [];
-                  chartData.forEach((d, i) => {
-                    if (d[key] != null) cur.push(xS(i)+","+yS(d[key]));
-                    else if (cur.length) { s.push(cur); cur = []; }
-                  });
-                  if (cur.length) s.push(cur);
-                  return s;
-                };
+
+                const points = key =>
+                  chartData
+                    .map((d, i) => d[key] != null ? xS(i) + "," + yS(d[key]) : null)
+                    .filter(Boolean)
+                    .join(" ");
+
                 return (
-                  <svg viewBox={"0 0 "+W+" "+H} preserveAspectRatio="xMidYMid meet" style={{ width: "100%", display: "block", minHeight: 380 }}>
-                    {[0,0.25,0.5,0.75,1].map(t => {
+                  <svg viewBox={"0 0 " + W + " " + H} preserveAspectRatio="xMidYMid meet" style={{ width: "100%", display: "block", minHeight: 320 }}>
+                    {[0, 0.25, 0.5, 0.75, 1].map(t => {
                       const y = pad.t + t * cH;
-                      const v = (yMax - t*(yMax-yMin)).toFixed(1);
-                      return <g key={t}>
-                        <line x1={pad.l} y1={y} x2={W-pad.r} y2={y} stroke="#334155" strokeWidth="1"/>
-                        <text x={pad.l-4} y={y+4} textAnchor="end" fill="#94a3b8" fontSize="14">{v}</text>
-                      </g>;
+                      const v = (yMax - t * (yMax - yMin)).toFixed(1);
+
+                      return (
+                        <g key={t}>
+                          <line x1={pad.l} y1={y} x2={W - pad.r} y2={y} stroke="#334155" strokeWidth="1" />
+                          <text x={pad.l - 4} y={y + 4} textAnchor="end" fill="#94a3b8" fontSize="12">
+                            {v}
+                          </text>
+                        </g>
+                      );
                     })}
-                    {chartData.filter((_,i) => i % 3 === 0).map((d,_,arr) => {
+
+                    {chartData.filter((_, i) => i % 3 === 0).map((d) => {
                       const i = chartData.indexOf(d);
-                      return <text key={i} x={xS(i)} y={H-6} textAnchor="middle" fill="#64748b" fontSize="10">{d.sem}</text>;
+                      return (
+                        <text key={i} x={xS(i)} y={H - 8} textAnchor="middle" fill="#64748b" fontSize="10">
+                          {d.sem}
+                        </text>
+                      );
                     })}
-                    {/* Objectif plan */}
-                    {segs("objectif").map((s,i) => <polyline key={"o"+i} points={s.join(" ")} fill="none" stroke="#475569" strokeWidth="2" strokeDasharray="6,4"/>)}
-                    {/* Poids estimé */}
-                    {segs("estime").map((s,i) => <polyline key={"e"+i} points={s.join(" ")} fill="none" stroke="#f59e0b" strokeWidth="2" strokeDasharray="8,4"/>)}
-                    {/* Poids mesuré */}
-                    {segs("mesure").map((s,i) => <polyline key={"m"+i} points={s.join(" ")} fill="none" stroke="#6366f1" strokeWidth="3"/>)}
-                    {chartData.map((d,i) => d.mesure != null ? (
-                      <circle key={"dot"+i} cx={xS(i)} cy={yS(d.mesure)} r="7" fill="#6366f1" stroke="#0f172a" strokeWidth="2"/>
+
+                    <polyline points={points("objectif")} fill="none" stroke="#475569" strokeWidth="2" strokeDasharray="6,4" />
+                    <polyline points={points("mesure")} fill="none" stroke="#6366f1" strokeWidth="3" />
+
+                    {chartData.map((d, i) => d.mesure != null ? (
+                      <circle key={i} cx={xS(i)} cy={yS(d.mesure)} r="7" fill="#6366f1" stroke="#0f172a" strokeWidth="2" />
                     ) : null)}
                   </svg>
                 );
               })()}
             </div>
 
-            {/* Sport */}
-            <div style={{ background: "#1e293b", borderRadius: 14, padding: "20px", border: "1px solid #334155" }}>
-              <div style={{ fontSize: 14, color: "#f8fafc", fontWeight: 600, marginBottom: 16 }}>
+            <div style={{
+              background: "#1e293b",
+              borderRadius: 14,
+              padding: "20px",
+              border: "1px solid #334155",
+            }}>
+              <div style={{
+                fontSize: 14,
+                color: "#f8fafc",
+                fontWeight: 600,
+                marginBottom: 16,
+              }}>
                 🏃 Sessions sport réalisées vs planifiées
               </div>
+
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {PLAN.map(p => {
                   const k = kpiSem(p.sem);
                   if (k.planSessions === 0) return null;
-                  const pct = k.planSessions > 0 ? (k.faitSessions / k.planSessions) : 0;
+
+                  const pct = k.planSessions > 0 ? k.faitSessions / k.planSessions : 0;
+
                   return (
-                    <div key={p.sem} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div style={{ width: 30, fontSize: 11, color: "#64748b" }}>S{p.sem}</div>
-                      <div style={{ flex: 1, background: "#0f172a", borderRadius: 4, height: 16, overflow: "hidden" }}>
+                    <div key={p.sem} style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                    }}>
+                      <div style={{ width: 30, fontSize: 11, color: "#64748b" }}>
+                        S{p.sem}
+                      </div>
+
+                      <div style={{
+                        flex: 1,
+                        background: "#0f172a",
+                        borderRadius: 4,
+                        height: 16,
+                        overflow: "hidden",
+                      }}>
                         <div style={{
-                          height: "100%", borderRadius: 4,
+                          height: "100%",
+                          borderRadius: 4,
                           width: `${Math.min(pct * 100, 100)}%`,
                           background: pct >= 1 ? "#10b981" : pct > 0.5 ? "#f59e0b" : "#ef4444",
                           transition: "width 0.4s",
                         }} />
                       </div>
-                      <div style={{ width: 40, fontSize: 11, color: "#94a3b8", textAlign: "right" }}>
+
+                      <div style={{
+                        width: 40,
+                        fontSize: 11,
+                        color: "#94a3b8",
+                        textAlign: "right",
+                      }}>
                         {k.faitSessions}/{k.planSessions}
                       </div>
                     </div>
@@ -1498,101 +2735,256 @@ function App() {
                 })}
               </div>
             </div>
+
+            <button onClick={resetAll} style={{
+              alignSelf: "flex-start",
+              padding: "7px 14px",
+              borderRadius: 8,
+              fontSize: 12,
+              cursor: "pointer",
+              border: "1px solid #450a0a",
+              background: "transparent",
+              color: "#ef4444",
+            }}>
+              🗑 Tout réinitialiser
+            </button>
           </div>
         )}
 
-        {/* Message copie */}
+        {activeTab === "recompenses" && (
+          <RewardsTab
+            rewardsStatus={rewardsStatus}
+            marathonData={marathonData}
+            updateMarathonField={updateMarathonField}
+            bodyCompositionData={bodyCompositionData}
+            updateBodyCompositionField={updateBodyCompositionField}
+          />
+        )}
+
+        {activeTab === "planRunning" && (
+          <RunningPlanTab
+            runningChecks={runningChecks}
+            updateRunningPlanCheck={updateRunningPlanCheck}
+            currentSem={currentPlanningPositionForTab.sem}
+          />
+        )}
+
+        {rewardToast && (
+          <div style={{
+            position: "fixed",
+            top: 18,
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "linear-gradient(135deg, #064e3b, #0f172a)",
+            border: "1px solid #10b981",
+            borderRadius: 16,
+            padding: "14px 18px",
+            color: "#ecfdf5",
+            zIndex: 300,
+            boxShadow: "0 12px 40px #000a",
+            maxWidth: 340,
+            width: "calc(100% - 32px)",
+          }}>
+            <div style={{ fontSize: 12, color: "#a7f3d0", textTransform: "uppercase", letterSpacing: 1, fontWeight: 800 }}>
+              🎉 Récompense débloquée
+            </div>
+            <div style={{ fontSize: 17, fontWeight: 800, marginTop: 6 }}>
+              {rewardToast.name}
+            </div>
+            <div style={{ fontSize: 13, color: "#fef3c7", marginTop: 4 }}>
+              🎁 {rewardToast.reward}
+            </div>
+          </div>
+        )}
+
         {copyMsg && (
           <div style={{
-            position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
-            background: "#1e293b", border: "1px solid #334155", borderRadius: 12,
-            padding: "12px 20px", fontSize: 13, color: "#e2e8f0", zIndex: 100,
-            display: "flex", gap: 12, alignItems: "center", boxShadow: "0 8px 32px #0008",
+            position: "fixed",
+            bottom: 24,
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "#1e293b",
+            border: "1px solid #334155",
+            borderRadius: 12,
+            padding: "12px 20px",
+            fontSize: 13,
+            color: "#e2e8f0",
+            zIndex: 100,
+            display: "flex",
+            gap: 12,
+            alignItems: "center",
+            boxShadow: "0 8px 32px #0008",
           }}>
             {copyMsg}
+
             <button onClick={() => setCopyMsg("")} style={{
-              background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 16,
-            }}>✕</button>
+              background: "none",
+              border: "none",
+              color: "#64748b",
+              cursor: "pointer",
+              fontSize: 16,
+            }}>
+              ✕
+            </button>
           </div>
         )}
 
-        {/* Modal export texte (fallback si clipboard bloqué) */}
         {showExport && (
           <div style={{
-            position: "fixed", inset: 0, background: "#000a", zIndex: 200,
-            display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+            position: "fixed",
+            inset: 0,
+            background: "#000a",
+            zIndex: 200,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 20,
           }}>
-            <div style={{ background: "#1e293b", borderRadius: 16, padding: 24, maxWidth: 500, width: "100%" }}>
-              <div style={{ fontSize: 15, color: "#f8fafc", fontWeight: 600, marginBottom: 12 }}>
+            <div style={{
+              background: "#1e293b",
+              borderRadius: 16,
+              padding: 24,
+              maxWidth: 500,
+              width: "100%",
+            }}>
+              <div style={{
+                fontSize: 15,
+                color: "#f8fafc",
+                fontWeight: 600,
+                marginBottom: 12,
+              }}>
                 💾 Sauvegarde manuelle
               </div>
-              <p style={{ fontSize: 13, color: "#94a3b8", marginBottom: 12 }}>
-                Copie ce texte et colle-le dans Notes ou un email à toi-même :
+
+              <p style={{
+                fontSize: 13,
+                color: "#94a3b8",
+                marginBottom: 12,
+              }}>
+                Copie ce texte et colle-le dans Notes ou un document :
               </p>
+
               <textarea
                 readOnly
                 value={JSON.stringify(data)}
                 rows={6}
-                style={{
-                  width: "100%", padding: 10, borderRadius: 8, background: "#0f172a",
-                  border: "1px solid #334155", color: "#94a3b8", fontSize: 11,
-                  fontFamily: "monospace", boxSizing: "border-box", resize: "none",
-                }}
                 onFocus={e => e.target.select()}
+                style={{
+                  width: "100%",
+                  padding: 10,
+                  borderRadius: 8,
+                  background: "#0f172a",
+                  border: "1px solid #334155",
+                  color: "#94a3b8",
+                  fontSize: 11,
+                  fontFamily: "monospace",
+                  resize: "none",
+                }}
               />
+
               <button onClick={() => setShowExport(false)} style={{
-                marginTop: 12, padding: "8px 20px", borderRadius: 8, border: "none",
-                background: "#6366f1", color: "white", cursor: "pointer", fontFamily: "inherit",
-              }}>Fermer</button>
+                marginTop: 12,
+                padding: "8px 20px",
+                borderRadius: 8,
+                border: "none",
+                background: "#6366f1",
+                color: "white",
+                cursor: "pointer",
+              }}>
+                Fermer
+              </button>
             </div>
           </div>
         )}
 
-        {/* Modal import texte (fallback si clipboard bloqué) */}
         {showImport && (
           <div style={{
-            position: "fixed", inset: 0, background: "#000a", zIndex: 200,
-            display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+            position: "fixed",
+            inset: 0,
+            background: "#000a",
+            zIndex: 200,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 20,
           }}>
-            <div style={{ background: "#1e293b", borderRadius: 16, padding: 24, maxWidth: 500, width: "100%" }}>
-              <div style={{ fontSize: 15, color: "#f8fafc", fontWeight: 600, marginBottom: 12 }}>
+            <div style={{
+              background: "#1e293b",
+              borderRadius: 16,
+              padding: 24,
+              maxWidth: 500,
+              width: "100%",
+            }}>
+              <div style={{
+                fontSize: 15,
+                color: "#f8fafc",
+                fontWeight: 600,
+                marginBottom: 12,
+              }}>
                 📂 Charger mes données
               </div>
-              <p style={{ fontSize: 13, color: "#94a3b8", marginBottom: 12 }}>
+
+              <p style={{
+                fontSize: 13,
+                color: "#94a3b8",
+                marginBottom: 12,
+              }}>
                 Colle ici le texte sauvegardé précédemment :
               </p>
+
               <textarea
                 value={importText}
                 onChange={e => setImportText(e.target.value)}
                 rows={6}
-                placeholder='Colle ton JSON ici...'
+                placeholder="Colle ton JSON ici..."
                 style={{
-                  width: "100%", padding: 10, borderRadius: 8, background: "#0f172a",
-                  border: "1px solid #334155", color: "#e2e8f0", fontSize: 11,
-                  fontFamily: "monospace", boxSizing: "border-box", resize: "none",
+                  width: "100%",
+                  padding: 10,
+                  borderRadius: 8,
+                  background: "#0f172a",
+                  border: "1px solid #334155",
+                  color: "#e2e8f0",
+                  fontSize: 11,
+                  fontFamily: "monospace",
+                  resize: "none",
                 }}
               />
+
               <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
                 <button onClick={doImportText} style={{
-                  flex: 1, padding: "8px 20px", borderRadius: 8, border: "none",
-                  background: "#6366f1", color: "white", cursor: "pointer", fontFamily: "inherit",
-                }}>Importer</button>
+                  flex: 1,
+                  padding: "8px 20px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: "#6366f1",
+                  color: "white",
+                  cursor: "pointer",
+                }}>
+                  Importer
+                </button>
+
                 <button onClick={() => setShowImport(false)} style={{
-                  padding: "8px 20px", borderRadius: 8, border: "1px solid #334155",
-                  background: "none", color: "#94a3b8", cursor: "pointer", fontFamily: "inherit",
-                }}>Annuler</button>
+                  padding: "8px 20px",
+                  borderRadius: 8,
+                  border: "1px solid #334155",
+                  background: "none",
+                  color: "#94a3b8",
+                  cursor: "pointer",
+                }}>
+                  Annuler
+                </button>
               </div>
             </div>
           </div>
         )}
-
       </div>
     </div>
   );
 }
 
-
-ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+ReactDOM.createRoot(document.getElementById("root")).render(
+  React.createElement(App)
+);
 </script>
 </body>
-  </html>
+</html>
