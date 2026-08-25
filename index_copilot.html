@@ -2058,13 +2058,18 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
   const week = getWeek(activeSem);
   const kpi = kpiSem(activeSem);
 
-  const totalJours = 112;
-  const joursSaisis = PLAN.reduce((acc, p) => {
-    const w = getWeek(p.sem);
-    return acc + w.jours.filter(j => j.kCalTotales || j.garminKcal || (j.sessionsFaites && j.sessionsFaites.length > 0)).length;
-  }, 0);
+const startDate = new Date(2026, 6, 6);
+const raceDate = new Date(2026, 9, 25);
+const today = new Date();
 
-  const progression = joursSaisis / totalJours;
+const totalMs = raceDate - startDate;
+const elapsedMs = Math.max(
+  0,
+  Math.min(today - startDate, totalMs)
+);
+
+const progression =
+  totalMs > 0 ? elapsedMs / totalMs : 0;
 
   const r = 44;
   const cx = 52;
