@@ -129,9 +129,9 @@ const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 
 const PHASE_COLORS = {
   "Préparation": "#6366f1",
-  "Entraînement": "#0ea5e9",
-  "Vacances": "#10b981",
-  "Affûtage": "#f59e0b",
+  "Entraînement": "#10b981",
+  "Vacances": "#f59e0b",
+  "Affûtage": "#0ea5e9",
 };
 
 const SESSION_DEFS = {
@@ -671,26 +671,26 @@ function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJo
 
 
 const REWARDS = [
-  { id: 1, category: "⚖️ Poids", name: "Allez grosse, on s’y remet !", condition: "Sous 67 kg", reward: "À définir" },
-  { id: 2, category: "⚖️ Poids", name: "Enfin ! Je n’y croyais plus !", condition: "Sous 66 kg", reward: "À définir" },
-  { id: 3, category: "⚖️ Poids", name: "Sérieux, bravo :)", condition: "Sous 65 kg", reward: "À définir" },
-  { id: 4, category: "⚖️ Poids", name: "Mieux que prévu", condition: "Sous 64 kg", reward: "À définir" },
-  { id: 5, category: "⚖️ Poids", name: "J’ai vu le 2 !!", condition: "Sous 63 kg", reward: "À définir" },
-  { id: 6, category: "⚖️ Poids", name: "Volonté de fer", condition: "Poids S5 et S8 saisis, écart ≤ 1 kg", reward: "À définir" },
-  { id: 7, category: "🧬 Morphologie", name: "Athlète 2.0", condition: "Gras < 27 % et muscle > 31 %", reward: "À définir" },
-  { id: 8, category: "🧬 Morphologie", name: "Athlète 3.0", condition: "Gras < 26 % et muscle > 32 %", reward: "À définir" },
-  { id: 9, category: "🏃 Blocs sport", name: "Bloc sport 1", condition: "Bloc 1 : ≥3 semaines Sport OK et ≥12 sorties", reward: "À définir" },
-  { id: 10, category: "🏃 Blocs sport", name: "Bloc sport 2", condition: "Bloc 2 : ≥3 semaines Sport OK et ≥12 sorties", reward: "À définir" },
-  { id: 11, category: "🏃 Blocs sport", name: "Bloc sport 3", condition: "Bloc 3 : ≥3 semaines Sport OK et ≥12 sorties", reward: "À définir" },
-  { id: 12, category: "🏃 Blocs sport", name: "Bloc sport 4", condition: "Bloc 4 : ≥3 semaines Sport OK et ≥12 sorties", reward: "À définir" },
-  { id: 13, category: "🎽 Sorties longues", name: "8 sorties longues", condition: "≥ 8 SL cochées dans Saisie", reward: "À définir" },
-  { id: 14, category: "🎽 Sorties longues", name: "12 sorties longues", condition: "≥ 12 SL cochées dans Saisie", reward: "À définir" },
-  { id: 15, category: "🔥 Semaines parfaites", name: "Bien partie", condition: "7 semaines parfaites", reward: "À définir" },
-  { id: 16, category: "🔥 Semaines parfaites", name: "Régulière comme une horloge", condition: "11 semaines parfaites", reward: "À définir" },
-  { id: 17, category: "🔥 Semaines parfaites", name: "Discipline de fer", condition: "15 semaines parfaites", reward: "À définir" },
-  { id: 18, category: "🏁 Marathon", name: "Finisher", condition: "Cocher Finisher", reward: "À définir" },
-  { id: 19, category: "🏁 Marathon", name: "Sous 3h45", condition: "Temps encodé < 3h45", reward: "À définir" },
-  { id: 20, category: "🏁 Marathon", name: "Trust the plan", condition: "≥ 47 cases cochées dans le Plan Running", reward: "À définir" },
+  { id: 1, category: "⚖️ Poids", name: "Allez grosse, on s’y remet !", condition: "Sous 67 kg", reward: "Un bouquet de fleurs" },
+  { id: 2, category: "⚖️ Poids", name: "Enfin ! Je n’y croyais plus !", condition: "Sous 66 kg", reward: "Un livre" },
+  { id: 3, category: "⚖️ Poids", name: "Sérieux, bravo :)", condition: "Sous 65 kg", reward: "Un jeu Switch" },
+  { id: 4, category: "⚖️ Poids", name: "Mieux que prévu", condition: "Sous 64 kg", reward: "Une robe Lady V" },
+  { id: 5, category: "⚖️ Poids", name: "J’ai vu le 2 !!", condition: "Sous 63 kg", reward: "Une robe Desigual" },
+  { id: 6, category: "⚖️ Poids", name: "Volonté de fer", condition: "Poids S5 et S8 saisis, écart ≤ 1 kg", reward: "Merveilleux du Pain Quotidien" },
+  { id: 7, category: "🧬 Morphologie", name: "Athlète 2.0", condition: "Gras < 27 % et muscle > 31 %", reward: "Un passage chez Cambria" },
+  { id: 8, category: "🧬 Morphologie", name: "Athlète 3.0", condition: "Gras < 26 % et muscle > 32 %", reward: "Bijou" },
+  { id: 9, category: "🏃 Blocs sport", name: "Bloc sport 1", condition: "Bloc 1 : ≥3 semaines Sport OK et ≥12 sorties", reward: "Une BD" },
+  { id: 10, category: "🏃 Blocs sport", name: "Bloc sport 2", condition: "Bloc 2 : ≥3 semaines Sport OK et ≥12 sorties", reward: "Nouvel écran de protection GSM" },
+  { id: 11, category: "🏃 Blocs sport", name: "Bloc sport 3", condition: "Bloc 3 : ≥3 semaines Sport OK et ≥12 sorties", reward: "3 jeux à gratter" },
+  { id: 12, category: "🏃 Blocs sport", name: "Bloc sport 4", condition: "Bloc 4 : ≥3 semaines Sport OK et ≥12 sorties", reward: "Manucure" },
+  { id: 13, category: "🎽 Sorties longues", name: "8 sorties longues", condition: "≥ 8 SL cochées dans Saisie", reward: "Mitraillette" },
+  { id: 14, category: "🎽 Sorties longues", name: "12 sorties longues", condition: "≥ 12 SL cochées dans Saisie", reward: "Resto indien" },
+  { id: 15, category: "🔥 Semaines parfaites", name: "Bien partie", condition: "7 semaines parfaites", reward: "Support à médailles" },
+  { id: 16, category: "🔥 Semaines parfaites", name: "Régulière comme une horloge", condition: "11 semaines parfaites", reward: "Pédicure" },
+  { id: 17, category: "🔥 Semaines parfaites", name: "Discipline de fer", condition: "15 semaines parfaites", reward: "Nouvelle montre" },
+  { id: 18, category: "🏁 Marathon", name: "Finisher", condition: "Cocher Finisher", reward: "Un parfum" },
+  { id: 19, category: "🏁 Marathon", name: "Sous 3h45", condition: "Temps encodé < 3h45", reward: "Un test à l’effort" },
+  { id: 20, category: "🏁 Marathon", name: "Trust the plan", condition: "≥ 47 cases cochées dans le Plan Running", reward: "Massage dos / épaules" },
 ];
 const COURSE_CODES = ["EF", "SL", "VMA"];
 
@@ -1485,7 +1485,7 @@ function RunningPlanTab({ runningChecks, updateRunningPlanCheck, currentSem }) {
       }}>
         <div style={{ fontSize: 20, color: "#f8fafc", fontWeight: 800 }}>🏃 Plan running</div>
         <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
-          Vue 2×2 sans scroll horizontal · clic sur une case pour la valider
+          Clic sur une case pour la valider
         </div>
       </div>
 
@@ -2840,4 +2840,3 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 </script>
 </body>
 </html>
-
