@@ -1,1 +1,18 @@
+{
+  "name": "Marathon Séville",
+  "short_name": "Séville",
+  "start_url": "./index_Seville.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a0f1e",
+  "theme_color": "#0a0f1e",
+  "icons": [
+    {
+      "src": "icon_Seville.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
 
