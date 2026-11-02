@@ -1790,7 +1790,11 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
     todayForTarget.setHours(0,0,0,0);
     const daysFromStart = Math.floor((todayForTarget - weekStart) / 86400000) + 1;
     const elapsedDays = Math.max(0, Math.min(7, daysFromStart));
-    const deficitAttendu = Math.round(deficitCible * elapsedDays / 7);
+    // Tableau : la cible est proratisée uniquement pour la semaine en cours.
+    // Une semaine future affiche sa cible hebdomadaire complète, au lieu de 0.
+    const deficitAttendu = elapsedDays === 0
+      ? deficitCible
+      : Math.round(deficitCible * elapsedDays / 7);
     const deficitStatus = elapsedDays === 0 ? null : getDeficitStatus(deficitReel, deficitAttendu);
     const deficitOk = deficitStatus;
 
