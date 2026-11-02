@@ -1790,11 +1790,7 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
     todayForTarget.setHours(0,0,0,0);
     const daysFromStart = Math.floor((todayForTarget - weekStart) / 86400000) + 1;
     const elapsedDays = Math.max(0, Math.min(7, daysFromStart));
-    // Tableau : la cible est proratisée uniquement pour la semaine en cours.
-    // Une semaine future affiche sa cible hebdomadaire complète, au lieu de 0.
-    const deficitAttendu = elapsedDays === 0
-      ? deficitCible
-      : Math.round(deficitCible * elapsedDays / 7);
+    const deficitAttendu = Math.round(deficitCible * elapsedDays / 7);
     const deficitStatus = elapsedDays === 0 ? null : getDeficitStatus(deficitReel, deficitAttendu);
     const deficitOk = deficitStatus;
 
@@ -2420,24 +2416,31 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
                         ) : <span style={{ color: "#334155" }}>—</span>}
                       </td>
 
-                      {k.sportJourOk.map((ok, i) => (
-                        <td key={i} style={{ padding: "8px 4px", textAlign: "center" }}>
-                          <div style={{
-                            width: 28,
-                            height: 28,
-                            borderRadius: 6,
-                            margin: "0 auto",
-                            background: ok === true ? "#064e3b" : ok === false ? "#450a0a" : "#1e293b",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: 14,
-                            color: ok === true ? "#6ee7b7" : ok === false ? "#fca5a5" : "#334155",
-                          }}>
-                            {ok === true ? "✓" : ok === false ? "✗" : ""}
-                          </div>
-                        </td>
-                      ))}
+                      {k.sportJourOk.map((ok, i) => {
+                        const daySessions = getWeek(p.sem).jours[i]?.sessionsFaites || [];
+                        const hasCourse = daySessions.some(session => COURSE_CODES.includes(session));
+                        const hasRenfo = daySessions.some(session => ["RJ", "RA", "RB", "RAB"].includes(session));
+                        const sportBg = hasCourse ? "#064e3b" : hasRenfo ? "#4c1d95" : "#1e293b";
+                        const sportColor = hasCourse ? "#6ee7b7" : hasRenfo ? "#c4b5fd" : "#334155";
+                        return (
+                          <td key={i} style={{ padding: "8px 4px", textAlign: "center" }}>
+                            <div style={{
+                              width: 28,
+                              height: 28,
+                              borderRadius: 6,
+                              margin: "0 auto",
+                              background: sportBg,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: 14,
+                              color: sportColor,
+                            }}>
+                              {hasCourse || hasRenfo ? "✓" : ""}
+                            </div>
+                          </td>
+                        );
+                      })}
                     </tr>
                   );
                 })}
