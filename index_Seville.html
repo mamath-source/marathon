@@ -100,8 +100,8 @@ const { useState, useEffect } = React;
 const STORAGE_KEY = "suivi-marathon-seville-v1";
 
 const DEFICIT_CIBLE = {
-  1: 0, 2: 2500,
-  3: 2500, 4: 2500, 5: 2500, 6: 2500, 7: 2500,
+  1: 0,
+  2: 2500, 3: 2500, 4: 2500, 5: 2500, 6: 2500, 7: 2500,
   8: 0, 9: 0,
   10: 2500, 11: 2500, 12: 2500, 13: 2500, 14: 2500,
   15: 0, 16: 0,
@@ -109,21 +109,21 @@ const DEFICIT_CIBLE = {
 const DEFAULT_KCAL = [1650, 1650, 1650, 1650, 1650, 1900, 1650];
 const PLAN = [
   { sem: 1,  label: "Récup", lundi: "2 nov",  startDate: "2026-11-02", phase: "Préparation", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 67.50, sessionsTargets: 2 },
-  { sem: 2,  label: "Récup", lundi: "9 nov",  startDate: "2026-11-09", phase: "Préparation", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 67.18, sessionsTargets: 2 },
-  { sem: 3,  label: "S1", lundi: "16 nov", startDate: "2026-11-16", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 66.91, sessionsTargets: 3 },
-  { sem: 4,  label: "S2", lundi: "23 nov", startDate: "2026-11-23", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 66.64, sessionsTargets: 3 },
-  { sem: 5,  label: "S3", lundi: "30 nov", startDate: "2026-11-30", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 66.36, sessionsTargets: 3 },
-  { sem: 6,  label: "S4", lundi: "7 déc",  startDate: "2026-12-07", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 66.09, sessionsTargets: 3 },
-  { sem: 7,  label: "S5", lundi: "14 déc", startDate: "2026-12-14", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.82, sessionsTargets: 3 },
-  { sem: 8,  label: "S6", lundi: "21 déc", startDate: "2026-12-21", phase: "Vacances", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.55, sessionsTargets: 3 },
-  { sem: 9,  label: "S7", lundi: "28 déc", startDate: "2026-12-28", phase: "Vacances", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.55, sessionsTargets: 3 },
-  { sem: 10, label: "S8", lundi: "4 janv", startDate: "2027-01-04", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.55, sessionsTargets: 3 },
-  { sem: 11, label: "S9", lundi: "11 janv",startDate: "2027-01-11", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.27, sessionsTargets: 3 },
-  { sem: 12, label: "S10",lundi: "18 janv",startDate: "2027-01-18", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.00, sessionsTargets: 3 },
-  { sem: 13, label: "S11",lundi: "25 janv",startDate: "2027-01-25", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 64.73, sessionsTargets: 3 },
-  { sem: 14, label: "S12",lundi: "1 févr", startDate: "2027-02-01", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 64.45, sessionsTargets: 3 },
-  { sem: 15, label: "S13",lundi: "8 févr", startDate: "2027-02-08", phase: "Affûtage", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 64.18, sessionsTargets: 3 },
-  { sem: 16, label: "S14",lundi: "15 févr",startDate: "2027-02-15", phase: "Affûtage", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 64.00, sessionsTargets: 3 },
+  { sem: 2,  label: "Récup", lundi: "9 nov",  startDate: "2026-11-09", phase: "Préparation", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 67.50, sessionsTargets: 2 },
+  { sem: 3,  label: "S1", lundi: "16 nov", startDate: "2026-11-16", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 67.18, sessionsTargets: 3 },
+  { sem: 4,  label: "S2", lundi: "23 nov", startDate: "2026-11-23", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 66.86, sessionsTargets: 3 },
+  { sem: 5,  label: "S3", lundi: "30 nov", startDate: "2026-11-30", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 66.54, sessionsTargets: 3 },
+  { sem: 6,  label: "S4", lundi: "7 déc",  startDate: "2026-12-07", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 66.22, sessionsTargets: 3 },
+  { sem: 7,  label: "S5", lundi: "14 déc", startDate: "2026-12-14", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.90, sessionsTargets: 3 },
+  { sem: 8,  label: "S6", lundi: "21 déc", startDate: "2026-12-21", phase: "Vacances", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.58, sessionsTargets: 3 },
+  { sem: 9,  label: "S7", lundi: "28 déc", startDate: "2026-12-28", phase: "Vacances", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.58, sessionsTargets: 3 },
+  { sem: 10, label: "S8", lundi: "4 janv", startDate: "2027-01-04", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.58, sessionsTargets: 3 },
+  { sem: 11, label: "S9", lundi: "11 janv",startDate: "2027-01-11", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.26, sessionsTargets: 3 },
+  { sem: 12, label: "S10",lundi: "18 janv",startDate: "2027-01-18", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 64.94, sessionsTargets: 3 },
+  { sem: 13, label: "S11",lundi: "25 janv",startDate: "2027-01-25", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 64.62, sessionsTargets: 3 },
+  { sem: 14, label: "S12",lundi: "1 févr", startDate: "2027-02-01", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 64.30, sessionsTargets: 3 },
+  { sem: 15, label: "S13",lundi: "8 févr", startDate: "2027-02-08", phase: "Affûtage", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 63.98, sessionsTargets: 3 },
+  { sem: 16, label: "S14",lundi: "15 févr",startDate: "2027-02-15", phase: "Affûtage", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 63.98, sessionsTargets: 3 },
 ];
 const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 
