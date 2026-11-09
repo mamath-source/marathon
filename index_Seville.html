@@ -97,33 +97,31 @@ loadNext();
 <script id="app-code" type="text/plain">
 const { useState, useEffect } = React;
 
-const STORAGE_KEY = "suivi-marathon-seville-v1";
+const STORAGE_KEY = "suivi-marathon-seville-v2";
+const LEGACY_STORAGE_KEY = "suivi-marathon-seville-v1";
 
 const DEFICIT_CIBLE = {
-  1: 0,
-  2: 2500, 3: 2500, 4: 2500, 5: 2500, 6: 2500, 7: 2500,
-  8: 0, 9: 0,
-  10: 2500, 11: 2500, 12: 2500, 13: 2500, 14: 2500,
-  15: 0, 16: 0,
+  1: 2500, 2: 2500, 3: 2500, 4: 2500, 5: 2500,
+  6: 0, 7: 0,
+  8: 2500, 9: 2500, 10: 2500, 11: 2500, 12: 2500, 13: 2500,
+  14: 0,
 };
 const DEFAULT_KCAL = [1650, 1650, 1650, 1650, 1650, 1900, 1650];
 const PLAN = [
-  { sem: 1,  label: "Récup", lundi: "2 nov",  startDate: "2026-11-02", phase: "Préparation", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 67.50, sessionsTargets: 2 },
-  { sem: 2,  label: "Récup", lundi: "9 nov",  startDate: "2026-11-09", phase: "Préparation", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 67.50, sessionsTargets: 2 },
-  { sem: 3,  label: "S1", lundi: "16 nov", startDate: "2026-11-16", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 67.18, sessionsTargets: 3 },
-  { sem: 4,  label: "S2", lundi: "23 nov", startDate: "2026-11-23", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 66.86, sessionsTargets: 3 },
-  { sem: 5,  label: "S3", lundi: "30 nov", startDate: "2026-11-30", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 66.54, sessionsTargets: 3 },
-  { sem: 6,  label: "S4", lundi: "7 déc",  startDate: "2026-12-07", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 66.22, sessionsTargets: 3 },
-  { sem: 7,  label: "S5", lundi: "14 déc", startDate: "2026-12-14", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.90, sessionsTargets: 3 },
-  { sem: 8,  label: "S6", lundi: "21 déc", startDate: "2026-12-21", phase: "Vacances", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.58, sessionsTargets: 3 },
-  { sem: 9,  label: "S7", lundi: "28 déc", startDate: "2026-12-28", phase: "Vacances", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.58, sessionsTargets: 3 },
-  { sem: 10, label: "S8", lundi: "4 janv", startDate: "2027-01-04", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.58, sessionsTargets: 3 },
-  { sem: 11, label: "S9", lundi: "11 janv",startDate: "2027-01-11", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.26, sessionsTargets: 3 },
-  { sem: 12, label: "S10",lundi: "18 janv",startDate: "2027-01-18", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 64.94, sessionsTargets: 3 },
-  { sem: 13, label: "S11",lundi: "25 janv",startDate: "2027-01-25", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 64.62, sessionsTargets: 3 },
-  { sem: 14, label: "S12",lundi: "1 févr", startDate: "2027-02-01", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 64.30, sessionsTargets: 3 },
-  { sem: 15, label: "S13",lundi: "8 févr", startDate: "2027-02-08", phase: "Affûtage", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 63.98, sessionsTargets: 3 },
-  { sem: 16, label: "S14",lundi: "15 févr",startDate: "2027-02-15", phase: "Affûtage", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 63.98, sessionsTargets: 3 },
+  { sem: 1,  label: "S1",  lundi: "16 nov", startDate: "2026-11-16", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 68.50, sessionsTargets: 3 },
+  { sem: 2,  label: "S2",  lundi: "23 nov", startDate: "2026-11-23", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 68.18, sessionsTargets: 3 },
+  { sem: 3,  label: "S3",  lundi: "30 nov", startDate: "2026-11-30", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 67.85, sessionsTargets: 3 },
+  { sem: 4,  label: "S4",  lundi: "7 déc",  startDate: "2026-12-07", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 67.53, sessionsTargets: 3 },
+  { sem: 5,  label: "S5",  lundi: "14 déc", startDate: "2026-12-14", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 67.20, sessionsTargets: 3 },
+  { sem: 6,  label: "S6",  lundi: "21 déc", startDate: "2026-12-21", phase: "Vacances", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 66.88, sessionsTargets: 3 },
+  { sem: 7,  label: "S7",  lundi: "28 déc", startDate: "2026-12-28", phase: "Vacances", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 66.88, sessionsTargets: 3 },
+  { sem: 8,  label: "S8",  lundi: "4 janv", startDate: "2027-01-04", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 66.88, sessionsTargets: 3 },
+  { sem: 9,  label: "S9",  lundi: "11 janv",startDate: "2027-01-11", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 66.55, sessionsTargets: 3 },
+  { sem: 10, label: "S10", lundi: "18 janv",startDate: "2027-01-18", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 66.23, sessionsTargets: 3 },
+  { sem: 11, label: "S11", lundi: "25 janv",startDate: "2027-01-25", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.90, sessionsTargets: 3 },
+  { sem: 12, label: "S12", lundi: "1 févr", startDate: "2027-02-01", phase: "Entraînement", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.58, sessionsTargets: 3 },
+  { sem: 13, label: "S13", lundi: "8 févr", startDate: "2027-02-08", phase: "Affûtage", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 65.25, sessionsTargets: 3 },
+  { sem: 14, label: "S14", lundi: "15 févr",startDate: "2027-02-15", phase: "Affûtage", cibleKcalJours: DEFAULT_KCAL, ciblePoids: 64.93, sessionsTargets: 3 },
 ];
 const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 
@@ -671,23 +669,23 @@ function NutritionPanel({ jour, activeJour, activeSem, cibleKcal, deficitCibleJo
 
 
 const REWARDS = [
-  { id: 1, category: "⚖️ Poids", name: "Allez grosse, on s’y remet !", condition: "Sous 67 kg", reward: "Un bouquet de fleurs" },
-  { id: 2, category: "⚖️ Poids", name: "Enfin ! Je n’y croyais plus !", condition: "Sous 66 kg", reward: "Un livre" },
-  { id: 3, category: "⚖️ Poids", name: "Sérieux, bravo :)", condition: "Sous 65 kg", reward: "Un jeu Switch" },
-  { id: 4, category: "⚖️ Poids", name: "Mieux que prévu", condition: "Sous 64 kg", reward: "Une robe Lady V" },
-  { id: 5, category: "⚖️ Poids", name: "J’ai vu le 2 !!", condition: "Sous 63 kg", reward: "Une robe Desigual" },
-  { id: 6, category: "⚖️ Poids", name: "Volonté de fer", condition: "Poids S5 et S8 saisis, écart ≤ 1 kg", reward: "Merveilleux du Pain Quotidien" },
+  { id: 1, category: "⚖️ Poids", name: "Allez grosse, on s’y remet !", condition: "Sous 68 kg", reward: "Un bouquet de fleurs" },
+  { id: 2, category: "⚖️ Poids", name: "Enfin ! Je n’y croyais plus !", condition: "Sous 67 kg", reward: "Un livre" },
+  { id: 3, category: "⚖️ Poids", name: "Sérieux, bravo :)", condition: "Sous 66 kg", reward: "Un jeu Switch" },
+  { id: 4, category: "⚖️ Poids", name: "J’ai vu le 4 !", condition: "Sous 65 kg", reward: "Une robe Lady V" },
+  { id: 5, category: "⚖️ Poids", name: "Mieux que prévu !", condition: "Sous 64 kg", reward: "Une robe Desigual" },
+  { id: 6, category: "⚖️ Poids", name: "Volonté de fer", condition: "Poids S3 et S6 saisis, écart ≤ 1 kg", reward: "Merveilleux du Pain Quotidien" },
   { id: 7, category: "🧬 Morphologie", name: "Athlète 2.0", condition: "Gras < 27 % et muscle > 31 %", reward: "Un passage chez Cambria" },
   { id: 8, category: "🧬 Morphologie", name: "Athlète 3.0", condition: "Gras < 26 % et muscle > 32 %", reward: "Bijou" },
-  { id: 9, category: "🏃 Blocs sport", name: "Bloc sport 1", condition: "Bloc 1 : ≥3 semaines Sport OK et ≥12 sorties", reward: "Une BD" },
-  { id: 10, category: "🏃 Blocs sport", name: "Bloc sport 2", condition: "Bloc 2 : ≥3 semaines Sport OK et ≥12 sorties", reward: "Nouvel écran de protection GSM" },
-  { id: 11, category: "🏃 Blocs sport", name: "Bloc sport 3", condition: "Bloc 3 : ≥3 semaines Sport OK et ≥12 sorties", reward: "3 jeux à gratter" },
-  { id: 12, category: "🏃 Blocs sport", name: "Bloc sport 4", condition: "Bloc 4 : ≥3 semaines Sport OK et ≥12 sorties", reward: "Manucure" },
+  { id: 9, category: "🏃 Blocs sport", name: "Bloc sport 1", condition: "S1-S3 : ≥2 semaines Sport OK et ≥9 sorties", reward: "Une BD" },
+  { id: 10, category: "🏃 Blocs sport", name: "Bloc sport 2", condition: "S4-S6 : ≥2 semaines Sport OK et ≥9 sorties", reward: "Nouvel écran de protection GSM" },
+  { id: 11, category: "🏃 Blocs sport", name: "Bloc sport 3", condition: "S7-S10 : ≥3 semaines Sport OK et ≥12 sorties", reward: "3 jeux à gratter" },
+  { id: 12, category: "🏃 Blocs sport", name: "Bloc sport 4", condition: "S11-S14 : ≥3 semaines Sport OK et ≥12 sorties", reward: "Manucure" },
   { id: 13, category: "🎽 Sorties longues", name: "8 sorties longues", condition: "≥ 8 SL cochées dans Saisie", reward: "Mitraillette" },
   { id: 14, category: "🎽 Sorties longues", name: "12 sorties longues", condition: "≥ 12 SL cochées dans Saisie", reward: "Resto indien" },
-  { id: 15, category: "🔥 Semaines parfaites", name: "Bien partie", condition: "7 semaines parfaites", reward: "Support à médailles" },
-  { id: 16, category: "🔥 Semaines parfaites", name: "Régulière comme une horloge", condition: "11 semaines parfaites", reward: "Pédicure" },
-  { id: 17, category: "🔥 Semaines parfaites", name: "Discipline de fer", condition: "15 semaines parfaites", reward: "Nouvelle montre" },
+  { id: 15, category: "🔥 Semaines parfaites", name: "Bien partie", condition: "5 semaines parfaites", reward: "Support à médailles" },
+  { id: 16, category: "🔥 Semaines parfaites", name: "Régulière comme une horloge", condition: "9 semaines parfaites", reward: "Pédicure" },
+  { id: 17, category: "🔥 Semaines parfaites", name: "Discipline de fer", condition: "13 semaines parfaites", reward: "Nouvelle montre" },
   { id: 18, category: "🏁 Marathon", name: "Finisher", condition: "Cocher Finisher", reward: "Un parfum" },
   { id: 19, category: "🏁 Marathon", name: "Sous 3h45", condition: "Temps encodé < 3h45", reward: "Un test à l’effort" },
   { id: 20, category: "🏁 Marathon", name: "Trust the plan", condition: "≥ 47 cases cochées dans le Plan Running", reward: "Massage dos / épaules" },
@@ -750,21 +748,21 @@ function buildRewardsStatus({ allWeeks, allKpis, data, marathonData, bodyComposi
   };
   const weightReward = (reward, threshold) => {
     const unlocked = minWeight !== null && minWeight < threshold;
-    return { ...reward, unlocked, progress: minWeight === null ? 0 : Math.max(0, Math.min(1, (68 - minWeight) / (68 - threshold))), detail: minWeight === null ? "Poids non saisi" : `Meilleur poids : ${minWeight.toFixed(1)} kg`, remaining: unlocked ? "Débloquée" : "Objectif en cours" };
+    return { ...reward, unlocked, progress: minWeight === null ? 0 : Math.max(0, Math.min(1, (69 - minWeight) / (69 - threshold))), detail: minWeight === null ? "Poids non saisi" : `Meilleur poids : ${minWeight.toFixed(1)} kg`, remaining: unlocked ? "Débloquée" : "Objectif en cours" };
   };
-  const blockReward = (reward, start, end) => {
+  const blockReward = (reward, start, end, weeksTarget, runsTarget) => {
     const x = blockStats(start, end);
-    const unlocked = x.sportValidatedWeeks >= 3 && x.sorties >= 12;
-    return { ...reward, unlocked, progress: Math.min(1, Math.min(x.sportValidatedWeeks / 3, x.sorties / 12)), detail: `${x.sportValidatedWeeks}/3 semaines · ${x.sorties}/12 sorties`, remaining: unlocked ? "Débloquée" : "Objectif en cours" };
+    const unlocked = x.sportValidatedWeeks >= weeksTarget && x.sorties >= runsTarget;
+    return { ...reward, unlocked, progress: Math.min(1, Math.min(x.sportValidatedWeeks / weeksTarget, x.sorties / runsTarget)), detail: `${x.sportValidatedWeeks}/${weeksTarget} semaines · ${x.sorties}/${runsTarget} sorties`, remaining: unlocked ? "Débloquée" : "Objectif en cours" };
   };
   const perfectReward = (reward, target) => ({ ...reward, unlocked: perfectWeeks >= target, progress: Math.min(1, perfectWeeks / target), detail: `${perfectWeeks}/${target} semaines parfaites`, remaining: perfectWeeks >= target ? "Débloquée" : `Encore ${target - perfectWeeks}` });
   const baseRewards = REWARDS.map(reward => {
-    if (reward.id >= 1 && reward.id <= 5) return weightReward(reward, [67,66,65,64,63][reward.id-1]);
+    if (reward.id >= 1 && reward.id <= 5) return weightReward(reward, [68,67,66,65,64][reward.id-1]);
     if (reward.id === 6) {
-      const p5 = parseFloat(allWeeks[6]?.poidsLundi); // S5 = 7e ligne, après les 2 Récup
-      const p8 = parseFloat(allWeeks[9]?.poidsLundi); // S8 = 10e ligne
-      const hasBoth = !isNaN(p5) && !isNaN(p8); const diff = hasBoth ? Math.abs(p8-p5) : null; const unlocked = hasBoth && diff <= 1;
-      return { ...reward, unlocked, progress: unlocked ? 1 : 0, detail: hasBoth ? `Écart S8-S5 : ${diff.toFixed(1)} kg` : "Poids S5 et S8 requis", remaining: unlocked ? "Débloquée" : "Objectif en cours" };
+      const p3 = parseFloat(allWeeks[2]?.poidsLundi);
+      const p6 = parseFloat(allWeeks[5]?.poidsLundi);
+      const hasBoth = !isNaN(p3) && !isNaN(p6); const diff = hasBoth ? Math.abs(p6-p3) : null; const unlocked = hasBoth && diff <= 1;
+      return { ...reward, unlocked, progress: unlocked ? 1 : 0, detail: hasBoth ? `Écart S6-S3 : ${diff.toFixed(1)} kg` : "Poids S3 et S6 requis", remaining: unlocked ? "Débloquée" : "Objectif en cours" };
     }
     if (reward.id === 7 || reward.id === 8) {
       const tier2 = reward.id === 7;
@@ -772,21 +770,21 @@ function buildRewardsStatus({ allWeeks, allKpis, data, marathonData, bodyComposi
       const muscleOk = tier2 ? !!bodyCompositionData.muscleOver31 : !!bodyCompositionData.muscleOver32;
       return { ...reward, unlocked: fatOk && muscleOk, progress: (fatOk?0.5:0)+(muscleOk?0.5:0), detail: `${fatOk?"✓":"☐"} Gras · ${muscleOk?"✓":"☐"} Muscle`, remaining: fatOk && muscleOk ? "Débloquée" : "Cases à valider" };
     }
-    if (reward.id === 9) return blockReward(reward,1,4);
-    if (reward.id === 10) return blockReward(reward,5,8);
-    if (reward.id === 11) return blockReward(reward,9,12);
-    if (reward.id === 12) return blockReward(reward,13,16);
+    if (reward.id === 9) return blockReward(reward,1,3,2,9);
+    if (reward.id === 10) return blockReward(reward,4,6,2,9);
+    if (reward.id === 11) return blockReward(reward,7,10,3,12);
+    if (reward.id === 12) return blockReward(reward,11,14,3,12);
     if (reward.id === 13 || reward.id === 14) { const target=reward.id===13?8:12; return { ...reward, unlocked: totalSL>=target, progress:Math.min(1,totalSL/target), detail:`${totalSL}/${target} SL`, remaining:totalSL>=target?"Débloquée":`Encore ${target-totalSL}`}; }
-    if (reward.id === 15) return perfectReward(reward,7);
-    if (reward.id === 16) return perfectReward(reward,11);
-    if (reward.id === 17) return perfectReward(reward,15);
+    if (reward.id === 15) return perfectReward(reward,5);
+    if (reward.id === 16) return perfectReward(reward,9);
+    if (reward.id === 17) return perfectReward(reward,13);
     if (reward.id === 18) return { ...reward, unlocked:!!marathonData.finished, progress:marathonData.finished?1:0, detail:marathonData.finished?"Marathon terminé":"À valider", remaining:marathonData.finished?"Débloquée":"Cocher Finisher"};
     if (reward.id === 19) { const target=3*3600+45*60; const unlocked=marathonSeconds!==null&&marathonSeconds<target; return {...reward,unlocked,progress:unlocked?1:0,detail:marathonData.time?`Temps : ${marathonData.time}`:"Temps à saisir",remaining:unlocked?"Débloquée":"Saisir un temps < 3h45"}; }
     if (reward.id === 20) return { ...reward, unlocked:runningPlanDone>=47, progress:Math.min(1,runningPlanDone/47), detail:`${runningPlanDone}/47 séances`, remaining:runningPlanDone>=47?"Débloquée":`Encore ${47-runningPlanDone}`};
     return { ...reward, unlocked:false, progress:0, detail:"", remaining:"" };
   });
   const secretStartDate = new Date(2027, 1, 15);
-  const secretUnlocked = new Date() >= secretStartDate && !!marathonData.finished && minWeight !== null && minWeight <= 63.6 && runningPlanDone >= 47;
+  const secretUnlocked = new Date() >= secretStartDate && !!marathonData.finished && minWeight !== null && minWeight < 65 && perfectWeeks >= 9 && runningPlanDone >= 47;
   baseRewards.push({ id:"secret-locked-chest", category:"🔐 Secret", name:secretUnlocked?"Surprise motherfucker!":"Coffre verrouillé", condition:secretUnlocked?"Objectif secret validé":"Conditions secrètes", reward:secretUnlocked?"Surprise":"Mystère 🔐", unlocked:secretUnlocked, progress:secretUnlocked?1:0, detail:secretUnlocked?"Surprise débloquée":"Coffre verrouillé", remaining:secretUnlocked?"Débloquée":"Conditions secrètes", secret:true, bonus:true });
   return baseRewards;
 }
@@ -801,7 +799,7 @@ function RewardsTab({ rewardsStatus, marathonData, updateMarathonField, bodyComp
     ? [...lockedRewards].sort((a, b) => (b.progress || 0) - (a.progress || 0))[0]
     : null;
 
-  const startDate = new Date(2026, 10, 2);
+  const startDate = new Date(2026, 10, 16);
   const raceDate = new Date(2027, 1, 21);
   const today = new Date();
   const totalMs = raceDate - startDate;
@@ -1534,11 +1532,11 @@ function RunningPlanTab({ runningChecks, updateRunningPlanCheck, currentSem }) {
 }
 
 function getCurrentPlanningPosition() {
-  const start = new Date(2026, 10, 2);
+  const start = new Date(2026, 10, 16);
   const today = new Date();
   const diffDays = Math.floor((today - start) / 86400000);
   if (diffDays < 0) return { sem: 1, jour: 0 };
-  return { sem: Math.min(Math.floor(diffDays / 7) + 1, 16), jour: Math.min(Math.max(diffDays % 7, 0), 6) };
+  return { sem: Math.min(Math.floor(diffDays / 7) + 1, 14), jour: Math.min(Math.max(diffDays % 7, 0), 6) };
 }
 function getCurrentRunningWeek() {
   const start = new Date(2026, 10, 16);
@@ -1562,7 +1560,24 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) setData(JSON.parse(saved));
+      if (saved) {
+        setData(JSON.parse(saved));
+      } else {
+        const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+        if (legacy) {
+          const oldData = JSON.parse(legacy);
+          const migrated = {};
+          for (let newSem = 1; newSem <= 14; newSem++) {
+            const oldSem = newSem + 2;
+            if (oldData[oldSem]) migrated[newSem] = oldData[oldSem];
+          }
+          ["_marathon", "_runningPlanChecks", "_bodyComposition"].forEach(k => {
+            if (oldData[k] !== undefined) migrated[k] = oldData[k];
+          });
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+          setData(migrated);
+        }
+      }
     } catch(e) {}
     setLoaded(true);
   }, []);
@@ -1617,7 +1632,7 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
 
     try {
       localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem("suivi-marathon-seville-unlocked-rewards-v1");
+      localStorage.removeItem("suivi-marathon-seville-unlocked-rewards-v2");
     } catch(e) {}
 
     save({});
@@ -1829,7 +1844,7 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
     const unlockedIds = statusForCheck.filter(r => r.unlocked).map(r => String(r.id));
     let previousIds = [];
     try {
-      previousIds = JSON.parse(localStorage.getItem("suivi-marathon-seville-unlocked-rewards-v1") || "[]");
+      previousIds = JSON.parse(localStorage.getItem("suivi-marathon-seville-unlocked-rewards-v2") || "[]");
     } catch(e) {
       previousIds = [];
     }
@@ -1842,7 +1857,7 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
       }
     }
     try {
-      localStorage.setItem("suivi-marathon-seville-unlocked-rewards-v1", JSON.stringify(Array.from(new Set([...previousIds, ...unlockedIds]))));
+      localStorage.setItem("suivi-marathon-seville-unlocked-rewards-v2", JSON.stringify(Array.from(new Set([...previousIds, ...unlockedIds]))));
     } catch(e) {}
   }, [data, loaded]);
 
@@ -1862,8 +1877,8 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
   const week = getWeek(activeSem);
   const kpi = kpiSem(activeSem);
 
-  const totalJours = 112;
-  const progressStart = new Date(2026, 10, 2);
+  const totalJours = 98;
+  const progressStart = new Date(2026, 10, 16);
   const progressToday = new Date();
   progressToday.setHours(0,0,0,0);
   const elapsedRaw = Math.floor((progressToday - progressStart) / 86400000) + 1;
@@ -1917,7 +1932,7 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
                 fontSize: 13,
                 color: "#64748b",
               }}>
-                Séville · 21 février 2027 · Objectif 64 kg
+                Séville · 21 février 2027 · Objectif < 65 kg
               </p>
             </div>
 
@@ -2474,8 +2489,8 @@ const [activeJour, setActiveJour] = useState(initialPos.jour);
                 const pad = { t: 20, r: 20, b: 40, l: 48 };
                 const cW = W - pad.l - pad.r;
                 const cH = H - pad.t - pad.b;
-                const yMin = 62.5;
-                const yMax = 68;
+                const yMin = 64.5;
+                const yMax = 69;
 
                 const xS = i => pad.l + (i / (chartData.length - 1)) * cW;
                 const yS = v => pad.t + cH - ((v - yMin) / (yMax - yMin)) * cH;
